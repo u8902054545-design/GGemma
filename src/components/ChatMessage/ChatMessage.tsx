@@ -40,7 +40,9 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
     thought,
     mainContent,
     localFeedback,
-    handleFeedback
+    handleFeedback,
+    handleSpeech,
+    isSpeaking
   } = useMessageLogic(cleanContent, messageId, feedback, onFeedback);
 
   const canShowExpand = !isAI && shouldShowExpandButton;
@@ -57,6 +59,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           hasThought={!!thought}
           isExpanded={isThoughtExpanded}
           onToggleThought={() => setIsThoughtExpanded(!isThoughtExpanded)}
+          onSpeech={handleSpeech}
+          isSpeaking={isSpeaking}
         />
       )}
 
@@ -197,7 +201,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               <button
                 onClick={() => handleFeedback(localFeedback === 'dislike' ? null : 'dislike')}
                 className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
-                  localFeedback === 'dislike' ? 'text-[var(--md-sys-color-on-surface-variant)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
+                  localFeedback === 'dislike' ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
                 }`}
               >
                 <span className={`material-symbols-outlined text-[20px] ${localFeedback === 'dislike' ? 'FILL' : ''}`} style={{ fontVariationSettings: localFeedback === 'dislike' ? "'FILL' 1" : "" }}>

@@ -1,4 +1,5 @@
 import { useState, useMemo, useCallback } from 'react';
+import { useSpeech } from './useSpeech';
 
 export const useMessageLogic = (
   content: string, 
@@ -23,6 +24,8 @@ export const useMessageLogic = (
     }
     return { thought: null, mainContent: content.trim() };
   }, [content]);
+
+  const { speak, isSpeaking } = useSpeech(mainContent);
 
   const shouldShowExpandButton = useMemo(() => {
     return mainContent.length > 1000;
@@ -51,6 +54,8 @@ export const useMessageLogic = (
     thought,
     mainContent,
     localFeedback,
-    handleFeedback
+    handleFeedback,
+    handleSpeech: speak,
+    isSpeaking
   };
 };
