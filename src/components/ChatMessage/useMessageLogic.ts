@@ -7,6 +7,7 @@ export const useMessageLogic = (
   onFeedback?: (id: string, type: 'like' | 'dislike' | null) => void
 ) => {
   const [isThoughtExpanded, setIsThoughtExpanded] = useState(false);
+  const [isContentExpanded, setIsContentExpanded] = useState(false);
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [localFeedback, setLocalFeedback] = useState<'like' | 'dislike' | null>(initialFeedback || null);
 
@@ -23,6 +24,10 @@ export const useMessageLogic = (
     return { thought: null, mainContent: content.trim() };
   }, [content]);
 
+  const shouldShowExpandButton = useMemo(() => {
+    return mainContent.length > 1000;
+  }, [mainContent]);
+
   const handleCopy = useCallback((text: string) => {
     navigator.clipboard.writeText(text);
     setCopiedText(text);
@@ -38,6 +43,9 @@ export const useMessageLogic = (
   return {
     isThoughtExpanded,
     setIsThoughtExpanded,
+    isContentExpanded,
+    setIsContentExpanded,
+    shouldShowExpandButton,
     copiedText,
     handleCopy,
     thought,

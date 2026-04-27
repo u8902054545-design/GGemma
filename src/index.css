@@ -324,3 +324,7 @@ textarea {
   font-size: 1.1em;
   line-height: 1.2;
 }
+
+.markdown-content p {
+  transition: max-height 0.3s ease;
+}
