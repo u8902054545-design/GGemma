@@ -16,6 +16,7 @@ type ChatInputProps = {
   models: string[];
   isSearchActive?: boolean;
   onSearchClick?: () => void;
+  onImageClick?: (url: string) => void;
 };
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
@@ -23,6 +24,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   isDropdownOpen, setIsDropdownOpen, isTyping, models,
   isSearchActive = false,
   onSearchClick,
+  onImageClick,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -115,7 +117,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
           {previewUrl && (
             <ImagePreview 
               url={previewUrl} 
-              onRemove={clearSelection} 
+              onRemove={clearSelection}
+              onImageClick={onImageClick}
             />
           )}
 

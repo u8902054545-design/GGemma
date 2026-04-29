@@ -3,20 +3,25 @@ import React from 'react';
 type ImagePreviewProps = {
   url: string;
   onRemove: () => void;
+  onImageClick?: (url: string) => void;
 };
 
-const ImagePreviewComponent: React.FC<ImagePreviewProps> = ({ url, onRemove }) => {
+const ImagePreviewComponent: React.FC<ImagePreviewProps> = ({ url, onRemove, onImageClick }) => {
   return (
     <div className="relative w-24 h-24 mt-2 ml-4 mb-2 group">
       <img 
         src={url} 
         alt="Preview" 
-        className="w-full h-full object-cover rounded-xl border border-[#333]"
+        className="w-full h-full object-cover rounded-xl border border-[#333] cursor-pointer hover:border-[#555] transition-all"
+        onClick={() => onImageClick?.(url)}
       />
       <button
         type="button"
-        onClick={onRemove}
-        className="absolute -top-2 -right-2 bg-black rounded-full p-0.5 border border-[#333] hover:border-[#555] transition-colors flex items-center justify-center"
+        onClick={(e) => {
+          e.stopPropagation();
+          onRemove();
+        }}
+        className="absolute -top-2 -right-2 bg-black rounded-full p-0.5 border border-[#333] hover:border-[#555] transition-colors flex items-center justify-center z-10"
       >
         <span className="material-symbols-outlined text-[18px] text-[#808080] group-hover:text-[#e2e2e2]">
           close

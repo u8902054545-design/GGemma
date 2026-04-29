@@ -13,6 +13,7 @@ import Snackbar from './components/Snackbar';
 import Login from './components/Login';
 import { pageVariants } from './motion/transitions';
 import { mainContentVariants } from './motion/drawer';
+import { FullscreenImage } from './components/FullscreenImage';
 
 export default function App() {
   const { user, loading, signInWithGoogle } = useAuth();
@@ -21,6 +22,8 @@ export default function App() {
   const { chats, refreshChats, deleteChat } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  
+  const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   const {
     messages,
@@ -163,6 +166,9 @@ export default function App() {
                           onFeedback={handleFeedback}
                           isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
                           isLast={index === messages.length - 1}
+                          onImageClick={(url) => {
+                            if (url) setFullscreenImage(url);
+                          }}
                         />
                       ))}
                       <div ref={messagesEndRef} className="h-1" />
@@ -201,8 +207,17 @@ export default function App() {
               models={models}
               isSearchActive={isSearchActive}
               onSearchClick={toggleSearch}
+              onImageClick={(url) => {
+                if (url) setFullscreenImage(url);
+              }}
             />
           </motion.div>
+
+          <FullscreenImage 
+            src={fullscreenImage} 
+            isOpen={!!fullscreenImage} 
+            onClose={() => setFullscreenImage(null)} 
+          />
 
           <Snackbar
             message={snackbarMessage}
@@ -214,3 +229,4 @@ export default function App() {
     </AnimatePresence>
   );
 }
+

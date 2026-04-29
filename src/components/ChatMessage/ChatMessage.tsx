@@ -14,6 +14,7 @@ import { CodeBlock } from './CodeBlock';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
+  onImageClick?: (url: string) => void;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({ 
@@ -25,7 +26,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   messageId, 
   feedback, 
   onFeedback,
-  isLast 
+  isLast,
+  onImageClick
 }) => {
   const isAI = role === 'ai';
   const isStopped = content.includes('_STOPPED_');
@@ -48,6 +50,12 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   } = useMessageLogic(cleanContent, messageId, feedback, onFeedback);
 
   const canShowExpand = !isAI && shouldShowExpandButton;
+
+  const handleImageClick = () => {
+    if (imageUrl && onImageClick) {
+      onImageClick(imageUrl);
+    }
+  };
 
   return (
     <motion.div
@@ -90,11 +98,15 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           } ${!isContentExpanded && canShowExpand ? 'max-h-[300px] overflow-hidden' : 'max-h-full'}`}
         >
           {imageUrl && (
-            <div className="mb-3 overflow-hidden rounded-lg">
+            <div 
+              className="mb-3 overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
+              onClick={handleImageClick}
+            >
               <img 
                 src={imageUrl} 
                 alt="Uploaded" 
                 className="max-w-full h-auto object-contain max-h-[400px] rounded-lg"
+                onError={(e) => console.error("Image load error:", imageUrl)}
               />
             </div>
           )}

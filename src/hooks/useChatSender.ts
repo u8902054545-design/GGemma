@@ -132,9 +132,6 @@ export const useChatSender = (
       }
     } finally {
       setIsTyping(false);
-      if (localImageUrl) {
-        URL.revokeObjectURL(localImageUrl);
-      }
     }
   }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, messages.length, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen]);
 
