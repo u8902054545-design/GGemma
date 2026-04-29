@@ -133,7 +133,7 @@ export const useChat = () => {
     }
   }, []);
 
-  const handleSend = useCallback(async (overrideInput?: string) => {
+  const handleSend = useCallback(async (overrideInput?: string, isSearchActive: boolean = false) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
     if (!textToSend.trim() || isTyping) return;
 
@@ -168,7 +168,8 @@ export const useChat = () => {
         body: JSON.stringify({
           message: userText,
           model: selectedModel,
-          chat_id: chatId
+          chat_id: chatId,
+          isSearchActive: isSearchActive
         }),
       });
 
@@ -220,10 +221,10 @@ export const useChat = () => {
     }
   }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent, isSearchActive: boolean) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      handleSend(undefined, isSearchActive);
     }
   };
 

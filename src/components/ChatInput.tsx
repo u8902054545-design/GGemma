@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { ModelSelector, MODEL_DATA } from './ModelSelector';
+import { ModelSelector } from './ModelSelector';
 
 type ChatInputProps = {
   input: string;
@@ -12,11 +12,15 @@ type ChatInputProps = {
   setIsDropdownOpen: (open: boolean) => void;
   isTyping: boolean;
   models: string[];
+  isSearchActive?: boolean;
+  onSearchClick?: () => void;
 };
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
   input, setInput, handleSend, stopRequest, selectedModel, setSelectedModel,
   isDropdownOpen, setIsDropdownOpen, isTyping, models,
+  isSearchActive = false,
+  onSearchClick,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isListening, setIsListening] = useState(false);
@@ -32,14 +36,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      const target = e.target as HTMLTextAreaElement;
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
-      const value = target.value;
-      setInput(value.substring(0, start) + "\n" + value.substring(end));
-      setTimeout(() => {
-        target.selectionStart = target.selectionEnd = start + 1;
-      }, 0);
+      handleSend();
     }
   };
 
@@ -83,44 +80,75 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
             className="w-full bg-transparent border-none outline-none resize-none max-h-60 min-h-[44px] px-4 py-3 text-[#e2e2e2] placeholder-[#444]"
             rows={1}
           />
-          <div className="flex items-center justify-end px-2 gap-3">
-            <ModelSelector
-              selectedModel={selectedModel}
-              setSelectedModel={setSelectedModel}
-              isDropdownOpen={isDropdownOpen}
-              setIsDropdownOpen={setIsDropdownOpen}
-              models={models}
-            />
-            <div className="flex items-center gap-1">
-              <button 
-                onClick={toggleListening}
-                className={`p-2 rounded-full transition-colors active:scale-90 flex items-center justify-center ${isListening ? "bg-[#EA4335]/20" : "hover:bg-[#1a1a1a]"}`}
+          <div className="flex items-center justify-between px-2">
+            <div className="flex items-center">
+              <button
+                type="button"
+                onClick={onSearchClick}
+                className={`relative flex items-center gap-2 px-4 py-1.5 rounded-full transition-all duration-300 active:scale-95 group ${
+                  isSearchActive
+                  ? "bg-[#8ab4f8]/10 ring-1 ring-[#8ab4f8]/50"
+                  : "hover:bg-[#1a1a1a]"
+                }`}
               >
-                <span className={`material-symbols-outlined text-[24px] ${isListening ? "text-[#EA4335]" : "text-[#808080]"}`}>
-                  {isListening ? "mic" : "mic_none"}
+                {isSearchActive && (
+                  <div className="absolute inset-0 rounded-full animate-gradient opacity-20 -z-10" />
+                )}
+                <span className={`material-symbols-outlined text-[20px] transition-colors ${
+                  isSearchActive ? "text-[#8ab4f8]" : "text-[#808080] group-hover:text-[#e2e2e2]"
+                }`}>
+                  search
+                </span>
+                <span className={`text-sm font-medium transition-colors ${
+                  isSearchActive ? "text-[#8ab4f8]" : "text-[#808080] group-hover:text-[#e2e2e2]"
+                }`}>
+                  Search
                 </span>
               </button>
-              
-              {isTyping ? (
+            </div>
+
+            <div className="flex items-center gap-3">
+              <ModelSelector
+                selectedModel={selectedModel}
+                setSelectedModel={setSelectedModel}
+                isDropdownOpen={isDropdownOpen}
+                setIsDropdownOpen={setIsDropdownOpen}
+                models={models}
+              />
+              <div className="flex items-center gap-1">
                 <button
-                  onClick={stopRequest}
-                  className="p-2 rounded-full hover:bg-[#1a1a1a] transition-transform active:scale-90 flex items-center justify-center"
+                  type="button"
+                  onClick={toggleListening}
+                  className={`p-2 rounded-full transition-colors active:scale-90 flex items-center justify-center ${isListening ? "bg-[#EA4335]/20" : "hover:bg-[#1a1a1a]"}`}
                 >
-                  <span className="material-symbols-outlined text-[24px] text-[#EA4335]">
-                    stop_circle
+                  <span className={`material-symbols-outlined text-[24px] ${isListening ? "text-[#EA4335]" : "text-[#808080]"}`}>
+                    mic
                   </span>
                 </button>
-              ) : (
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim()}
-                  className="p-2 rounded-full hover:bg-[#1a1a1a] disabled:opacity-10 transition-transform active:scale-90 flex items-center justify-center"
-                >
-                  <span className={`material-symbols-outlined text-[24px] ${input.trim() ? "text-[#8ab4f8]" : "text-[#808080]"}`}>
-                    send
-                  </span>
-                </button>
-              )}
+
+                {isTyping ? (
+                  <button
+                    type="button"
+                    onClick={stopRequest}
+                    className="p-2 rounded-full hover:bg-[#1a1a1a] transition-transform active:scale-90 flex items-center justify-center"
+                  >
+                    <span className="material-symbols-outlined text-[24px] text-[#EA4335]">
+                      stop_circle
+                    </span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSend}
+                    disabled={!input.trim()}
+                    className="p-2 rounded-full hover:bg-[#1a1a1a] disabled:opacity-10 transition-transform active:scale-90 flex items-center justify-center"
+                  >
+                    <span className={`material-symbols-outlined text-[24px] ${input.trim() ? "text-[#8ab4f8]" : "text-[#808080]"}`}>
+                      send
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
 import { useUserChats } from './hooks/useUserChats';
+import { useSearch } from './hooks/useSearch';
 import { ChatHeader } from './components/ChatHeader';
 import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
@@ -16,6 +17,7 @@ import { mainContentVariants } from './motion/drawer';
 export default function App() {
   const { user, loading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const { isSearchActive, toggleSearch, resetSearch } = useSearch();
   const { chats, refreshChats, deleteChat } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -97,6 +99,7 @@ export default function App() {
               setMessages([]);
               setChatId(crypto.randomUUID());
               setChatTitle('');
+              resetSearch();
               closeSidebar();
               refreshChats();
             }}
@@ -120,7 +123,7 @@ export default function App() {
               deleteChatFromDB={deleteChat}
             />
 
-            <main 
+            <main
               ref={scrollContainerRef}
               onScroll={handleScroll}
               className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth relative"
@@ -137,7 +140,7 @@ export default function App() {
                   >
                     <StartScreen
                       userName={user.user_metadata?.full_name || user.email}
-                      onSelectSuggestion={(text) => handleSend(text)}
+                      onSelectSuggestion={(text) => handleSend(text, isSearchActive)}
                     />
                   </motion.div>
                 ) : (
@@ -184,7 +187,7 @@ export default function App() {
             <ChatInput
               input={input}
               setInput={setInput}
-              handleSend={handleSend}
+              handleSend={() => handleSend(undefined, isSearchActive)}
               stopRequest={stopRequest}
               selectedModel={selectedModel}
               setSelectedModel={setSelectedModel}
@@ -192,6 +195,8 @@ export default function App() {
               setIsDropdownOpen={setIsDropdownOpen}
               isTyping={isTyping}
               models={models}
+              isSearchActive={isSearchActive}
+              onSearchClick={toggleSearch}
             />
           </motion.div>
 
