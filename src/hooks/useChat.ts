@@ -20,7 +20,7 @@ export const MODELS = [
   'Gemma 4 31B IT',
 ];
 
-export const useChat = () => {
+export const useChat = (onNewChatCreated?: () => void) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
@@ -50,6 +50,7 @@ export const useChat = () => {
           .maybeSingle();
         if (data?.title) {
           setChatTitle(data.title);
+          if (onNewChatCreated) onNewChatCreated();
           if (interval) clearInterval(interval);
         }
       };
@@ -59,7 +60,7 @@ export const useChat = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [chatId, messages.length, chatTitle]);
+  }, [chatId, messages.length, chatTitle, onNewChatCreated]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -144,6 +145,7 @@ export const useChat = () => {
       return;
     }
 
+    const isFirstMessage = messages.length === 0;
     const userText = textToSend.trim();
     const newUserMsg: Message = { id: Date.now().toString(), role: 'user', content: userText };
     setMessages(prev => [...prev, newUserMsg]);
@@ -200,6 +202,11 @@ export const useChat = () => {
           return prev;
         });
       }
+
+      if (isFirstMessage && onNewChatCreated) {
+        onNewChatCreated();
+      }
+
     } catch (error: any) {
       if (error.name === 'AbortError') {
         setMessages(prev => {
@@ -219,7 +226,7 @@ export const useChat = () => {
     } finally {
       setIsTyping(false);
     }
-  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom]);
+  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, messages.length, onNewChatCreated]);
 
   const handleKeyDown = (e: React.KeyboardEvent, isSearchActive: boolean) => {
     if (e.key === 'Enter' && !e.shiftKey) {

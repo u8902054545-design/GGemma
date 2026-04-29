@@ -46,7 +46,7 @@ export default function App() {
     setChatTitle,
     loadChatMessages,
     stopRequest
-  } = useChat();
+  } = useChat(refreshChats);
 
   const handleScroll = useCallback(() => {
     if (scrollContainerRef.current) {

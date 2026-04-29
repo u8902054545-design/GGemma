@@ -107,7 +107,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     onNewChat(); 
                     onClose();
                   }}
-                  className="flex items-center gap-3 px-4 py-3 bg-[#2b2930] hover:bg-[#36343b] text-[#c2e7ff] rounded-2xl transition-all active:scale-[0.95]"
+                  className="flex items-center gap-3 px-4 py-3 bg-[var(--md-sys-color-primary-container)] hover:opacity-90 text-[var(--md-sys-color-on-primary-container)] rounded-2xl transition-all active:scale-[0.95]"
                 >
                   <span className="material-symbols-outlined text-[22px]">edit_square</span>
                   <span className="font-medium text-sm">New chat</span>
@@ -131,7 +131,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           }}
                           className={`group flex items-center px-4 py-3 rounded-full text-sm text-left truncate transition-all duration-200 ${
                             isActive
-                            ? 'bg-[#c2e7ff] text-[#001d35] font-bold'
+                            ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] font-bold'
                             : 'text-[#e6e1e5] hover:bg-[#2b2930]'
                           }`}
                         >
