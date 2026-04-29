@@ -157,6 +157,7 @@ export default function App() {
                           messageId={msg.id}
                           role={msg.role}
                           content={msg.content}
+                          imageUrl={msg.imageUrl}
                           modelName={msg.modelName}
                           feedback={msg.feedback}
                           onFeedback={handleFeedback}
@@ -190,7 +191,7 @@ export default function App() {
             <ChatInput
               input={input}
               setInput={setInput}
-              handleSend={() => handleSend(undefined, isSearchActive)}
+              handleSend={handleSend}
               stopRequest={stopRequest}
               selectedModel={selectedModel}
               setSelectedModel={setSelectedModel}

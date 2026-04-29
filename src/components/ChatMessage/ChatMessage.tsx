@@ -19,6 +19,7 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({ 
   role, 
   content, 
+  imageUrl,
   modelName,
   isGenerating, 
   messageId, 
@@ -88,6 +89,16 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               : 'max-w-[85%] bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] px-5 py-3 rounded-[24px] rounded-tr-[4px] shadow-sm inline-block'
           } ${!isContentExpanded && canShowExpand ? 'max-h-[300px] overflow-hidden' : 'max-h-full'}`}
         >
+          {imageUrl && (
+            <div className="mb-3 overflow-hidden rounded-lg">
+              <img 
+                src={imageUrl} 
+                alt="Uploaded" 
+                className="max-w-full h-auto object-contain max-h-[400px] rounded-lg"
+              />
+            </div>
+          )}
+
           <div className={`text-[16px] leading-relaxed markdown-content select-text`}>
             {isAI && isGenerating && !mainContent ? (
               <div className="min-h-[40px] flex items-center">

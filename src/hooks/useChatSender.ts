@@ -17,9 +17,9 @@ export const useChatSender = (
   setIsSnackbarOpen: (open: boolean) => void,
   onNewChatCreated?: () => void
 ) => {
-  const handleSend = useCallback(async (overrideInput?: string, isSearchActive: boolean = false) => {
+  const handleSend = useCallback(async (overrideInput?: string, isSearchActive: boolean = false, file?: File) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
-    if (!textToSend.trim() || isTyping) return;
+    if ((!textToSend.trim() && !file) || isTyping) return;
 
     const { data: { session } } = await supabase.auth.getSession();
     if (!session?.access_token) {
@@ -30,13 +30,26 @@ export const useChatSender = (
 
     const isFirstMessage = messages.length === 0;
     const userText = textToSend.trim();
-    
-    const newUserMsg: Message = { 
-      id: crypto.randomUUID(), 
-      role: 'user', 
-      content: userText 
+
+    let base64Image = '';
+    let localImageUrl = '';
+
+    if (file) {
+      localImageUrl = URL.createObjectURL(file);
+      base64Image = await new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    const newUserMsg: Message = {
+      id: crypto.randomUUID(),
+      role: 'user',
+      content: userText,
+      imageUrl: localImageUrl
     };
-    
+
     setMessages(prev => [...prev, newUserMsg]);
     setInput('');
     setIsTyping(true);
@@ -60,7 +73,8 @@ export const useChatSender = (
           message: userText,
           model: selectedModel,
           chat_id: chatId,
-          isSearchActive: isSearchActive
+          isSearchActive: isSearchActive,
+          image: base64Image || null
         }),
       });
 
@@ -87,10 +101,10 @@ export const useChatSender = (
           if (prev.length === 0) return prev;
           const lastMsg = prev[prev.length - 1];
           if (lastMsg.id === aiMsgId) {
-            return [...prev.slice(0, -1), { 
-              ...lastMsg, 
+            return [...prev.slice(0, -1), {
+              ...lastMsg,
               content: accumulatedContent,
-              modelName: modelNameFromServer 
+              modelName: modelNameFromServer
             }];
           }
           return prev;
@@ -118,6 +132,9 @@ export const useChatSender = (
       }
     } finally {
       setIsTyping(false);
+      if (localImageUrl) {
+        URL.revokeObjectURL(localImageUrl);
+      }
     }
   }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, messages.length, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen]);
 

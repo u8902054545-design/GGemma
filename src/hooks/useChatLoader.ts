@@ -28,8 +28,8 @@ export const useChatLoader = (
         role: (m.role === 'assistant' || m.role === 'ai' || m.role === 'model') ? 'ai' : 'user',
         content: m.content,
         feedback: m.feedback,
-        // Добавляем получение имени модели из базы данных
-        modelName: m.model_name 
+        modelName: m.model_name,
+        imageUrl: m.image_url
       }));
 
       setMessages(formattedMessages);

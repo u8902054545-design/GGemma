@@ -1,10 +1,12 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { ModelSelector } from './ModelSelector';
+import { ImagePreview } from './ImagePreview';
+import { useImageUpload } from '../hooks/useImageUpload';
 
 type ChatInputProps = {
   input: string;
   setInput: (value: string) => void;
-  handleSend: () => void;
+  handleSend: (overrideInput?: string, isSearchActive?: boolean, file?: File) => void;
   stopRequest: () => void;
   selectedModel: string;
   setSelectedModel: (model: string) => void;
@@ -23,8 +25,16 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   onSearchClick,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
+
+  const { 
+    selectedFile, 
+    previewUrl, 
+    handleFileChange: onFileSelect, 
+    clearSelection 
+  } = useImageUpload();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -36,8 +46,29 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   const onKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      handleSend();
+      handleWrappedSend();
     }
+  };
+
+  const handleAddClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      onFileSelect(file);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  const handleWrappedSend = () => {
+    if (!input.trim() && !selectedFile) return;
+    
+    handleSend(undefined, isSearchActive, selectedFile || undefined);
+    clearSelection();
   };
 
   const toggleListening = () => {
@@ -67,10 +98,27 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
     recognition.start();
   };
 
+  const isSendDisabled = !input.trim() && !selectedFile;
+
   return (
     <footer className="w-full max-w-4xl mx-auto z-50">
       <div className="pt-[1px] px-[1px] rounded-t-[32px] animate-gradient">
         <div className="bg-black rounded-t-[31px] flex flex-col p-2 pb-3">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileChange}
+            accept="image/*"
+            className="hidden"
+          />
+
+          {previewUrl && (
+            <ImagePreview 
+              url={previewUrl} 
+              onRemove={clearSelection} 
+            />
+          )}
+
           <textarea
             ref={textareaRef}
             value={input}
@@ -81,7 +129,17 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
             rows={1}
           />
           <div className="flex items-center justify-between px-2">
-            <div className="flex items-center">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleAddClick}
+                className="p-2 rounded-full hover:bg-[#1a1a1a] transition-colors active:scale-90 flex items-center justify-center group"
+              >
+                <span className="material-symbols-outlined text-[24px] text-[#808080] group-hover:text-[#e2e2e2]">
+                  add
+                </span>
+              </button>
+
               <button
                 type="button"
                 onClick={onSearchClick}
@@ -139,11 +197,11 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 ) : (
                   <button
                     type="button"
-                    onClick={handleSend}
-                    disabled={!input.trim()}
+                    onClick={handleWrappedSend}
+                    disabled={isSendDisabled}
                     className="p-2 rounded-full hover:bg-[#1a1a1a] disabled:opacity-10 transition-transform active:scale-90 flex items-center justify-center"
                   >
-                    <span className={`material-symbols-outlined text-[24px] ${input.trim() ? "text-[#8ab4f8]" : "text-[#808080]"}`}>
+                    <span className={`material-symbols-outlined text-[24px] ${!isSendDisabled ? "text-[#8ab4f8]" : "text-[#808080]"}`}>
                       send
                     </span>
                   </button>
