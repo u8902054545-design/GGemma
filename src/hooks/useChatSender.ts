@@ -53,8 +53,7 @@ export const useChatSender = (
     setMessages(prev => [...prev, newUserMsg]);
     setInput('');
     setIsTyping(true);
-
-    setTimeout(scrollToBottom, 50);
+    scrollToBottom();
 
     const aiMsgId = crypto.randomUUID();
     const newAiMsg: Message = { id: aiMsgId, role: 'ai', content: '' };
@@ -121,7 +120,7 @@ export const useChatSender = (
           if (prev.length === 0) return prev;
           const lastMsg = prev[prev.length - 1];
           if (lastMsg.id === aiMsgId) {
-            return [...prev.slice(0, -1), { ...lastMsg, content: lastMsg.content + '_STOPPED_' }];
+            return [...prev.slice(0, -1), { ...lastMsg, content: lastMsg.content }];
           }
           return prev;
         });
