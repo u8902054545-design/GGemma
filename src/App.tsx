@@ -123,58 +123,60 @@ export default function App() {
               deleteChatFromDB={deleteChat}
             />
 
-            <main
-              ref={scrollContainerRef}
-              onScroll={handleScroll}
-              className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth relative"
-            >
-              <AnimatePresence mode="wait">
-                {messages.length === 0 ? (
-                  <motion.div
-                    key="start-screen-anim"
-                    variants={pageVariants}
-                    initial="initial"
-                    animate="animate"
-                    exit="exit"
-                    className="absolute inset-0 flex flex-col"
-                  >
-                    <StartScreen
-                      userName={user.user_metadata?.full_name || user.email}
-                      onSelectSuggestion={(text) => handleSend(text, isSearchActive)}
-                    />
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="chat-content-anim"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="p-6 pb-40 max-w-4xl w-full mx-auto flex flex-col"
-                  >
-                    {messages.map((msg, index) => (
-                      <ChatMessage
-                        key={msg.id}
-                        messageId={msg.id}
-                        role={msg.role}
-                        content={msg.content}
-                        feedback={msg.feedback}
-                        onFeedback={handleFeedback}
-                        isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
-                        isLast={index === messages.length - 1}
+            <div className="flex-1 relative overflow-hidden flex flex-col">
+              <main
+                ref={scrollContainerRef}
+                onScroll={handleScroll}
+                className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth"
+              >
+                <AnimatePresence mode="wait">
+                  {messages.length === 0 ? (
+                    <motion.div
+                      key="start-screen-anim"
+                      variants={pageVariants}
+                      initial="initial"
+                      animate="animate"
+                      exit="exit"
+                      className="absolute inset-0 flex flex-col"
+                    >
+                      <StartScreen
+                        userName={user.user_metadata?.full_name || user.email}
+                        onSelectSuggestion={(text) => handleSend(text, isSearchActive)}
                       />
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-              <div ref={messagesEndRef} />
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="chat-content-anim"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="p-6 pb-20 max-w-4xl w-full mx-auto flex flex-col"
+                    >
+                      {messages.map((msg, index) => (
+                        <ChatMessage
+                          key={msg.id}
+                          messageId={msg.id}
+                          role={msg.role}
+                          content={msg.content}
+                          feedback={msg.feedback}
+                          onFeedback={handleFeedback}
+                          isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
+                          isLast={index === messages.length - 1}
+                        />
+                      ))}
+                      <div ref={messagesEndRef} className="h-1" />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </main>
 
               <AnimatePresence>
-                {showScrollButton && (
+                {showScrollButton && messages.length > 0 && (
                   <motion.button
-                    initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.8, y: 20 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
                     onClick={scrollToBottomInstant}
-                    className="fixed bottom-28 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[#1e1e1e] opacity-100 border border-[#444746] text-[#a8c7fa] shadow-2xl hover:bg-[#282a2d] transition-colors cursor-pointer"
+                    className="absolute bottom-6 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[#1e1e1e] border border-[#444746] text-[#a8c7fa] shadow-2xl hover:bg-[#282a2d] transition-colors cursor-pointer"
                   >
                     <span className="material-symbols-outlined">
                       arrow_downward
@@ -182,7 +184,7 @@ export default function App() {
                   </motion.button>
                 )}
               </AnimatePresence>
-            </main>
+            </div>
 
             <ChatInput
               input={input}
