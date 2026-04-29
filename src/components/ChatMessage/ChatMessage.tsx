@@ -19,6 +19,7 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({ 
   role, 
   content, 
+  modelName,
   isGenerating, 
   messageId, 
   feedback, 
@@ -61,6 +62,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           onToggleThought={() => setIsThoughtExpanded(!isThoughtExpanded)}
           onSpeech={handleSpeech}
           isSpeaking={isSpeaking}
+          modelName={modelName}
         />
       )}
 
@@ -220,7 +222,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
 
             {isLast && (
               <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-70 leading-tight">
-                Gemma is an AI and may make mistakes. Verify its responses.
+                {modelName || 'Gemma'} is an AI and may make mistakes. Verify its responses.
               </p>
             )}
           </motion.div>

@@ -69,6 +69,8 @@ export const useChatSender = (
         throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
+      const modelNameFromServer = response.headers.get('x-model-name') || response.headers.get('X-Model-Name') || selectedModel;
+
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";
@@ -85,8 +87,11 @@ export const useChatSender = (
           if (prev.length === 0) return prev;
           const lastMsg = prev[prev.length - 1];
           if (lastMsg.id === aiMsgId) {
-            const updatedMsg = { ...lastMsg, content: accumulatedContent };
-            return [...prev.slice(0, -1), updatedMsg];
+            return [...prev.slice(0, -1), { 
+              ...lastMsg, 
+              content: accumulatedContent,
+              modelName: modelNameFromServer 
+            }];
           }
           return prev;
         });
@@ -102,8 +107,7 @@ export const useChatSender = (
           if (prev.length === 0) return prev;
           const lastMsg = prev[prev.length - 1];
           if (lastMsg.id === aiMsgId) {
-            const updatedMsg = { ...lastMsg, content: lastMsg.content + '_STOPPED_' };
-            return [...prev.slice(0, -1), updatedMsg];
+            return [...prev.slice(0, -1), { ...lastMsg, content: lastMsg.content + '_STOPPED_' }];
           }
           return prev;
         });

@@ -7,6 +7,7 @@ type HeaderProps = {
   onToggleThought: () => void;
   onSpeech?: () => void;
   isSpeaking?: boolean;
+  modelName?: string;
 };
 
 export const ChatMessageHeader: React.FC<HeaderProps> = ({
@@ -14,7 +15,8 @@ export const ChatMessageHeader: React.FC<HeaderProps> = ({
   isExpanded,
   onToggleThought,
   onSpeech,
-  isSpeaking
+  isSpeaking,
+  modelName
 }) => {
   return (
     <div className="flex items-center gap-2 mb-3 w-full">
@@ -22,7 +24,9 @@ export const ChatMessageHeader: React.FC<HeaderProps> = ({
         <div className="flex items-center justify-center w-6 h-6">
           <GemmaIcon className="w-6 h-6" />
         </div>
-        <span className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)]">Gemma</span>
+        <span className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)]">
+          {modelName || 'Gemma'}
+        </span>
       </div>
 
       {hasThought && (

@@ -157,6 +157,7 @@ export default function App() {
                           messageId={msg.id}
                           role={msg.role}
                           content={msg.content}
+                          modelName={msg.modelName}
                           feedback={msg.feedback}
                           onFeedback={handleFeedback}
                           isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
