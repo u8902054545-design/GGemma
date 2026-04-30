@@ -1,4 +1,4 @@
-import { supabase } from '../config';
+import { supabase, SUPABASE_ENDPOINT } from '../config';
 
 export const handleNewChat = (
   setMessages: (m: any[]) => void, 
@@ -16,12 +16,23 @@ export const renameChat = async (
   setChatTitle: (t: string) => void
 ) => {
   try {
-    const { error } = await supabase
-      .from('chats')
-      .update({ title: newTitle })
-      .eq('id', chatId);
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) throw new Error('Unauthorized');
 
-    if (error) throw error;
+    const response = await fetch(SUPABASE_ENDPOINT, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session.access_token}`,
+      },
+      body: JSON.stringify({ 
+        chat_id: chatId, 
+        new_title: newTitle 
+      }),
+    });
+
+    if (!response.ok) throw new Error('Failed to rename chat');
+    
     setChatTitle(newTitle);
   } catch (error) {
     console.error('Error renaming chat:', error);

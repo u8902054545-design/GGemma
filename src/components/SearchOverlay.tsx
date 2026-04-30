@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { supabase } from '../config';
+import { supabase, SUPABASE_ENDPOINT } from '../config';
 
 interface SearchResult {
   chat_id: string;
@@ -34,13 +34,20 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
   const handleSearch = async (text: string) => {
     setLoading(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-      const { data, error } = await supabase.rpc('global_search', {
-        search_query: text,
-        current_user_id: user.id
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+
+      const response = await fetch(`${SUPABASE_ENDPOINT}?search_query=${encodeURIComponent(text)}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
       });
-      if (error) throw error;
+
+      if (!response.ok) throw new Error('Search failed');
+
+      const data = await response.json();
       setResults(data || []);
     } catch (err) {
       console.error('Search error:', err);
