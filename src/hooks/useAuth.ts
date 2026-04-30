@@ -12,60 +12,10 @@ export const useAuth = () => {
   };
 
   useEffect(() => {
-    let profileSubscription: any = null;
-
-    const setupRealtimeSubscription = (userId: string) => {
-      if (profileSubscription) supabase.removeChannel(profileSubscription);
-
-      profileSubscription = supabase
-        .channel(`public:profiles:id=eq.${userId}`)
-        .on(
-          'postgres_changes',
-          {
-            event: 'UPDATE',
-            schema: 'public',
-            table: 'profiles',
-            filter: `id=eq.${userId}`,
-          },
-          (payload) => {
-            if (payload.new && payload.new.is_blocked === true) {
-              signOut();
-            }
-          }
-        )
-        .subscribe();
-    };
-
     const handleAuth = async (session: any) => {
       const currentUser = session?.user ?? null;
-
-      if (!currentUser) {
-        setUser(null);
-        setLoading(false);
-        return;
-      }
-
-      try {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('is_blocked')
-          .eq('id', currentUser.id)
-          .maybeSingle();
-
-        if (error) throw error;
-
-        if (data?.is_blocked) {
-          await signOut();
-        } else {
-          setUser(currentUser);
-          setupRealtimeSubscription(currentUser.id);
-        }
-      } catch (err) {
-        console.error(err);
-        setUser(currentUser);
-      } finally {
-        setLoading(false);
-      }
+      setUser(currentUser);
+      setLoading(false);
     };
 
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -78,7 +28,6 @@ export const useAuth = () => {
 
     return () => {
       authSub.unsubscribe();
-      if (profileSubscription) supabase.removeChannel(profileSubscription);
     };
   }, []);
 
