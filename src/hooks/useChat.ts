@@ -49,29 +49,6 @@ export const useChat = (onNewChatCreated?: () => void) => {
   );
 
   useEffect(() => {
-    let interval: any;
-    if (messages.length > 0 && !chatTitle) {
-      const fetchTitle = async () => {
-        const { data } = await supabase
-          .from('chats')
-          .select('title')
-          .eq('id', chatId)
-          .maybeSingle();
-        if (data?.title) {
-          setChatTitle(data.title);
-          if (onNewChatCreated) onNewChatCreated();
-          if (interval) clearInterval(interval);
-        }
-      };
-      interval = setInterval(fetchTitle, 3000);
-      fetchTitle();
-    }
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [chatId, messages.length, chatTitle, onNewChatCreated]);
-
-  useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
         setMessages([]);

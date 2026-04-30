@@ -1,4 +1,4 @@
-import { supabase } from '../config';
+import { supabase, SUPABASE_ENDPOINT } from '../config';
 import { Message } from './chatTypes';
 
 export const useChatLoader = (
@@ -15,15 +15,22 @@ export const useChatLoader = (
       setIsTyping(true);
       setChatId(id);
 
-      const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('chat_id', id)
-        .order('created_at', { ascending: true });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Unauthorized');
 
-      if (error) throw error;
+      const response = await fetch(`${SUPABASE_ENDPOINT}?chat_id=${id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json'
+        }
+      });
 
-      const formattedMessages: Message[] = data.map(m => ({
+      if (!response.ok) throw new Error('Failed to load messages');
+
+      const data = await response.json();
+
+      const formattedMessages: Message[] = data.map((m: any) => ({
         id: m.id,
         role: (m.role === 'assistant' || m.role === 'ai' || m.role === 'model') ? 'ai' : 'user',
         content: m.content,

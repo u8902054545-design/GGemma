@@ -20,12 +20,20 @@ export const useUserChats = (userId: string | undefined) => {
     }
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('chats')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false });
-      if (error) throw error;
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) throw new Error('Unauthorized');
+
+      const response = await fetch(SUPABASE_ENDPOINT, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) throw new Error('Failed to fetch chats');
+      
+      const data = await response.json();
       setChats(data || []);
     } catch (err) {
       console.error('Error fetching chats:', err);
