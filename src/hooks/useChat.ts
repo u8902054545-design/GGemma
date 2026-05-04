@@ -18,7 +18,7 @@ export const useChat = (onNewChatCreated?: () => void) => {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
-  const { createSignal, stopRequest } = useStopRequest();
+  const { createSignal, stopRequest: internalStopRequest } = useStopRequest();
   const { messagesEndRef, scrollToBottom } = useChatScroll();
 
   const { handleFeedback } = useChatFeedback(setMessages);
@@ -55,6 +55,24 @@ export const useChat = (onNewChatCreated?: () => void) => {
     onNewChatCreated,
     setChatTitle
   );
+
+  const stopRequest = useCallback(() => {
+    internalStopRequest(() => {
+      setMessages(prev => {
+        if (prev.length === 0) return prev;
+        const lastMessage = prev[prev.length - 1];
+        if (lastMessage.role === 'ai') {
+          const newMessages = [...prev];
+          newMessages[newMessages.length - 1] = {
+            ...lastMessage,
+            content: lastMessage.content + '_STOPPED_'
+          };
+          return newMessages;
+        }
+        return prev;
+      });
+    });
+  }, [internalStopRequest]);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {

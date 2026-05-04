@@ -127,7 +127,7 @@ export const useChatSender = (
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        setMessages(prev => prev.map(m => m.id === aiMsgId ? { ...m, content: m.content } : m));
+        console.log('Stream aborted');
       } else {
         setMessages(prev => prev.filter(msg => msg.id !== aiMsgId));
         setSnackbarMessage(error.message);

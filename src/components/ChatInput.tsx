@@ -191,9 +191,12 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                   <button
                     type="button"
                     onClick={stopRequest}
-                    className="p-2 rounded-full hover:bg-[#1a1a1a] transition-transform active:scale-90 flex items-center justify-center"
+                    className="p-2 rounded-full bg-[#282a2d] hover:bg-[#333537] transition-all active:scale-90 flex items-center justify-center"
                   >
-                    <span className="material-symbols-outlined text-[24px] text-[#EA4335]">
+                    <span 
+                      className="material-symbols-outlined text-[24px]" 
+                      style={{ color: 'var(--gemma-blue-bright)', fontVariationSettings: "'FILL' 1" }}
+                    >
                       stop_circle
                     </span>
                   </button>
@@ -202,7 +205,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                     type="button"
                     onClick={handleWrappedSend}
                     disabled={isSendDisabled}
-                    className="p-2 rounded-full hover:bg-[#1a1a1a] disabled:opacity-10 transition-transform active:scale-90 flex items-center justify-center"
+                    className="p-2 rounded-full hover:bg-[#1a1a1a] transition-transform active:scale-90 flex items-center justify-center"
                   >
                     <span className={`material-symbols-outlined text-[24px] ${!isSendDisabled ? "text-[#8ab4f8]" : "text-[#808080]"}`}>
                       send

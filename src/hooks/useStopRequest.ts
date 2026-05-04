@@ -9,10 +9,11 @@ export const useStopRequest = () => {
     return controller.signal;
   }, []);
 
-  const stopRequest = useCallback(() => {
+  const stopRequest = useCallback((onStop?: () => void) => {
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
       abortControllerRef.current = null;
+      if (onStop) onStop();
     }
   }, []);
 
