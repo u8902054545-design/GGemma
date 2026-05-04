@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../config';
 import { useStopRequest } from './useStopRequest';
 import { Message, MODELS } from './chatTypes';
@@ -32,6 +32,13 @@ export const useChat = (onNewChatCreated?: () => void) => {
     scrollToBottom
   );
 
+  const refreshCurrentChatTitle = useCallback((allChats: any[]) => {
+    const currentChat = allChats.find(c => c.id === chatId);
+    if (currentChat?.title) {
+      setChatTitle(currentChat.title);
+    }
+  }, [chatId]);
+
   const { handleSend } = useChatSender(
     messages,
     setMessages,
@@ -45,7 +52,8 @@ export const useChat = (onNewChatCreated?: () => void) => {
     scrollToBottom,
     setSnackbarMessage,
     setIsSnackbarOpen,
-    onNewChatCreated
+    onNewChatCreated,
+    setChatTitle
   );
 
   useEffect(() => {
@@ -94,6 +102,7 @@ export const useChat = (onNewChatCreated?: () => void) => {
     snackbarMessage,
     isSnackbarOpen,
     setIsSnackbarOpen,
-    stopRequest
+    stopRequest,
+    refreshCurrentChatTitle
   };
 };

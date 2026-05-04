@@ -15,7 +15,8 @@ export const useChatSender = (
   scrollToBottom: () => void,
   setSnackbarMessage: (msg: string) => void,
   setIsSnackbarOpen: (open: boolean) => void,
-  onNewChatCreated?: () => void
+  onNewChatCreated?: () => void,
+  setChatTitle?: (title: string) => void
 ) => {
   const handleSend = useCallback(async (overrideInput?: string, isSearchActive: boolean = false, file?: File) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
@@ -112,6 +113,18 @@ export const useChatSender = (
 
       if (isFirstMessage && onNewChatCreated) {
         onNewChatCreated();
+        
+        if (setChatTitle) {
+          const { data } = await supabase
+            .from('chats')
+            .select('title')
+            .eq('id', chatId)
+            .single();
+          
+          if (data?.title) {
+            setChatTitle(data.title);
+          }
+        }
       }
 
     } catch (error: any) {
@@ -132,7 +145,7 @@ export const useChatSender = (
     } finally {
       setIsTyping(false);
     }
-  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, messages.length, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen]);
+  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, messages.length, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen, setChatTitle]);
 
   return { handleSend };
 };

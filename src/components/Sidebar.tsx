@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SearchOverlay } from './SearchOverlay';
+import '@material/web/progress/circular-progress.js';
 
 const backdropVariants = {
   closed: { opacity: 0 },
@@ -39,15 +40,27 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   chats: Chat[];
+  loading?: boolean;
+  error?: boolean;
   currentChatId: string;
   onChatSelect: (id: string) => void;
   onNewChat: () => void;
+}
+
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      'md-circular-progress': any;
+    }
+  }
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   isOpen,
   onClose,
   chats,
+  loading,
+  error,
   currentChatId,
   onChatSelect,
   onNewChat
@@ -118,8 +131,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <div className="px-4 py-2">
                   <h2 className="text-[14px] font-medium text-[#e6e1e5]">Chats</h2>
                 </div>
+                
                 <div className="flex flex-col gap-1">
-                  {chats.length > 0 ? (
+                  {loading ? (
+                    <div className="flex justify-center py-10">
+                      <md-circular-progress indeterminate style={{ '--md-circular-progress-size': '32px' }} />
+                    </div>
+                  ) : error ? (
+                    <div className="px-4 py-8 text-center">
+                      <p className="text-sm text-[#ffb4ab]">Failed to load chats</p>
+                    </div>
+                  ) : chats.length > 0 ? (
                     chats.map((chat) => {
                       const isActive = currentChatId === chat.id;
                       return (

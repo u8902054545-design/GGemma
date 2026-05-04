@@ -16,13 +16,13 @@ import { mainContentVariants } from './motion/drawer';
 import { FullscreenImage } from './components/FullscreenImage';
 
 export default function App() {
-  const { user, loading, signInWithGoogle } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
-  const { chats, refreshChats, deleteChat } = useUserChats(user?.id);
+  const { chats, loading: chatsLoading, error: chatsError, refreshChats, deleteChat } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  
+
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   const {
@@ -63,7 +63,7 @@ export default function App() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  if (loading) {
+  if (authLoading) {
     return <div className="h-screen w-full bg-black" />;
   }
 
@@ -89,6 +89,8 @@ export default function App() {
             isOpen={isSidebarOpen}
             onClose={closeSidebar}
             chats={chats}
+            loading={chatsLoading}
+            error={!!chatsError}
             currentChatId={chatId}
             onChatSelect={(id) => {
               const selectedChat = chats.find(c => c.id === id);
@@ -213,10 +215,10 @@ export default function App() {
             />
           </motion.div>
 
-          <FullscreenImage 
-            src={fullscreenImage} 
-            isOpen={!!fullscreenImage} 
-            onClose={() => setFullscreenImage(null)} 
+          <FullscreenImage
+            src={fullscreenImage}
+            isOpen={!!fullscreenImage}
+            onClose={() => setFullscreenImage(null)}
           />
 
           <Snackbar
@@ -229,4 +231,3 @@ export default function App() {
     </AnimatePresence>
   );
 }
-
