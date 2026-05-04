@@ -117,7 +117,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
                 <GemmaSkeleton />
               </div>
             ) : (
-              <div className="min-h-[1.5em]">
+              <motion.div layout="position" className="min-h-[1.5em]">
                 {isAI ? (
                   <ReactMarkdown
                     remarkPlugins={[remarkGfm, remarkMath]}
@@ -182,7 +182,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
                     </span>
                   </motion.div>
                 )}
-              </div>
+              </motion.div>
             )}
           </div>
           

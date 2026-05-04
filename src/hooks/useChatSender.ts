@@ -83,11 +83,11 @@ export const useChatSender = (
         throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
-      const modelNameFromServer = response.headers.get('x-model-name') || response.headers.get('X-Model-Name') || selectedModel;
-
+      const modelNameFromServer = response.headers.get('x-model-name') || selectedModel;
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";
+      
       if (!reader) throw new Error('ReadableStream not supported');
 
       while (true) {
@@ -98,45 +98,36 @@ export const useChatSender = (
         accumulatedContent += chunk;
 
         setMessages(prev => {
-          if (prev.length === 0) return prev;
-          const lastMsg = prev[prev.length - 1];
-          if (lastMsg.id === aiMsgId) {
-            return [...prev.slice(0, -1), {
-              ...lastMsg,
+          const newMessages = [...prev];
+          const lastIdx = newMessages.length - 1;
+          if (lastIdx >= 0 && newMessages[lastIdx].id === aiMsgId) {
+            newMessages[lastIdx] = {
+              ...newMessages[lastIdx],
               content: accumulatedContent,
               modelName: modelNameFromServer
-            }];
+            };
           }
-          return prev;
+          return newMessages;
         });
       }
 
       if (isFirstMessage && onNewChatCreated) {
         onNewChatCreated();
-        
         if (setChatTitle) {
-          const { data } = await supabase
-            .from('chats')
-            .select('title')
-            .eq('id', chatId)
-            .single();
-          
-          if (data?.title) {
-            setChatTitle(data.title);
-          }
+          setTimeout(async () => {
+            const { data } = await supabase
+              .from('chats')
+              .select('title')
+              .eq('id', chatId)
+              .maybeSingle();
+            if (data?.title) setChatTitle(data.title);
+          }, 1500);
         }
       }
 
     } catch (error: any) {
       if (error.name === 'AbortError') {
-        setMessages(prev => {
-          if (prev.length === 0) return prev;
-          const lastMsg = prev[prev.length - 1];
-          if (lastMsg.id === aiMsgId) {
-            return [...prev.slice(0, -1), { ...lastMsg, content: lastMsg.content }];
-          }
-          return prev;
-        });
+        setMessages(prev => prev.map(m => m.id === aiMsgId ? { ...m, content: m.content } : m));
       } else {
         setMessages(prev => prev.filter(msg => msg.id !== aiMsgId));
         setSnackbarMessage(error.message);
