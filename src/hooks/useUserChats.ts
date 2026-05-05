@@ -12,14 +12,14 @@ export const useUserChats = (userId: string | undefined) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchChats = useCallback(async () => {
+  const fetchChats = useCallback(async (isSilent = false) => {
     if (!userId) {
       setChats([]);
       setLoading(false);
       return;
     }
     try {
-      setLoading(true);
+      if (!isSilent) setLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) throw new Error('Unauthorized');
 
@@ -38,7 +38,7 @@ export const useUserChats = (userId: string | undefined) => {
     } catch (err) {
       console.error('Error fetching chats:', err);
     } finally {
-      setLoading(false);
+      if (!isSilent) setLoading(false);
     }
   }, [userId]);
 

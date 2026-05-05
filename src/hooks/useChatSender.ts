@@ -111,18 +111,29 @@ export const useChatSender = (
         });
       }
 
-      if (isFirstMessage && onNewChatCreated) {
-        onNewChatCreated();
-        if (setChatTitle) {
-          setTimeout(async () => {
-            const { data } = await supabase
-              .from('chats')
-              .select('title')
-              .eq('id', chatId)
-              .maybeSingle();
-            if (data?.title) setChatTitle(data.title);
-          }, 1500);
-        }
+      if (isFirstMessage) {
+        let attempts = 0;
+        const maxAttempts = 5;
+        
+        const updateTitle = async () => {
+          const { data } = await supabase
+            .from('chats')
+            .select('title')
+            .eq('id', chatId)
+            .maybeSingle();
+
+          if (data?.title && data.title !== 'Untitled Chat') {
+            if (setChatTitle) setChatTitle(data.title);
+            if (onNewChatCreated) onNewChatCreated();
+          } else if (attempts < maxAttempts) {
+            attempts++;
+            setTimeout(updateTitle, 1000);
+          } else {
+            if (onNewChatCreated) onNewChatCreated();
+          }
+        };
+
+        await updateTitle();
       }
 
     } catch (error: any) {

@@ -145,7 +145,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     chats.map((chat) => {
                       const isActive = currentChatId === chat.id;
                       return (
-                        <button
+                        <motion.button
+                          layout
                           key={chat.id}
                           onClick={() => {
                             onChatSelect(chat.id);
@@ -160,7 +161,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           <span className="truncate flex-1">
                             {chat.title || 'Untitled Chat'}
                           </span>
-                        </button>
+                        </motion.button>
                       );
                     })
                   ) : (

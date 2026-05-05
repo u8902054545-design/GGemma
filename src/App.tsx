@@ -50,7 +50,7 @@ export default function App() {
     setChatTitle,
     loadChatMessages,
     stopRequest
-  } = useChat(refreshChats);
+  } = useChat(() => refreshChats(true));
 
   const handleScroll = useCallback(() => {
     handleScrollLogic(scrollContainerRef, setShowScrollButton);
@@ -83,7 +83,7 @@ export default function App() {
             error={!!chatsError}
             currentChatId={chatId}
             onChatSelect={(id) => handleChatSelection(id, chats, setChatTitle, loadChatMessages, () => closeState(setIsSidebarOpen))}
-            onNewChat={() => handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), refreshChats)}
+            onNewChat={() => handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false))}
           />
 
           <motion.div
