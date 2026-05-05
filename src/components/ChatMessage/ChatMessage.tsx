@@ -72,6 +72,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           onSpeech={handleSpeech}
           isSpeaking={isSpeaking}
           modelName={modelName}
+          isGenerating={isGenerating}
         />
       )}
 
@@ -245,7 +246,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
 
             {isLast && (
               <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-70 leading-tight">
-                {modelName || 'Gemma'} is an AI and may make mistakes. Verify its responses.
+                Gemma is an AI and may make mistakes. Verify its responses.
               </p>
             )}
           </motion.div>
