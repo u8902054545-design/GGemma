@@ -54,10 +54,26 @@ export const StartScreen: React.FC<StartScreenProps> = ({ userName, onSelectSugg
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full px-4 mt-4">
-        <SuggestionCard text="Give me ideas for what to do with my kids' art" icon="draw" onClick={onSelectSuggestion} />
-        <SuggestionCard text="Help me write a story about an astronaut" icon="edit_square" onClick={onSelectSuggestion} />
-        <SuggestionCard text="Explain how quantum computing works" icon="lightbulb" onClick={onSelectSuggestion} />
-        <SuggestionCard text="Plan a low-carb meal with what's in my fridge" icon="restaurant" onClick={onSelectSuggestion} />
+        <SuggestionCard 
+          text="Write a script for a show like Stranger Things" 
+          icon="movie_edit" 
+          onClick={onSelectSuggestion} 
+        />
+        <SuggestionCard 
+          text="How to use Kling AI for professional video creation" 
+          icon="video_settings" 
+          onClick={onSelectSuggestion} 
+        />
+        <SuggestionCard 
+          text="Latest theories about Welcome to Derry Season 2" 
+          icon="mystery" 
+          onClick={onSelectSuggestion} 
+        />
+        <SuggestionCard 
+          text="Create a prompt for a cinematic sci-fi scene" 
+          icon="auto_awesome" 
+          onClick={onSelectSuggestion} 
+        />
       </div>
     </div>
   );
