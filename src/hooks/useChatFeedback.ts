@@ -12,7 +12,7 @@ export const useChatFeedback = (setMessages: React.Dispatch<React.SetStateAction
     ));
 
     try {
-      await fetch(SUPABASE_ENDPOINT, {
+      const response = await fetch(SUPABASE_ENDPOINT, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -23,6 +23,10 @@ export const useChatFeedback = (setMessages: React.Dispatch<React.SetStateAction
           feedback: type
         }),
       });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
     } catch (error) {
       console.error('Error saving feedback:', error);
     }
