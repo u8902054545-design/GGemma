@@ -14,6 +14,9 @@ import Login from './components/Login';
 import { pageVariants } from './motion/transitions';
 import { mainContentVariants } from './motion/drawer';
 import { FullscreenImage } from './components/FullscreenImage';
+import { handleScrollLogic, scrollToBottomInstant } from './Functions/scrollUtils';
+import { handleChatSelection, handleCreateNewChat } from './Functions/chatUtils';
+import { toggleState, closeState, handleImagePreview } from './Functions/uiUtils';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -22,7 +25,6 @@ export default function App() {
   const { chats, loading: chatsLoading, error: chatsError, refreshChats, deleteChat } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   const {
@@ -37,7 +39,6 @@ export default function App() {
     isTyping,
     messagesEndRef,
     handleSend,
-    handleKeyDown,
     handleFeedback,
     models,
     snackbarMessage,
@@ -52,23 +53,12 @@ export default function App() {
   } = useChat(refreshChats);
 
   const handleScroll = useCallback(() => {
-    if (scrollContainerRef.current) {
-      const { scrollTop, scrollHeight, clientHeight } = scrollContainerRef.current;
-      const scrollBottom = scrollHeight - clientHeight - scrollTop;
-      setShowScrollButton(scrollBottom > 300);
-    }
+    handleScrollLogic(scrollContainerRef, setShowScrollButton);
   }, []);
-
-  const scrollToBottomInstant = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
 
   if (authLoading) {
     return <div className="h-screen w-full bg-black" />;
   }
-
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
-  const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
     <AnimatePresence mode="wait">
@@ -87,27 +77,13 @@ export default function App() {
         <div className="h-screen w-full bg-black overflow-hidden relative">
           <Sidebar
             isOpen={isSidebarOpen}
-            onClose={closeSidebar}
+            onClose={() => closeState(setIsSidebarOpen)}
             chats={chats}
             loading={chatsLoading}
             error={!!chatsError}
             currentChatId={chatId}
-            onChatSelect={(id) => {
-              const selectedChat = chats.find(c => c.id === id);
-              if (selectedChat) {
-                setChatTitle(selectedChat.title);
-              }
-              loadChatMessages(id);
-              closeSidebar();
-            }}
-            onNewChat={() => {
-              setMessages([]);
-              setChatId(crypto.randomUUID());
-              setChatTitle('');
-              resetSearch();
-              closeSidebar();
-              refreshChats();
-            }}
+            onChatSelect={(id) => handleChatSelection(id, chats, setChatTitle, loadChatMessages, () => closeState(setIsSidebarOpen))}
+            onNewChat={() => handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), refreshChats)}
           />
 
           <motion.div
@@ -123,7 +99,7 @@ export default function App() {
               setMessages={setMessages}
               setChatId={setChatId}
               setChatTitle={setChatTitle}
-              onMenuClick={toggleSidebar}
+              onMenuClick={() => toggleState(isSidebarOpen, setIsSidebarOpen)}
               isSidebarOpen={isSidebarOpen}
               deleteChatFromDB={deleteChat}
             />
@@ -168,9 +144,7 @@ export default function App() {
                           onFeedback={handleFeedback}
                           isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
                           isLast={index === messages.length - 1}
-                          onImageClick={(url) => {
-                            if (url) setFullscreenImage(url);
-                          }}
+                          onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
                         />
                       ))}
                       <div ref={messagesEndRef} className="h-1" />
@@ -185,7 +159,7 @@ export default function App() {
                     initial={{ opacity: 0, scale: 0.8 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.8 }}
-                    onClick={scrollToBottomInstant}
+                    onClick={() => scrollToBottomInstant(messagesEndRef)}
                     className="absolute bottom-6 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[#1e1e1e] border border-[#444746] text-[#a8c7fa] shadow-2xl hover:bg-[#282a2d] transition-colors cursor-pointer"
                   >
                     <span className="material-symbols-outlined">
@@ -209,22 +183,20 @@ export default function App() {
               models={models}
               isSearchActive={isSearchActive}
               onSearchClick={toggleSearch}
-              onImageClick={(url) => {
-                if (url) setFullscreenImage(url);
-              }}
+              onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
             />
           </motion.div>
 
           <FullscreenImage
             src={fullscreenImage}
             isOpen={!!fullscreenImage}
-            onClose={() => setFullscreenImage(null)}
+            onClose={() => closeState(setFullscreenImage)}
           />
 
           <Snackbar
             message={snackbarMessage}
             isOpen={isSnackbarOpen}
-            onClose={() => setIsSnackbarOpen(false)}
+            onClose={() => closeState(setIsSnackbarOpen)}
           />
         </div>
       )}
