@@ -46,7 +46,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   }, [input]);
 
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
       e.preventDefault();
       handleWrappedSend();
     }
