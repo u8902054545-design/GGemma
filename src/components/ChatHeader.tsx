@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Drawer } from 'vaul';
 import { UserProfile } from './UserProfile';
 import { mdEasing } from '../motion/transitions';
-import { downloadHistory, handleNewChat, renameChat } from './chatHeaderFunctions';
+import { downloadHistory, handleNewChat, renameChat, togglePinChat } from './chatHeaderFunctions';
 import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 
@@ -11,24 +11,28 @@ interface ChatHeaderProps {
   messages: any[];
   chatTitle: string;
   chatId: string;
+  isPinned: boolean;
   setMessages: (msgs: any[]) => void;
   setChatId: (id: string) => void;
   setChatTitle: (title: string) => void;
   onMenuClick: () => void;
   isSidebarOpen: boolean;
   deleteChatFromDB: (id: string) => Promise<void>;
+  togglePin: (id: string, pinned: boolean) => Promise<void>;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   messages,
   chatTitle,
   chatId,
+  isPinned,
   setMessages,
   setChatId,
   setChatTitle,
   onMenuClick,
   isSidebarOpen,
-  deleteChatFromDB
+  deleteChatFromDB,
+  togglePin
 }) => {
   const isChatStarted = messages.length > 0;
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -51,6 +55,15 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       setIsDeleteOpen(false);
     } catch (error) {
       console.error("Failed to delete chat:", error);
+    }
+  };
+
+  const handleTogglePin = async () => {
+    try {
+      await togglePinChat(chatId, !isPinned, togglePin);
+      setIsMenuOpen(false);
+    } catch (error) {
+      console.error("Failed to toggle pin in header:", error);
     }
   };
 
@@ -166,6 +179,13 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                   <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none border-none">
                     <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[#49454f] my-4" />
                     <div className="p-4 bg-[#1c1b1f] pb-8">
+                      <button
+                        onClick={handleTogglePin}
+                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200 border-none"
+                      >
+                        <span className="material-symbols-outlined">{isPinned ? 'keep_off' : 'keep'}</span>
+                        <span>{isPinned ? 'Unpin a chat' : 'Pin chat'}</span>
+                      </button>
                       <button
                         onClick={() => {
                           setIsMenuOpen(false);

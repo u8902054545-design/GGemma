@@ -4,7 +4,7 @@ import { Drawer } from 'vaul';
 import { SearchOverlay } from './SearchOverlay';
 import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
-import { renameChat } from './chatHeaderFunctions';
+import { renameChat, togglePinChat } from './chatHeaderFunctions';
 import '@material/web/progress/circular-progress.js';
 
 const backdropVariants = {
@@ -38,6 +38,7 @@ interface Chat {
   title: string;
   created_at: string;
   user_id: string;
+  is_pinned: boolean;
 }
 
 interface SidebarProps {
@@ -51,6 +52,7 @@ interface SidebarProps {
   onNewChat: () => void;
   deleteChatFromDB: (id: string) => Promise<void>;
   setChatTitle: (title: string) => void;
+  togglePin: (id: string, pinned: boolean) => Promise<void>;
 }
 
 declare global {
@@ -71,7 +73,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onChatSelect,
   onNewChat,
   deleteChatFromDB,
-  setChatTitle
+  setChatTitle,
+  togglePin
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
@@ -116,6 +119,18 @@ export const Sidebar: React.FC<SidebarProps> = ({
         setIsDeleteOpen(false);
       } catch (error) {
         console.error("Failed to delete chat:", error);
+      }
+    }
+  };
+
+  const handleTogglePin = async () => {
+    if (selectedChat) {
+      try {
+        const newPinState = !selectedChat.is_pinned;
+        await togglePinChat(selectedChat.id, newPinState, togglePin);
+        setIsMenuOpen(false);
+      } catch (error) {
+        console.error("Failed to pin/unpin chat:", error);
       }
     }
   };
@@ -219,6 +234,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           <span className="truncate flex-1">
                             {chat.title || 'Untitled Chat'}
                           </span>
+                          {chat.is_pinned && (
+                            <span className="material-symbols-outlined text-[18px] ml-2 opacity-70">
+                              keep
+                            </span>
+                          )}
                         </motion.button>
                       );
                     })
@@ -243,6 +263,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <div className="text-[var(--md-sys-color-on-surface)] text-sm font-medium px-6 mb-2 opacity-50 truncate">
                 {selectedChat?.title}
               </div>
+              <button
+                onClick={handleTogglePin}
+                className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200 border-none"
+              >
+                <span className="material-symbols-outlined">
+                  {selectedChat?.is_pinned ? 'keep_off' : 'keep'}
+                </span>
+                <span>{selectedChat?.is_pinned ? 'Unpin a chat' : 'Pin chat'}</span>
+              </button>
               <button
                 onClick={() => {
                   setIsMenuOpen(false);

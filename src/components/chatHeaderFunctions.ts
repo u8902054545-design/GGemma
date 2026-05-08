@@ -39,6 +39,19 @@ export const renameChat = async (
   }
 };
 
+export const togglePinChat = async (
+  chatId: string,
+  isPinned: boolean,
+  togglePin: (id: string, pinned: boolean) => Promise<void>
+) => {
+  try {
+    await togglePin(chatId, isPinned);
+  } catch (error) {
+    console.error('Error in togglePinChat function:', error);
+    throw error;
+  }
+};
+
 export const downloadHistory = (messages: any[], format: 'txt' | 'json') => {
   let content = "";
   if (format === 'json') {

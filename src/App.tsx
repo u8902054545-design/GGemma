@@ -22,7 +22,7 @@ export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
-  const { chats, loading: chatsLoading, error: chatsError, refreshChats, deleteChat } = useUserChats(user?.id);
+  const { chats, loading: chatsLoading, error: chatsError, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
@@ -86,6 +86,7 @@ export default function App() {
             onNewChat={() => handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false))}
             deleteChatFromDB={deleteChat}
             setChatTitle={setChatTitle}
+            togglePin={togglePin}
           />
 
           <motion.div
@@ -98,12 +99,14 @@ export default function App() {
               messages={messages}
               chatTitle={chatTitle}
               chatId={chatId}
+              isPinned={chats.find(c => c.id === chatId)?.is_pinned || false}
               setMessages={setMessages}
               setChatId={setChatId}
               setChatTitle={setChatTitle}
               onMenuClick={() => toggleState(isSidebarOpen, setIsSidebarOpen)}
               isSidebarOpen={isSidebarOpen}
               deleteChatFromDB={deleteChat}
+              togglePin={togglePin}
             />
 
             <div className="flex-1 relative overflow-hidden flex flex-col">
