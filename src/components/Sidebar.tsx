@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { Drawer } from 'vaul';
 import { SearchOverlay } from './SearchOverlay';
+import { RenameDialog } from './RenameDialog';
+import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { renameChat } from './chatHeaderFunctions';
 import '@material/web/progress/circular-progress.js';
 
 const backdropVariants = {
@@ -45,6 +49,8 @@ interface SidebarProps {
   currentChatId: string;
   onChatSelect: (id: string) => void;
   onNewChat: () => void;
+  deleteChatFromDB: (id: string) => Promise<void>;
+  setChatTitle: (title: string) => void;
 }
 
 declare global {
@@ -63,9 +69,56 @@ export const Sidebar: React.FC<SidebarProps> = ({
   error,
   currentChatId,
   onChatSelect,
-  onNewChat
+  onNewChat,
+  deleteChatFromDB,
+  setChatTitle
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isRenameOpen, setIsRenameOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleTouchStart = (chat: Chat) => {
+    timerRef.current = setTimeout(() => {
+      setSelectedChat(chat);
+      setIsMenuOpen(true);
+      if (window.navigator.vibrate) {
+        window.navigator.vibrate(50);
+      }
+    }, 600);
+  };
+
+  const handleTouchEnd = () => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+  };
+
+  const handleRenameConfirm = async (newTitle: string) => {
+    if (selectedChat) {
+      await renameChat(selectedChat.id, newTitle, (title) => {
+        setChatTitle(title);
+        selectedChat.title = title;
+      });
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (selectedChat) {
+      try {
+        await deleteChatFromDB(selectedChat.id);
+        if (currentChatId === selectedChat.id) {
+          onNewChat();
+        }
+        setIsDeleteOpen(false);
+      } catch (error) {
+        console.error("Failed to delete chat:", error);
+      }
+    }
+  };
 
   return (
     <>
@@ -152,7 +205,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             onChatSelect(chat.id);
                             onClose();
                           }}
-                          className={`group flex items-center px-4 py-3 rounded-full text-sm text-left truncate transition-all duration-200 ${
+                          onTouchStart={() => handleTouchStart(chat)}
+                          onTouchEnd={handleTouchEnd}
+                          onMouseDown={() => handleTouchStart(chat)}
+                          onMouseUp={handleTouchEnd}
+                          onMouseLeave={handleTouchEnd}
+                          className={`group flex items-center px-4 py-3 rounded-full text-sm text-left truncate transition-all duration-200 select-none ${
                             isActive
                             ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] font-bold'
                             : 'text-[#e6e1e5] hover:bg-[#2b2930]'
@@ -175,6 +233,53 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </>
         )}
       </AnimatePresence>
+
+      <Drawer.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+        <Drawer.Portal>
+          <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[70]" />
+          <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto fixed bottom-0 left-0 right-0 z-[80] outline-none border-none">
+            <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[#49454f] my-4" />
+            <div className="p-4 bg-[#1c1b1f] pb-8">
+              <div className="text-[var(--md-sys-color-on-surface)] text-sm font-medium px-6 mb-2 opacity-50 truncate">
+                {selectedChat?.title}
+              </div>
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setTimeout(() => setIsRenameOpen(true), 300);
+                }}
+                className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200 border-none"
+              >
+                <span className="material-symbols-outlined">edit</span>
+                <span>Rename chat</span>
+              </button>
+              <button
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setTimeout(() => setIsDeleteOpen(true), 300);
+                }}
+                className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-[#ffb4ab] border-none"
+              >
+                <span className="material-symbols-outlined">delete</span>
+                <span>Delete chat</span>
+              </button>
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+
+      <RenameDialog
+        isOpen={isRenameOpen}
+        onClose={() => setIsRenameOpen(false)}
+        currentTitle={selectedChat?.title || ''}
+        onConfirm={handleRenameConfirm}
+      />
+
+      <DeleteConfirmDialog
+        isOpen={isDeleteOpen}
+        onClose={() => setIsDeleteOpen(false)}
+        onConfirm={handleDeleteConfirm}
+      />
     </>
   );
 };

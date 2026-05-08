@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { mdEasing } from '../motion/transitions';
 import { motion, AnimatePresence } from 'motion/react';
@@ -12,6 +12,18 @@ interface RenameDialogProps {
 
 export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, currentTitle, onConfirm }) => {
   const [inputValue, setInputValue] = useState(currentTitle);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      setInputValue(currentTitle);
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.select();
+        }
+      }, 50);
+    }
+  }, [isOpen, currentTitle]);
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
@@ -40,6 +52,7 @@ export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, cur
                 
                 <div className="relative group">
                   <input
+                    ref={inputRef}
                     autoFocus
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}

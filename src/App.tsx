@@ -84,6 +84,8 @@ export default function App() {
             currentChatId={chatId}
             onChatSelect={(id) => handleChatSelection(id, chats, setChatTitle, loadChatMessages, () => closeState(setIsSidebarOpen))}
             onNewChat={() => handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false))}
+            deleteChatFromDB={deleteChat}
+            setChatTitle={setChatTitle}
           />
 
           <motion.div
