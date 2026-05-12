@@ -19,6 +19,8 @@ interface ChatHeaderProps {
   isSidebarOpen: boolean;
   deleteChatFromDB: (id: string) => Promise<void>;
   togglePin: (id: string, pinned: boolean) => Promise<void>;
+  isTemporary?: boolean;
+  onTemporaryChatClick?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -32,13 +34,17 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   onMenuClick,
   isSidebarOpen,
   deleteChatFromDB,
-  togglePin
+  togglePin,
+  isTemporary = false,
+  onTemporaryChatClick
 }) => {
   const isChatStarted = messages.length > 0;
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+
+  const displayTitle = isTemporary ? "Temporary Chat" : chatTitle;
 
   const onNewChatClick = () => {
     handleNewChat(setMessages, setChatId, setChatTitle);
@@ -91,22 +97,40 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         </div>
 
         <AnimatePresence mode="wait">
-          {isChatStarted && chatTitle && (
+          {isChatStarted && displayTitle && (
             <motion.h1
-              key={chatTitle}
+              key={displayTitle}
               initial={{ opacity: 0, x: -5 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -5 }}
               transition={{ duration: 0.4, ease: mdEasing.standard }}
               className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] truncate mr-4 ml-1"
             >
-              {chatTitle}
+              {displayTitle}
             </motion.h1>
           )}
         </AnimatePresence>
       </div>
 
-      <div className="flex items-center justify-end min-w-[48px]">
+      <div className="flex items-center justify-end min-w-[48px] gap-1">
+        <AnimatePresence mode="wait">
+          {!isChatStarted && (
+            <motion.button
+              key="temp-chat-toggle"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2 }}
+              onClick={onTemporaryChatClick}
+              className={`p-2 rounded-full transition-colors flex items-center justify-center ${isTemporary ? 'bg-[#a8c7fa]/20 text-[#a8c7fa]' : 'hover:bg-white/10 text-[var(--md-sys-color-on-surface-variant)]'}`}
+            >
+              <span className="material-symbols-outlined text-[22px]">
+                chat_dashed
+              </span>
+            </motion.button>
+          )}
+        </AnimatePresence>
+
         <AnimatePresence mode="wait" initial={false}>
           {!isChatStarted ? (
             <motion.div
@@ -166,50 +190,52 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 </Drawer.Portal>
               </Drawer.Root>
 
-              <Drawer.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-                <Drawer.Trigger asChild>
-                  <button className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
-                    <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">
-                      more_vert
-                    </span>
-                  </button>
-                </Drawer.Trigger>
-                <Drawer.Portal>
-                  <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[60]" />
-                  <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none border-none">
-                    <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[#49454f] my-4" />
-                    <div className="p-4 bg-[#1c1b1f] pb-8">
-                      <button
-                        onClick={handleTogglePin}
-                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200 border-none"
-                      >
-                        <span className="material-symbols-outlined">{isPinned ? 'keep_off' : 'keep'}</span>
-                        <span>{isPinned ? 'Unpin a chat' : 'Pin chat'}</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          setTimeout(() => setIsRenameOpen(true), 300);
-                        }}
-                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200 border-none"
-                      >
-                        <span className="material-symbols-outlined">edit</span>
-                        <span>Rename chat</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setIsMenuOpen(false);
-                          setTimeout(() => setIsDeleteOpen(true), 300);
-                        }}
-                        className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-[#ffb4ab] border-none"
-                      >
-                        <span className="material-symbols-outlined">delete</span>
-                        <span>Delete chat</span>
-                      </button>
-                    </div>
-                  </Drawer.Content>
-                </Drawer.Portal>
-              </Drawer.Root>
+              {!isTemporary && (
+                <Drawer.Root open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                  <Drawer.Trigger asChild>
+                    <button className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center">
+                      <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">
+                        more_vert
+                      </span>
+                    </button>
+                  </Drawer.Trigger>
+                  <Drawer.Portal>
+                    <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[60]" />
+                    <Drawer.Content className="bg-[#1c1b1f] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none border-none">
+                      <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[#49454f] my-4" />
+                      <div className="p-4 bg-[#1c1b1f] pb-8">
+                        <button
+                          onClick={handleTogglePin}
+                          className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200 border-none"
+                        >
+                          <span className="material-symbols-outlined">{isPinned ? 'keep_off' : 'keep'}</span>
+                          <span>{isPinned ? 'Unpin a chat' : 'Pin chat'}</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setTimeout(() => setIsRenameOpen(true), 300);
+                          }}
+                          className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200 border-none"
+                        >
+                          <span className="material-symbols-outlined">edit</span>
+                          <span>Rename chat</span>
+                        </button>
+                        <button
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            setTimeout(() => setIsDeleteOpen(true), 300);
+                          }}
+                          className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-[#ffb4ab] border-none"
+                        >
+                          <span className="material-symbols-outlined">delete</span>
+                          <span>Delete chat</span>
+                        </button>
+                      </div>
+                    </Drawer.Content>
+                  </Drawer.Portal>
+                </Drawer.Root>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

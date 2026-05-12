@@ -7,7 +7,7 @@ import { useChatFeedback } from './useChatFeedback';
 import { useChatLoader } from './useChatLoader';
 import { useChatSender } from './useChatSender';
 
-export const useChat = (onNewChatCreated?: () => void) => {
+export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = false) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
@@ -53,7 +53,8 @@ export const useChat = (onNewChatCreated?: () => void) => {
     setSnackbarMessage,
     setIsSnackbarOpen,
     onNewChatCreated,
-    setChatTitle
+    setChatTitle,
+    isTemporary
   );
 
   const stopRequest = useCallback(() => {

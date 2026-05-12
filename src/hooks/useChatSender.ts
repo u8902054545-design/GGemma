@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { SUPABASE_ENDPOINT, supabase } from '../config';
 import { Message } from './chatTypes';
+import { saveTempMessages } from '../TemporaryChat/temporaryStorage';
 
 export const useChatSender = (
   messages: Message[],
@@ -16,14 +17,17 @@ export const useChatSender = (
   setSnackbarMessage: (msg: string) => void,
   setIsSnackbarOpen: (open: boolean) => void,
   onNewChatCreated?: () => void,
-  setChatTitle?: (title: string) => void
+  setChatTitle?: (title: string) => void,
+  isTemporary: boolean = false
 ) => {
   const handleSend = useCallback(async (overrideInput?: string, isSearchActive: boolean = false, file?: File) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
     if ((!textToSend.trim() && !file) || isTyping) return;
 
     const { data: { session } } = await supabase.auth.getSession();
-    if (!session?.access_token) {
+    const accessToken = session?.access_token;
+
+    if (!isTemporary && !accessToken) {
       setSnackbarMessage('Session expired. Please sign in again.');
       setIsSnackbarOpen(true);
       return;
@@ -51,7 +55,13 @@ export const useChatSender = (
       imageUrl: localImageUrl
     };
 
-    setMessages(prev => [...prev, newUserMsg]);
+    const updatedMessages = [...messages, newUserMsg];
+    setMessages(updatedMessages);
+
+    if (isTemporary) {
+      saveTempMessages(updatedMessages);
+    }
+
     setInput('');
     setIsTyping(true);
     scrollToBottom();
@@ -66,15 +76,17 @@ export const useChatSender = (
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session.access_token}`,
+          ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
         },
         signal,
         body: JSON.stringify({
           message: userText,
           model: selectedModel,
-          chat_id: chatId,
+          chat_id: isTemporary ? `temp_${chatId}` : chatId,
           isSearchActive: isSearchActive,
-          image: base64Image || null
+          image: base64Image || null,
+          isTemporary: isTemporary,
+          history: isTemporary ? updatedMessages : undefined
         }),
       });
 
@@ -87,7 +99,7 @@ export const useChatSender = (
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";
-      
+
       if (!reader) throw new Error('ReadableStream not supported');
 
       while (true) {
@@ -106,15 +118,18 @@ export const useChatSender = (
               content: accumulatedContent,
               modelName: modelNameFromServer
             };
+            if (isTemporary) {
+              saveTempMessages(newMessages);
+            }
           }
           return newMessages;
         });
       }
 
-      if (isFirstMessage) {
+      if (isFirstMessage && !isTemporary) {
         let attempts = 0;
         const maxAttempts = 5;
-        
+
         const updateTitle = async () => {
           const { data } = await supabase
             .from('chats')
@@ -147,7 +162,7 @@ export const useChatSender = (
     } finally {
       setIsTyping(false);
     }
-  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, messages.length, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen, setChatTitle]);
+  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, messages, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen, setChatTitle, isTemporary]);
 
   return { handleSend };
 };

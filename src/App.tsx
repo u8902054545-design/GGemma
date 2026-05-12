@@ -17,6 +17,8 @@ import { FullscreenImage } from './components/FullscreenImage';
 import { handleScrollLogic, scrollToBottomInstant } from './Functions/scrollUtils';
 import { handleChatSelection, handleCreateNewChat } from './Functions/chatUtils';
 import { toggleState, closeState, handleImagePreview } from './Functions/uiUtils';
+import { TemporaryChatPage } from './TemporaryChat/TemporaryChatPage';
+import { clearTempMessages } from './TemporaryChat/temporaryStorage';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -26,6 +28,8 @@ export default function App() {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+
+  const [isTemporary, setIsTemporary] = useState(false);
 
   const {
     messages,
@@ -50,11 +54,22 @@ export default function App() {
     setChatTitle,
     loadChatMessages,
     stopRequest
-  } = useChat(() => refreshChats(true));
+  } = useChat(() => refreshChats(true), isTemporary);
 
   const handleScroll = useCallback(() => {
     handleScrollLogic(scrollContainerRef, setShowScrollButton);
   }, []);
+
+  const handleTemporaryToggle = () => {
+    if (!isTemporary) {
+      handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
+      setIsTemporary(true);
+    } else {
+      setIsTemporary(false);
+      clearTempMessages();
+      handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
+    }
+  };
 
   if (authLoading) {
     return <div className="h-screen w-full bg-black" />;
@@ -82,8 +97,16 @@ export default function App() {
             loading={chatsLoading}
             error={!!chatsError}
             currentChatId={chatId}
-            onChatSelect={(id) => handleChatSelection(id, chats, setChatTitle, loadChatMessages, () => closeState(setIsSidebarOpen))}
-            onNewChat={() => handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false))}
+            onChatSelect={(id) => {
+              if (isTemporary) clearTempMessages();
+              setIsTemporary(false);
+              handleChatSelection(id, chats, setChatTitle, loadChatMessages, () => closeState(setIsSidebarOpen));
+            }}
+            onNewChat={() => {
+              if (isTemporary) clearTempMessages();
+              setIsTemporary(false);
+              handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false));
+            }}
             deleteChatFromDB={deleteChat}
             setChatTitle={setChatTitle}
             togglePin={togglePin}
@@ -97,7 +120,7 @@ export default function App() {
           >
             <ChatHeader
               messages={messages}
-              chatTitle={chatTitle}
+              chatTitle={isTemporary ? "Temporary Chat" : chatTitle}
               chatId={chatId}
               isPinned={chats.find(c => c.id === chatId)?.is_pinned || false}
               setMessages={setMessages}
@@ -107,6 +130,8 @@ export default function App() {
               isSidebarOpen={isSidebarOpen}
               deleteChatFromDB={deleteChat}
               togglePin={togglePin}
+              isTemporary={isTemporary}
+              onTemporaryChatClick={handleTemporaryToggle}
             />
 
             <div className="flex-1 relative overflow-hidden flex flex-col">
@@ -116,7 +141,9 @@ export default function App() {
                 className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth"
               >
                 <AnimatePresence mode="wait">
-                  {messages.length === 0 ? (
+                  {isTemporary && messages.length === 0 ? (
+                    <TemporaryChatPage key="temp-page" />
+                  ) : messages.length === 0 ? (
                     <motion.div
                       key="start-screen-anim"
                       variants={pageVariants}
@@ -150,6 +177,7 @@ export default function App() {
                           isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
                           isLast={index === messages.length - 1}
                           onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
+                          isTemporary={isTemporary}
                         />
                       ))}
                       <div ref={messagesEndRef} className="h-1" />

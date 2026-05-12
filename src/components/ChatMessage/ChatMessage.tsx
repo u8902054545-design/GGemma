@@ -15,6 +15,7 @@ import { CodeBlock } from './CodeBlock';
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
   onImageClick?: (url: string) => void;
+  isTemporary?: boolean;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({ 
@@ -27,7 +28,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   feedback, 
   onFeedback,
   isLast,
-  onImageClick
+  onImageClick,
+  isTemporary = false
 }) => {
   const isAI = role === 'ai';
   const isStopped = content.includes('_STOPPED_');
@@ -214,26 +216,30 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
             className="mt-4 flex flex-col gap-3 w-full select-none"
           >
             <div className="flex items-center gap-1">
-              <button
-                onClick={() => handleFeedback(localFeedback === 'like' ? null : 'like')}
-                className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
-                  localFeedback === 'like' ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
-                }`}
-              >
-                <span className={`material-symbols-outlined text-[20px] ${localFeedback === 'like' ? 'FILL' : ''}`} style={{ fontVariationSettings: localFeedback === 'like' ? "'FILL' 1" : "" }}>
-                  thumb_up
-                </span>
-              </button>
-              <button
-                onClick={() => handleFeedback(localFeedback === 'dislike' ? null : 'dislike')}
-                className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
-                  localFeedback === 'dislike' ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
-                }`}
-              >
-                <span className={`material-symbols-outlined text-[20px] ${localFeedback === 'dislike' ? 'FILL' : ''}`} style={{ fontVariationSettings: localFeedback === 'dislike' ? "'FILL' 1" : "" }}>
-                  thumb_down
-                </span>
-              </button>
+              {!isTemporary && (
+                <>
+                  <button
+                    onClick={() => handleFeedback(localFeedback === 'like' ? null : 'like')}
+                    className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
+                      localFeedback === 'like' ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-[20px] ${localFeedback === 'like' ? 'FILL' : ''}`} style={{ fontVariationSettings: localFeedback === 'like' ? "'FILL' 1" : "" }}>
+                      thumb_up
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => handleFeedback(localFeedback === 'dislike' ? null : 'dislike')}
+                    className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
+                      localFeedback === 'dislike' ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-[20px] ${localFeedback === 'dislike' ? 'FILL' : ''}`} style={{ fontVariationSettings: localFeedback === 'dislike' ? "'FILL' 1" : "" }}>
+                      thumb_down
+                    </span>
+                  </button>
+                </>
+              )}
               <button
                 onClick={() => handleCopy(mainContent)}
                 className="p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] transition-colors cursor-pointer"
