@@ -1,5 +1,4 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
-import { ModelSelector } from './ModelSelector';
 import { ImagePreview } from './ImagePreview';
 import { useImageUpload } from '../hooks/useImageUpload';
 
@@ -9,22 +8,20 @@ type ChatInputProps = {
   handleSend: (overrideInput?: string, isSearchActive?: boolean, file?: File) => void;
   stopRequest: () => void;
   selectedModel: string;
-  setSelectedModel: (model: string) => void;
-  isDropdownOpen: boolean;
-  setIsDropdownOpen: (open: boolean) => void;
   isTyping: boolean;
-  models: string[];
   isSearchActive?: boolean;
   onSearchClick?: () => void;
   onImageClick?: (url: string) => void;
+  onModelConfigClick?: () => void;
 };
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
-  input, setInput, handleSend, stopRequest, selectedModel, setSelectedModel,
-  isDropdownOpen, setIsDropdownOpen, isTyping, models,
+  input, setInput, handleSend, stopRequest,
+  isTyping,
   isSearchActive = false,
   onSearchClick,
   onImageClick,
+  onModelConfigClick,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -169,13 +166,16 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
             </div>
 
             <div className="flex items-center gap-3">
-              <ModelSelector
-                selectedModel={selectedModel}
-                setSelectedModel={setSelectedModel}
-                isDropdownOpen={isDropdownOpen}
-                setIsDropdownOpen={setIsDropdownOpen}
-                models={models}
-              />
+              <button
+                type="button"
+                onClick={onModelConfigClick}
+                className="p-2 rounded-full hover:bg-[#1a1a1a] transition-all active:scale-90 flex items-center justify-center group"
+              >
+                <span className="material-symbols-outlined text-[24px] text-[#808080] group-hover:text-[#8ab4f8]">
+                  tune
+                </span>
+              </button>
+
               <div className="flex items-center gap-1">
                 <button
                   type="button"
