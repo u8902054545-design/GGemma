@@ -124,7 +124,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKeyDown}
-            placeholder="Message Gemma..."
+            placeholder="Ask Gemma"
             className="w-full bg-transparent border-none outline-none resize-none max-h-60 min-h-[44px] px-4 py-3 text-[#e2e2e2] placeholder-[#444]"
             rows={1}
           />
