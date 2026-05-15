@@ -16,23 +16,20 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
   onClose
 }) => {
   const [activeCategory, setActiveCategory] = useState('Gemma');
-  
-  // Вычисляем состояние напрямую из глобальной выбранной модели
+
   const isAutoGemma = selectedModel.id === 'auto';
 
   const categories = ['Gemma', 'Gemini', 'Images', 'Video', 'Audio'];
-  
+
   const modelsData: Record<string, { id: string, name: string, desc: string }[]> = {
     Gemma: [
-      { id: 'google/gemma-4-31b-it', name: 'Gemma 4 31B', desc: 'The absolute pinnacle of open models from Google.' },
-      { id: 'google/gemma-4-26b-a4b-it', name: 'Gemma 4 26B', desc: 'Next-generation architecture for unparalleled efficiency.' },
-      { id: 'google/gemma-3-27b-it', name: 'Gemma 3 27B', desc: 'Powerful and highly capable model for complex reasoning.' },
-      { id: 'google/gemma-3-12b-it', name: 'Gemma 3 12B', desc: 'The perfect balance of high performance and incredible speed.' },
-      { id: 'google/gemma-3-4b-it', name: 'Gemma 3 4B', desc: 'Lightning-fast and lightweight model for everyday tasks.' },
-      { id: 'google/gemma-3-1b-it', name: 'Gemma 3 1B', desc: 'Extremely efficient and small model for basic interactions.' },
-      { id: 'google/gemma-3n-e4b-it', name: 'Gemma 3n E4B', desc: 'Optimized neural core for ultra-fast edge computing.' },
-      { id: 'google/gemma-3n-e2b-it', name: 'Gemma 3n E2B', desc: 'Ultra-lightweight neural model for instant responses.' },
-      { id: 'google/gemma-2-27b-it', name: 'Gemma 2 27B', desc: 'The classic and battle-tested heavyweight model.' }
+      { id: 'Gemma 4 31B', name: 'Gemma 4 31B', desc: 'The absolute pinnacle of open models from Google.' },
+      { id: 'Gemma 4 26B', name: 'Gemma 4 26B', desc: 'Next-generation architecture for unparalleled efficiency.' },
+      { id: 'Gemma 3 27B', name: 'Gemma 3 27B', desc: 'Powerful and highly capable model for complex reasoning.' },
+      { id: 'Gemma 3 12B', name: 'Gemma 3 12B', desc: 'The perfect balance of high performance and incredible speed.' },
+      { id: 'Gemma 3 4B', name: 'Gemma 3 4B', desc: 'Lightning-fast and lightweight model for everyday tasks.' },
+      { id: 'Gemma 3n E4B', name: 'Gemma 3n E4B', desc: 'Optimized neural core for ultra-fast edge computing.' },
+      { id: 'Gemma 2 27B', name: 'Gemma 2 27B', desc: 'The classic and battle-tested heavyweight model.' }
     ],
     Gemini: [],
     Images: [],
@@ -45,29 +42,27 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
     const circle = document.createElement("span");
     const diameter = Math.max(button.clientWidth, button.clientHeight);
     const radius = diameter / 2;
-    
+
     const rect = button.getBoundingClientRect();
     circle.style.width = circle.style.height = `${diameter}px`;
     circle.style.left = `${e.clientX - rect.left - radius}px`;
     circle.style.top = `${e.clientY - rect.top - radius}px`;
     circle.classList.add("md3-ripple", "animate-ripple");
-    
+
     const existingRipples = button.getElementsByClassName("md3-ripple");
     for(let i = 0; i < existingRipples.length; i++) {
         existingRipples[i].remove();
     }
-    
+
     button.appendChild(circle);
     setTimeout(() => circle.remove(), 600);
   };
 
   const handleAutoToggle = () => {
     if (!isAutoGemma) {
-      // Включаем автоматический выбор
       setSelectedModel({ id: 'auto', name: 'Automatic' });
     } else {
-      // Если выключаем ползунок, выбираем базовую модель по умолчанию
-      setSelectedModel({ id: 'google/gemma-3-4b-it', name: 'Gemma 3 4B' });
+      setSelectedModel({ id: 'Gemma 3 4B', name: 'Gemma 3 4B' });
     }
   };
 
@@ -77,10 +72,10 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
-      
+
       <div className="flex flex-col h-full w-full bg-[#000000] select-none">
         <header className="px-6 py-6 flex flex-col items-start shrink-0 max-w-5xl w-full mx-auto">
-          <button 
+          <button
             onClick={onClose}
             className="mb-6 cursor-pointer ripple-container p-1 rounded-full -ml-1 hover:bg-[#1a1a1a] transition-colors border-none outline-none bg-transparent"
           >
@@ -104,8 +99,8 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                   setActiveCategory(category);
                 }}
                 className={`ripple-container shrink-0 relative px-5 py-2 rounded-full text-[15px] font-medium transition-colors duration-300 whitespace-nowrap ${
-                  activeCategory === category 
-                    ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]' 
+                  activeCategory === category
+                    ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]'
                     : 'text-[var(--md-sys-color-on-background)] hover:bg-[rgba(255,255,255,0.05)]'
                 }`}
               >
@@ -128,15 +123,15 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
               >
                 <h2 className="text-[17px] font-semibold mb-2 mt-1 text-[var(--md-sys-color-on-surface)] flex items-center gap-2">
                   <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">
-                    {activeCategory === 'Gemma' || activeCategory === 'Gemini' ? 'neurology' : 
-                     activeCategory === 'Images' ? 'image' : 
+                    {activeCategory === 'Gemma' || activeCategory === 'Gemini' ? 'neurology' :
+                     activeCategory === 'Images' ? 'image' :
                      activeCategory === 'Video' ? 'movie' : 'audio_file'}
                   </span>
                   {activeCategory} Models
                 </h2>
 
                 {activeCategory === 'Gemma' && (
-                  <div 
+                  <div
                     onClick={handleAutoToggle}
                     className="ripple-container group relative p-5 mb-2 rounded-2xl cursor-pointer transition-all duration-300 flex items-center justify-between border border-transparent bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)]"
                   >
@@ -168,8 +163,8 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                         setSelectedModel({ id: item.id, name: item.name });
                       }}
                       className={`ripple-container group relative p-5 rounded-2xl cursor-pointer transition-all duration-300 flex flex-col gap-3 ${
-                        selectedModel.id === item.id 
-                          ? 'border border-[var(--md-sys-color-primary)] bg-transparent' 
+                        selectedModel.id === item.id
+                          ? 'border border-[var(--md-sys-color-primary)] bg-transparent'
                           : 'border border-transparent bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)]'
                       }`}
                     >
@@ -181,14 +176,14 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                             deployed_code
                           </span>
                         </div>
-                        
+
                         {selectedModel.id === item.id && (
                           <span className="material-symbols-outlined text-[var(--md-sys-color-primary)]">
                             check_circle
                           </span>
                         )}
                       </div>
-                      
+
                       <div className="mt-1">
                         <h3 className="text-[17px] font-semibold text-[var(--md-sys-color-on-surface)] mb-1">
                           {item.name}

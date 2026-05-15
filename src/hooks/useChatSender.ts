@@ -86,7 +86,6 @@ export const useChatSender = (
         signal,
         body: JSON.stringify({
           message: userText,
-          modelId: selectedModel.id,
           publicModelName: selectedModel.name,
           chat_id: isTemporary ? `temp_${chatId}` : chatId,
           isSearchActive: isSearchActive,

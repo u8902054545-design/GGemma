@@ -9,16 +9,15 @@ type ModelSelectorProps = {
   models: string[];
 };
 
-export const MODEL_DATA: Record<string, { title: string, chip: string, desc: string }> = {
-  'auto': { title: 'Automatic', chip: 'Auto', desc: 'Let the system choose the best model' },
-  'Gemma 3 1B': { title: 'Gemma 3: Lite', chip: 'V3: Lite', desc: 'Ultra-fast for simple questions' },
-  'Gemma 3 4B': { title: 'Gemma 3: Basic', chip: 'V3: Basic', desc: 'Perfect balance for daily tasks' },
-  'Gemma 3 12B': { title: 'Gemma 3: Pro', chip: 'V3: Pro', desc: 'Smart reasoning and deep chat' },
-  'Gemma 3 27B': { title: 'Gemma 3: Ultra', chip: 'V3: Ultra', desc: 'Maximum intelligence for complex work' },
-  'Gemma 3n E2B': { title: 'Gemma 3n: Flash', chip: 'V3n: Flash', desc: 'Super efficient edge intelligence' },
-  'Gemma 3n E4B': { title: 'Gemma 3n: Turbo', chip: 'V3n: Turbo', desc: 'High-speed advanced processing' },
-  'Gemma 4 26B A4B IT': { title: 'Gemma 4: Next', chip: 'V4: Next', desc: 'Experimental futuristic architecture' },
-  'Gemma 4 31B IT': { title: 'Gemma 4: Flagship', chip: 'V4: Elite', desc: 'The most powerful elite model' },
+export const MODEL_DATA: Record<string, {}> = {
+  'auto': {},
+  'Gemma 3 4B': {},
+  'Gemma 3 12B': {},
+  'Gemma 3 27B': {},
+  'Gemma 3n E4B': {},
+  'Gemma 4 26B A4B IT': {},
+  'Gemma 4 31B IT': {},
+  'Gemma 2 27B': {},
 };
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
@@ -32,7 +31,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   const timerRef = useRef<any>(null);
 
   const isAutoGemma = selectedModel === 'auto' || selectedModel?.id === 'auto';
-  
+
   const selectedModelId = typeof selectedModel === 'string' ? selectedModel : selectedModel?.id;
 
   const handlePointerDown = (model: string) => {
@@ -64,7 +63,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
       <Drawer.Trigger asChild>
         <button className="flex items-center px-3 py-1 rounded-full bg-[#1a1a1a] border border-[#333] hover:bg-[#252525] transition-transform active:scale-95">
           <span className="text-[11px] font-medium text-[#e2e2e2] tracking-tight">
-            {MODEL_DATA[selectedModelId]?.chip || selectedModelId}
+            {selectedModelId === 'auto' ? 'Auto' : selectedModelId}
           </span>
         </button>
       </Drawer.Trigger>
@@ -105,10 +104,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                       className={`w-full text-left p-4 rounded-2xl flex flex-col transition-colors ${selectedModelId === model ? "bg-[#1a1a1a]" : "hover:bg-[#161616]"}`}
                     >
                       <span className={`text-[15px] font-medium ${selectedModelId === model ? "text-[#8ab4f8]" : "text-[#e2e2e2]"}`}>
-                        {MODEL_DATA[model]?.title || model}
-                      </span>
-                      <span className="text-xs text-[#808080] mt-0.5">
-                        {MODEL_DATA[model]?.desc}
+                        {model}
                       </span>
                     </button>
                     {activeHint === model && (
@@ -125,7 +121,7 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
                   <span className="text-xs text-[#808080]">No models available</span>
                 </div>
               )}
-              
+
             </div>
           </div>
         </Drawer.Content>
