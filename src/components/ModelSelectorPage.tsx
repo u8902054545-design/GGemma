@@ -6,6 +6,7 @@ import { SelectedModel } from '../hooks/chatTypes';
 type ModelSelectorPageProps = {
   selectedModel: SelectedModel;
   setSelectedModel: (model: SelectedModel) => void;
+  isAutoGemma?: boolean;
   onClose: () => void;
 };
 
@@ -15,6 +16,9 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
   onClose
 }) => {
   const [activeCategory, setActiveCategory] = useState('Gemma');
+  
+  // Вычисляем состояние напрямую из глобальной выбранной модели
+  const isAutoGemma = selectedModel.id === 'auto';
 
   const categories = ['Gemma', 'Gemini', 'Images', 'Video', 'Audio'];
   
@@ -55,6 +59,16 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
     
     button.appendChild(circle);
     setTimeout(() => circle.remove(), 600);
+  };
+
+  const handleAutoToggle = () => {
+    if (!isAutoGemma) {
+      // Включаем автоматический выбор
+      setSelectedModel({ id: 'auto', name: 'Automatic' });
+    } else {
+      // Если выключаем ползунок, выбираем базовую модель по умолчанию
+      setSelectedModel({ id: 'google/gemma-3-4b-it', name: 'Gemma 3 4B' });
+    }
   };
 
   return (
@@ -121,7 +135,31 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                   {activeCategory} Models
                 </h2>
 
-                {modelsData[activeCategory]?.length > 0 ? (
+                {activeCategory === 'Gemma' && (
+                  <div 
+                    onClick={handleAutoToggle}
+                    className="ripple-container group relative p-5 mb-2 rounded-2xl cursor-pointer transition-all duration-300 flex items-center justify-between border border-transparent bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)]"
+                  >
+                    <div className="flex flex-col">
+                      <span className="text-[17px] font-semibold text-[var(--md-sys-color-on-surface)]">
+                        Automatic selection
+                      </span>
+                      <span className="text-[14px] text-[var(--md-sys-color-on-surface-variant)] mt-1">
+                        Let the system choose the best model
+                      </span>
+                    </div>
+                    <div className={`w-12 h-7 rounded-full flex items-center p-1 transition-colors duration-300 ${isAutoGemma ? 'bg-[#0842a0]' : 'bg-[#444746]'}`}>
+                      <motion.div
+                        layout
+                        className={`w-5 h-5 rounded-full shadow-md ${isAutoGemma ? 'bg-white' : 'bg-[#c4c7c5]'}`}
+                        animate={{ x: isAutoGemma ? 20 : 0 }}
+                        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {!(activeCategory === 'Gemma' && isAutoGemma) && modelsData[activeCategory]?.length > 0 ? (
                   modelsData[activeCategory].map((item) => (
                     <div
                       key={item.id}
@@ -162,19 +200,21 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                     </div>
                   ))
                 ) : (
-                  <div className="w-full flex flex-col items-center justify-center py-20 px-4 mt-4 rounded-3xl border border-dashed border-[var(--md-sys-color-outline-variant)] bg-[rgba(40,42,45,0.3)]">
-                    <div className="w-16 h-16 mb-4 rounded-full bg-[var(--md-sys-color-surface-container-highest)] flex items-center justify-center">
-                      <span className="material-symbols-outlined text-3xl text-[var(--md-sys-color-on-surface-variant)] opacity-80">
-                        smart_toy
-                      </span>
+                  !(activeCategory === 'Gemma' && isAutoGemma) && (
+                    <div className="w-full flex flex-col items-center justify-center py-20 px-4 mt-4 rounded-3xl border border-dashed border-[var(--md-sys-color-outline-variant)] bg-[rgba(40,42,45,0.3)]">
+                      <div className="w-16 h-16 mb-4 rounded-full bg-[var(--md-sys-color-surface-container-highest)] flex items-center justify-center">
+                        <span className="material-symbols-outlined text-3xl text-[var(--md-sys-color-on-surface-variant)] opacity-80">
+                          smart_toy
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-semibold text-[var(--md-sys-color-on-surface)] mb-2 text-center">
+                        No models available yet
+                      </h3>
+                      <p className="text-[14px] text-[var(--md-sys-color-on-surface-variant)] text-center max-w-sm leading-relaxed">
+                        We are actively training new models. Check back later!
+                      </p>
                     </div>
-                    <h3 className="text-lg font-semibold text-[var(--md-sys-color-on-surface)] mb-2 text-center">
-                      No models available yet
-                    </h3>
-                    <p className="text-[14px] text-[var(--md-sys-color-on-surface-variant)] text-center max-w-sm leading-relaxed">
-                      We are actively training new models. Check back later!
-                    </p>
-                  </div>
+                  )
                 )}
               </motion.div>
             </AnimatePresence>

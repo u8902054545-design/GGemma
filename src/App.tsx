@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useMemo } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
@@ -55,6 +55,8 @@ export default function App() {
     isSnackbarOpen,
     setIsSnackbarOpen
   } = useChat(() => refreshChats(true), isTemporary);
+
+  const isAutoGemma = useMemo(() => selectedModel.id === 'auto', [selectedModel.id]);
 
   const handleScroll = useCallback(() => {
     handleScrollLogic(scrollContainerRef, setShowScrollButton);
@@ -243,8 +245,11 @@ export default function App() {
                   selectedModel={selectedModel}
                   setSelectedModel={(model) => {
                     setSelectedModel(model);
-                    setIsModelSelectorOpen(false);
+                    if (model.id !== 'auto') {
+                       setIsModelSelectorOpen(false);
+                    }
                   }}
+                  isAutoGemma={isAutoGemma}
                   onClose={() => setIsModelSelectorOpen(false)}
                 />
               </motion.div>
