@@ -100,8 +100,9 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   const isSendDisabled = !input.trim() && !selectedFile;
 
   return (
-    <footer className="w-full max-w-4xl mx-auto z-50">
-      <div className="pt-[1px] px-[1px] rounded-t-[32px] animate-gradient">
+    <footer className="w-full max-w-4xl mx-auto z-50 relative">
+      <div className="absolute -inset-[1px] rounded-t-[32px] animate-gradient blur-md opacity-60 pointer-events-none" />
+      <div className="relative pt-[1px] px-[1px] rounded-t-[32px] animate-gradient">
         <div className="bg-black rounded-t-[31px] flex flex-col p-2 pb-3">
           <input
             type="file"
