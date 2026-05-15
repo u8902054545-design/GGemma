@@ -1,6 +1,8 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
+import { motion } from 'motion/react';
 import { ImagePreview } from './ImagePreview';
 import { useImageUpload } from '../hooks/useImageUpload';
+import { searchButtonVariants, searchTextVariants } from '../motion/searchTransition';
 
 type ChatInputProps = {
   input: string;
@@ -154,10 +156,13 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 </span>
               </button>
 
-              <button
+              <motion.button
                 type="button"
                 onClick={onSearchClick}
-                className={`relative flex items-center gap-2 px-4 py-1.5 rounded-full transition-all duration-300 active:scale-95 group ${
+                variants={searchButtonVariants}
+                initial="inactive"
+                animate={isSearchActive ? "active" : "inactive"}
+                className={`relative flex items-center h-[36px] overflow-hidden rounded-full group ${
                   isSearchActive
                   ? "bg-[#8ab4f8]/10 ring-1 ring-[#8ab4f8]/50"
                   : "hover:bg-[#1a1a1a]"
@@ -166,17 +171,22 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 {isSearchActive && (
                   <div className="absolute inset-0 rounded-full animate-gradient opacity-20 -z-10" />
                 )}
-                <span className={`material-symbols-outlined text-[20px] transition-colors ${
+                <span className={`material-symbols-outlined text-[20px] shrink-0 transition-colors ${
                   isSearchActive ? "text-[#8ab4f8]" : "text-[#808080] group-hover:text-[#e2e2e2]"
                 }`}>
                   search
                 </span>
-                <span className={`text-sm font-medium transition-colors ${
-                  isSearchActive ? "text-[#8ab4f8]" : "text-[#808080] group-hover:text-[#e2e2e2]"
-                }`}>
+                <motion.span
+                  variants={searchTextVariants}
+                  initial="hidden"
+                  animate={isSearchActive ? "visible" : "hidden"}
+                  className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-colors ${
+                    isSearchActive ? "text-[#8ab4f8]" : "text-[#808080] group-hover:text-[#e2e2e2]"
+                  }`}
+                >
                   Search
-                </span>
-              </button>
+                </motion.span>
+              </motion.button>
             </div>
 
             <div className="flex items-center gap-3">

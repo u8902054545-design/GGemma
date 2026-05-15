@@ -25,7 +25,9 @@ import { modelPageVariants, mainContentBackdropVariants } from './motion/modelPa
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
+  
   const { chats, loading: chatsLoading, error: chatsError, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
