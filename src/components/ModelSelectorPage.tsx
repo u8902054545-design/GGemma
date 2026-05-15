@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import { pageVariants } from '../motion/transitions';
 
 type ModelSelectorPageProps = {
   selectedModel: string;
@@ -60,7 +61,7 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       `}</style>
       
-      <div className="flex flex-col h-full w-full bg-[#000000]">
+      <div className="flex flex-col h-full w-full bg-[#000000] select-none">
         <header className="px-6 py-6 flex flex-col items-start shrink-0 max-w-5xl w-full mx-auto">
           <button 
             onClick={onClose}
@@ -72,7 +73,7 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
           </button>
 
           <div className="flex items-center mb-6">
-            <h1 className="text-3xl font-bold tracking-tight text-[var(--md-sys-color-on-background)] select-text">
+            <h1 className="text-3xl font-bold tracking-tight text-[var(--md-sys-color-on-background)]">
               Model selection
             </h1>
           </div>
@@ -99,30 +100,24 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
 
         <main className="flex-1 overflow-y-auto px-6 pb-12 flex flex-col hide-scrollbar">
           <div className="max-w-5xl w-full mx-auto">
-            
-            <h2 className="text-[17px] font-semibold mb-5 text-[var(--md-sys-color-on-surface)] flex items-center gap-2">
-              <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">
-                {activeCategory === 'Gemma' || activeCategory === 'Gemini' ? 'neurology' : 
-                 activeCategory === 'Images' ? 'image' : 
-                 activeCategory === 'Video' ? 'movie' : 'audio_file'}
-              </span>
-              {activeCategory} Models
-            </h2>
-
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeCategory}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ 
-                  duration: 0.3, 
-                  delay: 0.15,
-                  type: 'spring',
-                  bounce: 0
-                }}
+                variants={pageVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
                 className="flex flex-col gap-3"
               >
+                <h2 className="text-[17px] font-semibold mb-2 mt-1 text-[var(--md-sys-color-on-surface)] flex items-center gap-2">
+                  <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">
+                    {activeCategory === 'Gemma' || activeCategory === 'Gemini' ? 'neurology' : 
+                     activeCategory === 'Images' ? 'image' : 
+                     activeCategory === 'Video' ? 'movie' : 'audio_file'}
+                  </span>
+                  {activeCategory} Models
+                </h2>
+
                 {modelsData[activeCategory]?.length > 0 ? (
                   modelsData[activeCategory].map((item) => (
                     <div
@@ -180,7 +175,6 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                 )}
               </motion.div>
             </AnimatePresence>
-            
           </div>
         </main>
       </div>
