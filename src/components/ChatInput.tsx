@@ -7,7 +7,7 @@ type ChatInputProps = {
   setInput: (value: string) => void;
   handleSend: (overrideInput?: string, isSearchActive?: boolean, file?: File) => void;
   stopRequest: () => void;
-  selectedModel: string;
+  selectedModel: { id: string; name: string };
   isTyping: boolean;
   isSearchActive?: boolean;
   onSearchClick?: () => void;
@@ -17,6 +17,7 @@ type ChatInputProps = {
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
   input, setInput, handleSend, stopRequest,
+  selectedModel,
   isTyping,
   isSearchActive = false,
   onSearchClick,
@@ -28,12 +29,20 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
+  const isImageDisabled = selectedModel.id === 'Gemma 2 27B' || selectedModel.id === 'Gemma 3n E4B';
+
   const { 
     selectedFile, 
     previewUrl, 
     handleFileChange: onFileSelect, 
     clearSelection 
   } = useImageUpload();
+
+  useEffect(() => {
+    if (isImageDisabled && selectedFile) {
+      clearSelection();
+    }
+  }, [isImageDisabled, selectedFile, clearSelection]);
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -50,6 +59,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   };
 
   const handleAddClick = () => {
+    if (isImageDisabled) return;
     fileInputRef.current?.click();
   };
 
@@ -134,10 +144,13 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
               <button
                 type="button"
                 onClick={handleAddClick}
-                className="p-2 rounded-full hover:bg-[#1a1a1a] transition-colors active:scale-90 flex items-center justify-center group"
+                disabled={isImageDisabled}
+                className={`p-2 rounded-full transition-colors flex items-center justify-center group ${
+                  isImageDisabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#1a1a1a] active:scale-90'
+                }`}
               >
                 <span className="material-symbols-outlined text-[24px] text-[#808080] group-hover:text-[#e2e2e2]">
-                  add
+                  {isImageDisabled ? 'attach_file_off' : 'add'}
                 </span>
               </button>
 
