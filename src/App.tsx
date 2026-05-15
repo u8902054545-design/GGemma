@@ -98,7 +98,7 @@ export default function App() {
             variants={mainContentBackdropVariants}
             animate={isModelSelectorOpen ? "pushed" : "idle"}
             className="h-full w-full flex flex-col bg-black relative"
-            style={{ transform: 'translateZ(0)' }}
+            style={{ willChange: 'transform' }}
           >
             <Sidebar
               isOpen={isSidebarOpen}
@@ -236,10 +236,7 @@ export default function App() {
                 initial="initial"
                 animate="animate"
                 exit="exit"
-                style={{ 
-                  willChange: 'transform',
-                  transform: 'translateZ(0)' 
-                }}
+                style={{ willChange: 'transform' }}
                 className="fixed inset-0 z-[150] bg-black"
               >
                 <ModelSelectorPage

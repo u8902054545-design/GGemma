@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'motion/react'; // Добавляем импорты
+import { motion, AnimatePresence } from 'motion/react';
 
 type ModelSelectorPageProps = {
   selectedModel: string;
@@ -111,11 +111,16 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
 
             <AnimatePresence mode="wait">
               <motion.div
-                key={activeCategory} // Важно: ключ заставляет motion менять контент анимированно
-                initial={{ opacity: 0, y: 10 }}
+                key={activeCategory}
+                initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ 
+                  duration: 0.3, 
+                  delay: 0.15,
+                  type: 'spring',
+                  bounce: 0
+                }}
                 className="flex flex-col gap-3"
               >
                 {modelsData[activeCategory]?.length > 0 ? (

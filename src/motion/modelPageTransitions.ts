@@ -1,31 +1,23 @@
 import { Variants } from 'motion/react';
 
-const EASING = {
-  EMPHASIZED_DECELERATE: [0.05, 0.7, 0.1, 1],
-  EMPHASIZED_ACCELERATE: [0.3, 0, 0.8, 0.15],
-};
-
-const DURATION = {
-  ENTER: 0.5,
-  EXIT: 0.25,
-};
-
 export const modelPageVariants: Variants = {
   initial: {
-    y: '100%',
+    y: '100vh',
   },
   animate: {
     y: 0,
     transition: {
-      duration: DURATION.ENTER,
-      ease: EASING.EMPHASIZED_DECELERATE,
+      type: 'spring',
+      bounce: 0,
+      duration: 0.5,
     },
   },
   exit: {
-    y: '100%',
+    y: '100vh',
     transition: {
-      duration: DURATION.EXIT,
-      ease: EASING.EMPHASIZED_ACCELERATE,
+      type: 'spring',
+      bounce: 0,
+      duration: 0.3,
     },
   },
 };
