@@ -3,12 +3,17 @@ import { SUPABASE_ENDPOINT, supabase } from '../config';
 import { Message } from './chatTypes';
 import { saveTempMessages } from '../TemporaryChat/temporaryStorage';
 
+interface SelectedModel {
+  id: string;
+  name: string;
+}
+
 export const useChatSender = (
   messages: Message[],
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
   input: string,
   setInput: (val: string) => void,
-  selectedModel: string,
+  selectedModel: SelectedModel,
   chatId: string,
   isTyping: boolean,
   setIsTyping: (val: boolean) => void,
@@ -81,7 +86,8 @@ export const useChatSender = (
         signal,
         body: JSON.stringify({
           message: userText,
-          model: selectedModel,
+          modelId: selectedModel.id,
+          publicModelName: selectedModel.name,
           chat_id: isTemporary ? `temp_${chatId}` : chatId,
           isSearchActive: isSearchActive,
           image: base64Image || null,
@@ -95,7 +101,7 @@ export const useChatSender = (
         throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
-      const modelNameFromServer = response.headers.get('x-model-name') || selectedModel;
+      const modelNameFromServer = response.headers.get('x-model-name') || selectedModel.name;
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";

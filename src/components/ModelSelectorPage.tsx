@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { pageVariants } from '../motion/transitions';
+import { SelectedModel } from '../hooks/chatTypes';
 
 type ModelSelectorPageProps = {
-  selectedModel: string;
-  setSelectedModel: (model: string) => void;
+  selectedModel: SelectedModel;
+  setSelectedModel: (model: SelectedModel) => void;
   onClose: () => void;
 };
 
@@ -17,15 +18,17 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
 
   const categories = ['Gemma', 'Gemini', 'Images', 'Video', 'Audio'];
   
-  const modelsData: Record<string, { id: string, desc: string }[]> = {
+  const modelsData: Record<string, { id: string, name: string, desc: string }[]> = {
     Gemma: [
-      { id: 'Gemma 4 31B', desc: 'The absolute pinnacle of open models from Google.' },
-      { id: 'Gemma 4 26B A4B', desc: 'Next-generation architecture for unparalleled efficiency.' },
-      { id: 'Gemma 3 27B', desc: 'Powerful and highly capable model for complex reasoning.' },
-      { id: 'Gemma 3 12B', desc: 'The perfect balance of high performance and incredible speed.' },
-      { id: 'Gemma 3 4B', desc: 'Lightning-fast and lightweight model for everyday tasks.' },
-      { id: 'Gemma 3n E4B', desc: 'Optimized neural core for ultra-fast edge computing.' },
-      { id: 'Gemma 2 27B', desc: 'The classic and battle-tested heavyweight model.' }
+      { id: 'google/gemma-4-31b-it', name: 'Gemma 4 31B', desc: 'The absolute pinnacle of open models from Google.' },
+      { id: 'google/gemma-4-26b-a4b-it', name: 'Gemma 4 26B', desc: 'Next-generation architecture for unparalleled efficiency.' },
+      { id: 'google/gemma-3-27b-it', name: 'Gemma 3 27B', desc: 'Powerful and highly capable model for complex reasoning.' },
+      { id: 'google/gemma-3-12b-it', name: 'Gemma 3 12B', desc: 'The perfect balance of high performance and incredible speed.' },
+      { id: 'google/gemma-3-4b-it', name: 'Gemma 3 4B', desc: 'Lightning-fast and lightweight model for everyday tasks.' },
+      { id: 'google/gemma-3-1b-it', name: 'Gemma 3 1B', desc: 'Extremely efficient and small model for basic interactions.' },
+      { id: 'google/gemma-3n-e4b-it', name: 'Gemma 3n E4B', desc: 'Optimized neural core for ultra-fast edge computing.' },
+      { id: 'google/gemma-3n-e2b-it', name: 'Gemma 3n E2B', desc: 'Ultra-lightweight neural model for instant responses.' },
+      { id: 'google/gemma-2-27b-it', name: 'Gemma 2 27B', desc: 'The classic and battle-tested heavyweight model.' }
     ],
     Gemini: [],
     Images: [],
@@ -124,24 +127,24 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                       key={item.id}
                       onClick={(e) => {
                         createRipple(e);
-                        setSelectedModel(item.id);
+                        setSelectedModel({ id: item.id, name: item.name });
                       }}
                       className={`ripple-container group relative p-5 rounded-2xl cursor-pointer transition-all duration-300 flex flex-col gap-3 ${
-                        selectedModel === item.id 
+                        selectedModel.id === item.id 
                           ? 'border border-[var(--md-sys-color-primary)] bg-transparent' 
                           : 'border border-transparent bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)]'
                       }`}
                     >
                       <div className="flex justify-between items-start">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-transform ${
-                           selectedModel === item.id ? 'bg-[rgba(168,199,250,0.1)] text-[var(--md-sys-color-primary)]' : 'bg-[#1a1c1e] text-[var(--md-sys-color-on-surface-variant)]'
+                           selectedModel.id === item.id ? 'bg-[rgba(168,199,250,0.1)] text-[var(--md-sys-color-primary)]' : 'bg-[#1a1c1e] text-[var(--md-sys-color-on-surface-variant)]'
                         }`}>
                           <span className="material-symbols-outlined text-[22px]">
                             deployed_code
                           </span>
                         </div>
                         
-                        {selectedModel === item.id && (
+                        {selectedModel.id === item.id && (
                           <span className="material-symbols-outlined text-[var(--md-sys-color-primary)]">
                             check_circle
                           </span>
@@ -150,7 +153,7 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                       
                       <div className="mt-1">
                         <h3 className="text-[17px] font-semibold text-[var(--md-sys-color-on-surface)] mb-1">
-                          {item.id}
+                          {item.name}
                         </h3>
                         <p className="text-[14px] text-[var(--md-sys-color-on-surface-variant)] leading-snug">
                           {item.desc}
