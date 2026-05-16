@@ -2,6 +2,7 @@ import { useCallback } from 'react';
 import { SUPABASE_ENDPOINT, supabase } from '../config';
 import { Message } from './chatTypes';
 import { saveTempMessages } from '../TemporaryChat/temporaryStorage';
+import { setAudioBufferCache } from '../components/ChatMessage/useSpeech';
 
 interface SelectedModel {
   id: string;
@@ -79,10 +80,13 @@ export const useChatSender = (
 
     try {
       const signal = createSignal();
+      const isAudioModel = selectedModel.name === 'Gemini 3.1 Flash TTS Preview';
+
       const response = await fetch(SUPABASE_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-ai-message-id': aiMsgId,
           ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
         },
         signal,
@@ -94,7 +98,8 @@ export const useChatSender = (
           image: base64Image || null,
           isTemporary: isTemporary,
           history: isTemporary ? updatedMessages : undefined,
-          voice: currentVoice
+          voice: currentVoice,
+          isAudioOnly: isAudioModel
         }),
       });
 
@@ -104,27 +109,28 @@ export const useChatSender = (
       }
 
       const modelNameFromServer = response.headers.get('x-model-name') || selectedModel.name;
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      let accumulatedContent = "";
+      const serverMessageId = response.headers.get('x-ai-message-id');
 
-      if (!reader) throw new Error('ReadableStream not supported');
+      if (isAudioModel) {
+        const audioBuffer = await response.arrayBuffer();
+        const userId = session?.user?.id || 'temp';
+        
+        const { data: { publicUrl } } = supabase.storage
+          .from('chat-audio')
+          .getPublicUrl(`${userId}/${serverMessageId || aiMsgId}.pcm`);
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        const chunk = decoder.decode(value, { stream: true });
-        accumulatedContent += chunk;
+        setAudioBufferCache(publicUrl, audioBuffer);
 
         setMessages(prev => {
           const newMessages = [...prev];
           const lastIdx = newMessages.length - 1;
           if (lastIdx >= 0 && newMessages[lastIdx].id === aiMsgId) {
             newMessages[lastIdx] = {
-              ...newMessages[lastIdx],
-              content: accumulatedContent,
-              modelName: modelNameFromServer
+              id: serverMessageId || aiMsgId,
+              role: 'ai',
+              content: publicUrl,
+              modelName: modelNameFromServer,
+              voice: currentVoice
             };
             if (isTemporary) {
               saveTempMessages(newMessages);
@@ -132,6 +138,36 @@ export const useChatSender = (
           }
           return newMessages;
         });
+      } else {
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        let accumulatedContent = "";
+
+        if (!reader) throw new Error('ReadableStream not supported');
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const chunk = decoder.decode(value, { stream: true });
+          accumulatedContent += chunk;
+
+          setMessages(prev => {
+            const newMessages = [...prev];
+            const lastIdx = newMessages.length - 1;
+            if (lastIdx >= 0 && newMessages[lastIdx].id === aiMsgId) {
+              newMessages[lastIdx] = {
+                ...newMessages[lastIdx],
+                content: accumulatedContent,
+                modelName: modelNameFromServer
+              };
+              if (isTemporary) {
+                saveTempMessages(newMessages);
+              }
+            }
+            return newMessages;
+          });
+        }
       }
 
       if (isFirstMessage && !isTemporary) {

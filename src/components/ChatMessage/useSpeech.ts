@@ -2,7 +2,13 @@ import { useState, useCallback, useEffect } from 'react';
 import { useVoicePlayer } from '../../hooks/useVoicePlayer';
 import { SUPABASE_ENDPOINT, supabase } from '../../config';
 
-export const useSpeech = (text: string) => {
+const audioBufferCache: Record<string, ArrayBuffer> = {};
+
+export const setAudioBufferCache = (key: string, buffer: ArrayBuffer) => {
+  audioBufferCache[key] = buffer;
+};
+
+export const useSpeech = (text: string, modelName?: string) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const { playPcmBuffer, stop: stopPcm, isPlaying: isPcmPlaying } = useVoicePlayer();
 
@@ -13,17 +19,36 @@ export const useSpeech = (text: string) => {
   }, [stopPcm]);
 
   const speak = useCallback(async () => {
-    if (!text) return;
+    if (!text && modelName !== 'Gemini 3.1 Flash TTS Preview') return;
 
     if (isSpeaking || isPcmPlaying) {
       stop();
       return;
     }
 
-    const selectedVoice = localStorage.getItem('selected_voice') || 'Zephyr';
+    const trimmedText = text.trim();
+
+    if (audioBufferCache[trimmedText]) {
+      setIsSpeaking(true);
+      await playPcmBuffer(audioBufferCache[trimmedText]);
+      return;
+    }
+
+    const isAudioUrl = trimmedText.startsWith('http');
+    const isAudioModel = modelName === 'Gemini 3.1 Flash TTS Preview';
     setIsSpeaking(true);
 
     try {
+      if (isAudioUrl) {
+        const response = await fetch(trimmedText);
+        if (!response.ok) throw new Error('Failed to fetch audio file');
+        const audioData = await response.arrayBuffer();
+        audioBufferCache[trimmedText] = audioData;
+        await playPcmBuffer(audioData);
+        return;
+      }
+
+      const selectedVoice = localStorage.getItem('selected_voice') || 'Zephyr';
       const { data: { session } } = await supabase.auth.getSession();
       const accessToken = session?.access_token;
 
@@ -35,30 +60,35 @@ export const useSpeech = (text: string) => {
         },
         body: JSON.stringify({
           message: text,
-          publicModelName: 'Gemini 3.1 Flash TTS Preview',
+          publicModelName: modelName || 'Gemini 3.1 Flash TTS Preview',
           voice: selectedVoice,
-          isAudioOnly: true 
+          isAudioOnly: isAudioModel
         }),
       });
 
       if (!response.ok) throw new Error('TTS Failed');
 
       const audioData = await response.arrayBuffer();
+      audioBufferCache[trimmedText] = audioData;
       await playPcmBuffer(audioData);
 
     } catch (error) {
       console.error('TTS Error, falling back to Web Speech API', error);
-      
-      const utterance = new SpeechSynthesisUtterance(text);
-      const voices = window.speechSynthesis.getVoices();
-      const russianVoice = voices.find(voice => voice.lang.includes('ru-RU'));
-      if (russianVoice) utterance.voice = russianVoice;
 
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
-      window.speechSynthesis.speak(utterance);
+      if (!isAudioModel && !isAudioUrl) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        const voices = window.speechSynthesis.getVoices();
+        const russianVoice = voices.find(voice => voice.lang.includes('ru-RU'));
+        if (russianVoice) utterance.voice = russianVoice;
+
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+        window.speechSynthesis.speak(utterance);
+      } else {
+        setIsSpeaking(false);
+      }
     }
-  }, [text, isSpeaking, isPcmPlaying, stop, playPcmBuffer]);
+  }, [text, modelName, isSpeaking, isPcmPlaying, stop, playPcmBuffer]);
 
   useEffect(() => {
     setIsSpeaking(isPcmPlaying);

@@ -37,7 +37,13 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
     Gemini: [],
     Images: [],
     Video: [],
-    Audio: []
+    Audio: [
+      { 
+        id: 'Gemini 3.1 Flash TTS Preview', 
+        name: 'Gemini 3.1 Flash TTS Preview', 
+        desc: 'Advanced model with integrated text-to-speech capabilities for natural voice interaction.' 
+      }
+    ]
   };
 
   const syncModel = async (model: SelectedModel) => {

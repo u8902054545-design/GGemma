@@ -11,6 +11,7 @@ import { ChatMessageProps } from './types';
 import { useMessageLogic } from './useMessageLogic';
 import { ChatMessageHeader } from './ChatMessageHeader';
 import { CodeBlock } from './CodeBlock';
+import { AudioMessage } from './AudioMessage';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
@@ -18,14 +19,14 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   isTemporary?: boolean;
 }
 
-const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({ 
-  role, 
-  content, 
+const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
+  role,
+  content,
   imageUrl,
   modelName,
-  isGenerating, 
-  messageId, 
-  feedback, 
+  isGenerating,
+  messageId,
+  feedback,
   onFeedback,
   isLast,
   onImageClick,
@@ -34,6 +35,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   const isAI = role === 'ai';
   const isStopped = content.includes('_STOPPED_');
   const cleanContent = content.replace('_STOPPED_', '');
+  const isAudioModel = modelName === 'Gemini 3.1 Flash TTS Preview';
 
   const {
     isThoughtExpanded,
@@ -66,7 +68,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
       transition={{ duration: mdDuration.short4, ease: mdEasing.decelerate }}
       className={`flex flex-col mb-8 ${isAI ? 'items-start w-full' : 'items-end'}`}
     >
-      {isAI && (
+      {isAI && !isAudioModel && (
         <ChatMessageHeader
           hasThought={!!thought}
           isExpanded={isThoughtExpanded}
@@ -95,19 +97,19 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
         </AnimatePresence>
 
         <div className={`relative transition-all duration-300 ease-in-out ${
-            isAI 
-              ? 'text-[var(--md-sys-color-on-background)] w-full' 
+            isAI
+              ? 'text-[var(--md-sys-color-on-background)] w-full'
               : 'max-w-[85%] bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] px-5 py-3 rounded-[24px] rounded-tr-[4px] shadow-sm inline-block'
           } ${!isContentExpanded && canShowExpand ? 'max-h-[300px] overflow-hidden' : 'max-h-full'}`}
         >
           {imageUrl && (
-            <div 
+            <div
               className="mb-3 overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
               onClick={handleImageClick}
             >
-              <img 
-                src={imageUrl} 
-                alt="Uploaded" 
+              <img
+                src={imageUrl}
+                alt="Uploaded"
                 className="max-w-full h-auto object-contain max-h-[400px] rounded-lg"
                 onError={(e) => console.error("Image load error:", imageUrl)}
               />
@@ -119,6 +121,19 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               <div className="min-h-[40px] flex items-center">
                 <GemmaSkeleton />
               </div>
+            ) : isAI && isAudioModel ? (
+              <AudioMessage
+                isSpeaking={isSpeaking}
+                onSpeech={handleSpeech}
+                modelName={modelName}
+                hasThought={!!thought}
+                isThoughtExpanded={isThoughtExpanded}
+                onToggleThought={() => setIsThoughtExpanded(!isThoughtExpanded)}
+                isGenerating={isGenerating}
+                localFeedback={localFeedback}
+                handleFeedback={handleFeedback}
+                isTemporary={isTemporary}
+              />
             ) : (
               <motion.div layout="position" className="min-h-[1.5em]">
                 {isAI ? (
@@ -188,7 +203,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               </motion.div>
             )}
           </div>
-          
+
           {!isContentExpanded && canShowExpand && (
             <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[var(--md-sys-color-background)] to-transparent pointer-events-none" />
           )}
@@ -208,8 +223,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           </button>
         )}
 
-        {isAI && !isGenerating && mainContent && (
-          <motion.div 
+        {isAI && !isGenerating && mainContent && !isAudioModel && (
+          <motion.div
             initial={{ opacity: 0, y: 5 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: mdDuration.medium4, ease: mdEasing.standard }}

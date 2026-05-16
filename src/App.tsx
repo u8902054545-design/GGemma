@@ -12,7 +12,6 @@ import { Sidebar } from './components/Sidebar';
 import Snackbar from './components/Snackbar';
 import Login from './components/Login';
 import { pageVariants } from './motion/transitions';
-import { mainContentVariants } from './motion/drawer';
 import { FullscreenImage } from './components/FullscreenImage';
 import { handleScrollLogic, scrollToBottomInstant } from './Functions/scrollUtils';
 import { handleChatSelection, handleCreateNewChat } from './Functions/chatUtils';
@@ -26,9 +25,8 @@ import { SUPABASE_ENDPOINT, supabase } from './config';
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  
+
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
-  
   const { chats, loading: chatsLoading, error: chatsError, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -71,9 +69,7 @@ export default function App() {
             'Authorization': `Bearer ${session?.access_token}`,
           }
         });
-        
         const data = await response.json();
-
         if (data) {
           if (data.selected_model_id && data.selected_model_id !== selectedModel.id) {
             setSelectedModel({
@@ -137,7 +133,6 @@ export default function App() {
             variants={mainContentBackdropVariants}
             animate={isModelSelectorOpen ? "pushed" : "idle"}
             className="h-full w-full flex flex-col bg-black relative"
-            style={{ willChange: 'transform' }}
           >
             <Sidebar
               isOpen={isSidebarOpen}
@@ -161,12 +156,8 @@ export default function App() {
               togglePin={togglePin}
             />
 
-            <motion.div
-              variants={mainContentVariants}
-              initial="closed"
-              animate={isSidebarOpen ? "open" : "closed"}
-              className="h-full w-full flex flex-col bg-black relative shadow-2xl"
-            >
+            {/* Контейнер чата теперь статичен, вся анимация идет в Sidebar */}
+            <div className="h-full w-full flex flex-col bg-black relative shadow-2xl">
               <ChatHeader
                 messages={messages}
                 chatTitle={isTemporary ? "Temporary Chat" : chatTitle}
@@ -264,7 +255,7 @@ export default function App() {
                 onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
                 onModelConfigClick={() => setIsModelSelectorOpen(true)}
               />
-            </motion.div>
+            </div>
           </motion.div>
 
           <AnimatePresence>

@@ -36,7 +36,6 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) return;
-
       const response = await fetch(`${SUPABASE_ENDPOINT}?search_query=${encodeURIComponent(text)}`, {
         method: 'GET',
         headers: {
@@ -64,7 +63,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="fixed inset-0 bg-[#1c1b1f] z-[100] flex flex-col"
+          className="fixed inset-0 bg-[#1c1b1f] z-[200] flex flex-col"
         >
           <div className="p-4 flex items-center gap-3 border-b border-white/5">
             <button

@@ -20,6 +20,8 @@ export const ChatMessageHeader: React.FC<HeaderProps> = ({
   modelName,
   isGenerating
 }) => {
+  const isAudioModel = modelName === 'Gemini 3.1 Flash TTS Preview';
+
   return (
     <div className="flex items-center gap-2 mb-3 w-full">
       <div className="flex items-center gap-2">
@@ -45,19 +47,21 @@ export const ChatMessageHeader: React.FC<HeaderProps> = ({
         </button>
       )}
 
-      <button
-        onClick={onSpeech}
-        className={`ml-auto p-1.5 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center ${
-          isSpeaking 
-            ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-lg scale-110' 
-            : 'hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)]'
-        }`}
-        title={isSpeaking ? "Stop" : "Listen"}
-      >
-        <span className="material-symbols-outlined text-[20px]">
-          {isSpeaking ? 'pause' : 'volume_up'}
-        </span>
-      </button>
+      {!isAudioModel && (
+        <button
+          onClick={onSpeech}
+          className={`ml-auto p-1.5 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center ${
+            isSpeaking
+              ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-lg scale-110'
+              : 'hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)]'
+          }`}
+          title={isSpeaking ? "Stop" : "Listen"}
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            {isSpeaking ? 'pause' : 'volume_up'}
+          </span>
+        </button>
+      )}
     </div>
   );
 };
