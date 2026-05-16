@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { pageVariants } from '../motion/transitions';
 import { SelectedModel } from '../hooks/chatTypes';
+import { SUPABASE_ENDPOINT, supabase } from '../config';
+import { useAuth } from '../hooks/useAuth';
 
 type ModelSelectorPageProps = {
   selectedModel: SelectedModel;
@@ -15,6 +17,7 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
   setSelectedModel,
   onClose
 }) => {
+  const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState('Gemma');
 
   const isAutoGemma = selectedModel.id === 'auto';
@@ -35,6 +38,30 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
     Images: [],
     Video: [],
     Audio: []
+  };
+
+  const syncModel = async (model: SelectedModel) => {
+    setSelectedModel(model);
+    if (user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        await fetch(SUPABASE_ENDPOINT, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            settings: { 
+              selected_model_id: model.id,
+              selected_model_name: model.name
+            }
+          }),
+        });
+      } catch (err) {
+        console.error('Failed to sync model:', err);
+      }
+    }
   };
 
   const createRipple = (e: React.MouseEvent<HTMLElement>) => {
@@ -60,9 +87,9 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
 
   const handleAutoToggle = () => {
     if (!isAutoGemma) {
-      setSelectedModel({ id: 'auto', name: 'Automatic' });
+      syncModel({ id: 'auto', name: 'Automatic' });
     } else {
-      setSelectedModel({ id: 'Gemma 3 4B', name: 'Gemma 3 4B' });
+      syncModel({ id: 'Gemma 3 4B', name: 'Gemma 3 4B' });
     }
   };
 
@@ -160,7 +187,7 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                       key={item.id}
                       onClick={(e) => {
                         createRipple(e);
-                        setSelectedModel({ id: item.id, name: item.name });
+                        syncModel({ id: item.id, name: item.name });
                       }}
                       className={`ripple-container group relative p-5 rounded-2xl cursor-pointer transition-all duration-300 flex flex-col gap-3 ${
                         selectedModel.id === item.id

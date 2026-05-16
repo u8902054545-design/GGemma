@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { pageVariants } from '../../motion/transitions';
 import { useVoicePlayer } from '../../hooks/useVoicePlayer';
 import { SUPABASE_ENDPOINT, supabase } from '../../config';
+import { useAuth } from '../../hooks/useAuth';
 
 interface VoiceSelectionProps {
   isOpen: boolean;
@@ -10,6 +11,7 @@ interface VoiceSelectionProps {
 }
 
 export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose }) => {
+  const { user } = useAuth();
   const [selectedVoice, setSelectedVoice] = useState<string>(() => {
     return localStorage.getItem('selected_voice') || 'Zephyr';
   });
@@ -19,8 +21,51 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
   const PREVIEW_TEXT = "Hello! I am one of the Gemini voices. How do I sound to you?";
 
   useEffect(() => {
-    localStorage.setItem('selected_voice', selectedVoice);
-  }, [selectedVoice]);
+    const fetchRemoteSettings = async () => {
+      if (!user) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(`${SUPABASE_ENDPOINT}?type=settings`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${session?.access_token}`,
+          }
+        });
+        const data = await response.json();
+        
+        if (data?.selected_voice && data.selected_voice !== selectedVoice) {
+          setSelectedVoice(data.selected_voice);
+          localStorage.setItem('selected_voice', data.selected_voice);
+        }
+      } catch (err) {
+        console.error('Failed to fetch settings:', err);
+      }
+    };
+    fetchRemoteSettings();
+  }, [user]);
+
+  const updateVoice = async (voice: string) => {
+    setSelectedVoice(voice);
+    localStorage.setItem('selected_voice', voice);
+
+    if (user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        await fetch(SUPABASE_ENDPOINT, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            settings: { selected_voice: voice }
+          }),
+        });
+      } catch (err) {
+        console.error('Failed to sync voice:', err);
+      }
+    }
+  };
 
   useEffect(() => {
     if (!isPlaying) {
@@ -110,7 +155,7 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
             return (
               <button
                 key={voice}
-                onClick={() => setSelectedVoice(voice)}
+                onClick={() => updateVoice(voice)}
                 className="ripple-container w-full py-4 px-3 flex items-center justify-between border-b border-[#111111] hover:bg-white/5 rounded-xl transition-all text-left active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3">

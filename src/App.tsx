@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useMemo } from 'react';
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
@@ -21,6 +21,7 @@ import { TemporaryChatPage } from './TemporaryChat/TemporaryChatPage';
 import { clearTempMessages } from './TemporaryChat/temporaryStorage';
 import { ModelSelectorPage } from './components/ModelSelectorPage';
 import { modelPageVariants, mainContentBackdropVariants } from './motion/modelPageTransitions';
+import { SUPABASE_ENDPOINT, supabase } from './config';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -57,6 +58,40 @@ export default function App() {
     isSnackbarOpen,
     setIsSnackbarOpen
   } = useChat(() => refreshChats(true), isTemporary);
+
+  useEffect(() => {
+    const syncSettings = async () => {
+      if (!user) return;
+
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const response = await fetch(`${SUPABASE_ENDPOINT}?type=settings`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${session?.access_token}`,
+          }
+        });
+        
+        const data = await response.json();
+
+        if (data) {
+          if (data.selected_model_id && data.selected_model_id !== selectedModel.id) {
+            setSelectedModel({
+              id: data.selected_model_id,
+              name: data.selected_model_name || data.selected_model_id
+            });
+          }
+          if (data.selected_voice) {
+            localStorage.setItem('selected_voice', data.selected_voice);
+          }
+        }
+      } catch (err) {
+        console.error('Settings sync error:', err);
+      }
+    };
+
+    syncSettings();
+  }, [user]);
 
   const isAutoGemma = useMemo(() => selectedModel.id === 'auto', [selectedModel.id]);
 

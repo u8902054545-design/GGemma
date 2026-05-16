@@ -12,15 +12,18 @@ export const useAuth = () => {
   };
 
   useEffect(() => {
-    const handleAuth = async (session: any) => {
+    const handleAuth = (session: any) => {
       const currentUser = session?.user ?? null;
       setUser(currentUser);
       setLoading(false);
     };
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       handleAuth(session);
-    });
+    };
+
+    initAuth();
 
     const { data: { subscription: authSub } } = supabase.auth.onAuthStateChange((_event, session) => {
       handleAuth(session);
@@ -35,7 +38,13 @@ export const useAuth = () => {
     try {
       await supabase.auth.signInWithOAuth({
         provider: 'google',
-        options: { redirectTo: window.location.origin },
+        options: { 
+          redirectTo: window.location.origin,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'select_account',
+          },
+        },
       });
     } catch (error) {
       console.error(error);
