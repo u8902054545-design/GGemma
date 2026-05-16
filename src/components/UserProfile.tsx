@@ -4,12 +4,14 @@ import { useAuth } from '../hooks/useAuth';
 import { motion, AnimatePresence } from 'motion/react';
 import { pageVariants } from '../motion/transitions';
 import { APP_VERSION } from '../versionApp';
+import { SettingsApp } from './Settings/settingsApp';
 
 import '@material/web/progress/circular-progress.js';
 
 const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { user, signOut } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
   if (!user) return null;
 
@@ -94,11 +96,28 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
                 </p>
               </div>
             </div>
+
+            <div className="w-full max-w-[400px] mt-4 bg-[#0a0a0a] border border-[#1a1a1a] rounded-[28px] p-4 flex flex-col items-center shadow-2xl">
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                disabled={isLoggingOut}
+                className="ripple-container w-full h-12 flex items-center justify-center gap-3 bg-[#111111] hover:bg-[#1a1a1a] text-white border border-[#222222] rounded-full font-medium transition-all disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)]">settings</span>
+                <span>Settings</span>
+              </button>
+            </div>
             
             <p className="mt-8 text-[12px] text-[#555555] font-medium tracking-wide">
               Google Account
             </p>
           </main>
+
+          <AnimatePresence>
+            {isSettingsOpen && (
+              <SettingsApp isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
+            )}
+          </AnimatePresence>
         </motion.div>
       )}
     </AnimatePresence>
