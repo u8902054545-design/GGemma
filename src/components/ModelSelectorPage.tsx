@@ -172,7 +172,6 @@ export const ModelSelectorPage: React.FC<ModelSelectorPageProps> = ({
                     </div>
                     <div className={`w-12 h-7 rounded-full flex items-center p-1 transition-colors duration-300 ${isAutoGemma ? 'bg-[#0842a0]' : 'bg-[#444746]'}`}>
                       <motion.div
-                        layout
                         className={`w-5 h-5 rounded-full shadow-md ${isAutoGemma ? 'bg-white' : 'bg-[#c4c7c5]'}`}
                         animate={{ x: isAutoGemma ? 20 : 0 }}
                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
