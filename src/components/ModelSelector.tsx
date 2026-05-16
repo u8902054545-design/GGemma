@@ -18,6 +18,7 @@ export const MODEL_DATA: Record<string, {}> = {
   'Gemma 4 26B A4B IT': {},
   'Gemma 4 31B IT': {},
   'Gemma 2 27B': {},
+  'Gemini 3.1 Flash TTS Preview': {},
 };
 
 export const ModelSelector: React.FC<ModelSelectorProps> = ({
@@ -31,7 +32,6 @@ export const ModelSelector: React.FC<ModelSelectorProps> = ({
   const timerRef = useRef<any>(null);
 
   const isAutoGemma = selectedModel === 'auto' || selectedModel?.id === 'auto';
-
   const selectedModelId = typeof selectedModel === 'string' ? selectedModel : selectedModel?.id;
 
   const handlePointerDown = (model: string) => {

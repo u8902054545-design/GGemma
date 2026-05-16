@@ -10,6 +10,7 @@ export type Message = {
   imageUrl?: string;
   modelName?: string;
   feedback?: 'like' | 'dislike' | null;
+  voice?: string;
 };
 
 export const MODELS: SelectedModel[] = [
@@ -19,5 +20,6 @@ export const MODELS: SelectedModel[] = [
   { id: 'Gemma 3 12B', name: 'Gemma 3 12B' },
   { id: 'Gemma 3 4B', name: 'Gemma 3 4B' },
   { id: 'Gemma 3n E4B', name: 'Gemma 3n E4B' },
-  { id: 'Gemma 2 27B', name: 'Gemma 2 27B' }
+  { id: 'Gemma 2 27B', name: 'Gemma 2 27B' },
+  { id: 'Gemini 3.1 Flash TTS Preview', name: 'Gemini 3.1 Flash TTS Preview' }
 ];

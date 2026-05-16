@@ -40,6 +40,7 @@ export const useChatSender = (
 
     const isFirstMessage = messages.length === 0;
     const userText = textToSend.trim();
+    const currentVoice = localStorage.getItem('selected_voice') || 'Zephyr';
 
     let base64Image = '';
     let localImageUrl = '';
@@ -57,7 +58,8 @@ export const useChatSender = (
       id: crypto.randomUUID(),
       role: 'user',
       content: userText,
-      imageUrl: localImageUrl
+      imageUrl: localImageUrl,
+      voice: currentVoice
     };
 
     const updatedMessages = [...messages, newUserMsg];
@@ -72,7 +74,7 @@ export const useChatSender = (
     scrollToBottom();
 
     const aiMsgId = crypto.randomUUID();
-    const newAiMsg: Message = { id: aiMsgId, role: 'ai', content: '' };
+    const newAiMsg: Message = { id: aiMsgId, role: 'ai', content: '', voice: currentVoice };
     setMessages(prev => [...prev, newAiMsg]);
 
     try {
@@ -91,7 +93,8 @@ export const useChatSender = (
           isSearchActive: isSearchActive,
           image: base64Image || null,
           isTemporary: isTemporary,
-          history: isTemporary ? updatedMessages : undefined
+          history: isTemporary ? updatedMessages : undefined,
+          voice: currentVoice
         }),
       });
 
