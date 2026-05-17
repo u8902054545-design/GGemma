@@ -31,7 +31,9 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   const [isListening, setIsListening] = useState(false);
   const recognitionRef = useRef<any>(null);
 
-  const isImageDisabled = selectedModel.id === 'Gemma 2 27B' || selectedModel.id === 'Gemma 3n E4B';
+  const isTTSModel = selectedModel.id === 'Gemini 3.1 Flash TTS Preview';
+  const isImageDisabled = selectedModel.id === 'Gemma 2 27B' || selectedModel.id === 'Gemma 3n E4B' || isTTSModel;
+  const isSearchDisabled = isTTSModel;
 
   const { 
     selectedFile, 
@@ -158,14 +160,17 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
 
               <motion.button
                 type="button"
-                onClick={onSearchClick}
+                onClick={!isSearchDisabled ? onSearchClick : undefined}
                 variants={searchButtonVariants}
                 initial="inactive"
                 animate={isSearchActive ? "active" : "inactive"}
+                disabled={isSearchDisabled}
                 className={`relative flex items-center h-[36px] overflow-hidden rounded-full group ${
-                  isSearchActive
-                  ? "bg-[#8ab4f8]/10 ring-1 ring-[#8ab4f8]/50"
-                  : "hover:bg-[#1a1a1a]"
+                  isSearchDisabled 
+                    ? "cursor-not-allowed opacity-50" 
+                    : isSearchActive
+                    ? "bg-[#8ab4f8]/10 ring-1 ring-[#8ab4f8]/50"
+                    : "hover:bg-[#1a1a1a]"
                 }`}
               >
                 {isSearchActive && (
@@ -174,7 +179,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 <span className={`material-symbols-outlined text-[20px] shrink-0 transition-colors ${
                   isSearchActive ? "text-[#8ab4f8]" : "text-[#808080] group-hover:text-[#e2e2e2]"
                 }`}>
-                  search
+                  {isSearchDisabled ? 'search_off' : 'search'}
                 </span>
                 <motion.span
                   variants={searchTextVariants}

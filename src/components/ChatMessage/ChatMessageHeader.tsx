@@ -47,7 +47,7 @@ export const ChatMessageHeader: React.FC<HeaderProps> = ({
         </button>
       )}
 
-      {!isAudioModel && (
+      {!isAudioModel && !isGenerating && (
         <button
           onClick={onSpeech}
           className={`ml-auto p-1.5 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center ${
