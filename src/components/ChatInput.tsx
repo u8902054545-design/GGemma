@@ -115,9 +115,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
 
   return (
     <footer className="w-full max-w-4xl mx-auto z-50 relative">
-      <div className="absolute -inset-[1px] rounded-t-[32px] animate-gradient blur-md opacity-60 pointer-events-none" />
-      <div className="relative pt-[1px] px-[1px] rounded-t-[32px] animate-gradient">
-        <div className="bg-black rounded-t-[31px] flex flex-col p-2 pb-3">
+          <div className="bg-[#1e1e1e] border-t border-[#3c4043] flex flex-col p-2 pb-3">
           <input
             type="file"
             ref={fileInputRef}
@@ -140,7 +138,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={onKeyDown}
             placeholder="Ask Gemma"
-            className="w-full bg-transparent border-none outline-none resize-none max-h-60 min-h-[44px] px-4 py-3 text-[#e2e2e2] placeholder-[#444]"
+            className="w-full bg-transparent border-none outline-none resize-none max-h-60 min-h-[44px] px-4 py-3 text-[#e2e2e2] placeholder-[#5f6368]"
             rows={1}
           />
           <div className="flex items-center justify-between px-2">
@@ -150,7 +148,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 onClick={handleAddClick}
                 disabled={isImageDisabled}
                 className={`p-2 rounded-full transition-colors flex items-center justify-center group ${
-                  isImageDisabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#1a1a1a] active:scale-90'
+                  isImageDisabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-[#2d2f31] active:scale-90'
                 }`}
               >
                 <span className="material-symbols-outlined text-[24px] text-[#808080] group-hover:text-[#e2e2e2]">
@@ -170,13 +168,10 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                     ? "cursor-not-allowed opacity-50" 
                     : isSearchActive
                     ? "bg-[#8ab4f8]/10 ring-1 ring-[#8ab4f8]/50"
-                    : "hover:bg-[#1a1a1a]"
+                    : "hover:bg-[#2d2f31]"
                 }`}
               >
-                {isSearchActive && (
-                  <div className="absolute inset-0 rounded-full animate-gradient opacity-20 -z-10" />
-                )}
-                <span className={`material-symbols-outlined text-[20px] shrink-0 transition-colors ${
+                <span className={`material-symbols-outlined text-[20px] shrink-0 transition-colors mx-2 ${
                   isSearchActive ? "text-[#8ab4f8]" : "text-[#808080] group-hover:text-[#e2e2e2]"
                 }`}>
                   {isSearchDisabled ? 'search_off' : 'search'}
@@ -185,7 +180,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                   variants={searchTextVariants}
                   initial="hidden"
                   animate={isSearchActive ? "visible" : "hidden"}
-                  className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-colors ${
+                  className={`text-sm font-medium whitespace-nowrap overflow-hidden transition-colors mr-2 ${
                     isSearchActive ? "text-[#8ab4f8]" : "text-[#808080] group-hover:text-[#e2e2e2]"
                   }`}
                 >
@@ -198,7 +193,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
               <button
                 type="button"
                 onClick={onModelConfigClick}
-                className="p-2 rounded-full hover:bg-[#1a1a1a] transition-all active:scale-90 flex items-center justify-center group"
+                className="p-2 rounded-full hover:bg-[#2d2f31] transition-all active:scale-90 flex items-center justify-center group"
               >
                 <span className="material-symbols-outlined text-[24px] text-[#808080] group-hover:text-[#8ab4f8]">
                   tune
@@ -209,7 +204,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 <button
                   type="button"
                   onClick={toggleListening}
-                  className={`p-2 rounded-full transition-colors active:scale-90 flex items-center justify-center ${isListening ? "bg-[#EA4335]/20" : "hover:bg-[#1a1a1a]"}`}
+                  className={`p-2 rounded-full transition-colors active:scale-90 flex items-center justify-center ${isListening ? "bg-[#EA4335]/20" : "hover:bg-[#2d2f31]"}`}
                 >
                   <span className={`material-symbols-outlined text-[24px] ${isListening ? "text-[#EA4335]" : "text-[#808080]"}`}>
                     mic
@@ -224,7 +219,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                   >
                     <span 
                       className="material-symbols-outlined text-[24px]" 
-                      style={{ color: 'var(--gemma-blue-bright)', fontVariationSettings: "'FILL' 1" }}
+                      style={{ color: '#8ab4f8', fontVariationSettings: "'FILL' 1" }}
                     >
                       stop_circle
                     </span>
@@ -234,7 +229,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                     type="button"
                     onClick={handleWrappedSend}
                     disabled={isSendDisabled}
-                    className="p-2 rounded-full hover:bg-[#1a1a1a] transition-transform active:scale-90 flex items-center justify-center"
+                    className="p-2 rounded-full hover:bg-[#2d2f31] transition-transform active:scale-90 flex items-center justify-center"
                   >
                     <span className={`material-symbols-outlined text-[24px] ${!isSendDisabled ? "text-[#8ab4f8]" : "text-[#808080]"}`}>
                       send
@@ -245,7 +240,6 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
             </div>
           </div>
         </div>
-      </div>
     </footer>
   );
 };

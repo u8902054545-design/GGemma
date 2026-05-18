@@ -21,19 +21,22 @@ import { clearTempMessages } from './TemporaryChat/temporaryStorage';
 import { ModelSelectorPage } from './components/ModelSelectorPage';
 import { modelPageVariants, mainContentBackdropVariants } from './motion/modelPageTransitions';
 import { SUPABASE_ENDPOINT, supabase } from './config';
+import { TTSInput } from './components/TTSInput';
+import { VoiceSelection } from './components/Settings/voiceSelection';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
-  const { chats, loading: chatsLoading, error: chatsError, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
+  const { chats, loading: chatsLoading, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
 
   const [isTemporary, setIsTemporary] = useState(false);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
+  const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
 
   const {
     messages,
@@ -90,6 +93,7 @@ export default function App() {
   }, [user]);
 
   const isAutoGemma = useMemo(() => selectedModel.id === 'auto', [selectedModel.id]);
+  const isTTSModel = useMemo(() => selectedModel.id === 'Gemini 3.1 Flash TTS Preview', [selectedModel.id]);
 
   const handleScroll = useCallback(() => {
     handleScrollLogic(scrollContainerRef, setShowScrollButton);
@@ -139,7 +143,7 @@ export default function App() {
               onClose={() => closeState(setIsSidebarOpen)}
               chats={chats}
               loading={chatsLoading}
-              error={!!chatsError}
+              error={false}
               currentChatId={chatId}
               onChatSelect={(id) => {
                 if (isTemporary) clearTempMessages();
@@ -149,14 +153,13 @@ export default function App() {
               onNewChat={() => {
                 if (isTemporary) clearTempMessages();
                 setIsTemporary(false);
-                handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false));
+                handleCreateNewChat(setMessages, setChatId as any, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false));
               }}
               deleteChatFromDB={deleteChat}
               setChatTitle={setChatTitle}
               togglePin={togglePin}
             />
 
-            {/* Контейнер чата теперь статичен, вся анимация идет в Sidebar */}
             <div className="h-full w-full flex flex-col bg-black relative shadow-2xl">
               <ChatHeader
                 messages={messages}
@@ -181,7 +184,44 @@ export default function App() {
                   className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth"
                 >
                   <AnimatePresence mode="wait">
-                    {isTemporary && messages.length === 0 ? (
+                    {isTTSModel ? (
+                      <motion.div
+                        key="tts-interface"
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        className="flex-1 flex flex-col pt-8"
+                      >
+                        <TTSInput
+                          onVoice={(text) => handleSend(text)}
+                          onOpenVoiceSelection={() => setIsVoiceSelectionOpen(true)}
+                          isTyping={isTyping}
+                          selectedModel={selectedModel}
+                        />
+                        {messages.length > 0 && (
+                          <div className="p-6 pb-20 max-w-4xl w-full mx-auto flex flex-col border-t border-[#3c4043] mt-8">
+                             <h3 className="text-[#808080] text-sm font-medium mb-6 uppercase tracking-widest">History</h3>
+                             {messages.map((msg, index) => (
+                              <ChatMessage
+                                key={msg.id}
+                                messageId={msg.id}
+                                role={msg.role}
+                                content={msg.content}
+                                imageUrl={msg.imageUrl}
+                                modelName={msg.modelName}
+                                feedback={msg.feedback}
+                                onFeedback={handleFeedback}
+                                isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
+                                isLast={index === messages.length - 1}
+                                onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
+                                isTemporary={isTemporary}
+                              />
+                            ))}
+                            <div ref={messagesEndRef} className="h-1" />
+                          </div>
+                        )}
+                      </motion.div>
+                    ) : isTemporary && messages.length === 0 ? (
                       <TemporaryChatPage key="temp-page" />
                     ) : messages.length === 0 ? (
                       <motion.div
@@ -233,7 +273,7 @@ export default function App() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       onClick={() => scrollToBottomInstant(messagesEndRef)}
-                      className="absolute bottom-6 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[#1e1e1e] border border-[#444746] text-[#a8c7fa] shadow-2xl hover:bg-[#282a2d] transition-colors cursor-pointer"
+                      className="absolute bottom-6 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[#1e1e1e] border border-[#3c4043] text-[#a8c7fa] shadow-2xl hover:bg-[#282a2d] transition-colors cursor-pointer"
                     >
                       <span className="material-symbols-outlined">
                         arrow_downward
@@ -243,18 +283,20 @@ export default function App() {
                 </AnimatePresence>
               </div>
 
-              <ChatInput
-                input={input}
-                setInput={setInput}
-                handleSend={handleSend}
-                stopRequest={stopRequest}
-                selectedModel={selectedModel}
-                isTyping={isTyping}
-                isSearchActive={isSearchActive}
-                onSearchClick={toggleSearch}
-                onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
-                onModelConfigClick={() => setIsModelSelectorOpen(true)}
-              />
+              {!isTTSModel && (
+                <ChatInput
+                  input={input}
+                  setInput={setInput}
+                  handleSend={handleSend}
+                  stopRequest={stopRequest}
+                  selectedModel={selectedModel}
+                  isTyping={isTyping}
+                  isSearchActive={isSearchActive}
+                  onSearchClick={toggleSearch}
+                  onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
+                  onModelConfigClick={() => setIsModelSelectorOpen(true)}
+                />
+              )}
             </div>
           </motion.div>
 
@@ -284,10 +326,19 @@ export default function App() {
             )}
           </AnimatePresence>
 
+          <AnimatePresence>
+            {isVoiceSelectionOpen && (
+              <VoiceSelection
+                isOpen={isVoiceSelectionOpen}
+                onClose={() => setIsVoiceSelectionOpen(false)}
+              />
+            )}
+          </AnimatePresence>
+
           <FullscreenImage
             src={fullscreenImage}
             isOpen={!!fullscreenImage}
-            onClose={() => closeState(setFullscreenImage)}
+            onClose={() => setFullscreenImage(null)}
           />
 
           <Snackbar
@@ -300,3 +351,4 @@ export default function App() {
     </div>
   );
 }
+

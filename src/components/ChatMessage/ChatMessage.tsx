@@ -17,6 +17,7 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
   onImageClick?: (url: string) => void;
   isTemporary?: boolean;
+  imageUrl?: string;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({

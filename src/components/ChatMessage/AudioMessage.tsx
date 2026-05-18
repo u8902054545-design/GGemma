@@ -28,10 +28,10 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
   handleFeedback,
   isTemporary = false
 }) => {
-  const bars = Array.from({ length: 12 });
+  const bars = Array.from({ length: 16 });
 
   return (
-    <div className="flex flex-col w-full group/audio">
+    <div className="flex flex-col w-full group/audio max-w-2xl">
       <ChatMessageHeader
         hasThought={hasThought}
         isExpanded={isThoughtExpanded}
@@ -47,126 +47,89 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
         initial="initial"
         animate="animate"
         exit="exit"
-        className="relative mt-2 p-[1px] rounded-[32px] rounded-tl-[8px] overflow-hidden w-fit min-w-[280px] max-w-full shadow-2xl shadow-black/40"
+        className="mt-3 overflow-hidden rounded-[24px] bg-[#1e1e1e] border border-[#3c4043] hover:border-[#5f6368] transition-colors shadow-sm"
       >
-        {/* Animated Gradient Border */}
-        <div className={`absolute inset-0 animate-gradient opacity-40 transition-opacity duration-500 ${isSpeaking ? 'opacity-100' : 'group-hover/audio:opacity-70'}`} />
-        
-        <div className="relative bg-[#1a1c1e]/80 backdrop-blur-3xl rounded-[31px] rounded-tl-[7px] px-5 py-4 flex items-center gap-5">
-          {/* Main Play Button with Pulsing Effect */}
-          <div className="relative flex-shrink-0">
-            <AnimatePresence>
-              {isSpeaking && (
-                <>
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0.6 }}
-                    animate={{ scale: 1.8, opacity: 0 }}
-                    transition={{ repeat: Infinity, duration: 2, ease: "easeOut" }}
-                    className="absolute inset-0 rounded-full bg-[var(--gemma-blue-bright)]/40 blur-sm"
-                  />
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0.4 }}
-                    animate={{ scale: 1.5, opacity: 0 }}
-                    transition={{ repeat: Infinity, duration: 2, ease: "easeOut", delay: 0.5 }}
-                    className="absolute inset-0 rounded-full bg-[var(--gemma-blue-deep)]/30 blur-md"
-                  />
-                </>
-              )}
+        <div className="flex items-center gap-4 px-4 py-3">
+          {/* Play/Pause Button - MD3 FAB style */}
+          <button
+            onClick={onSpeech}
+            className={`w-12 h-12 flex items-center justify-center rounded-full transition-all active:scale-90 relative overflow-hidden ${
+              isSpeaking 
+              ? 'bg-[#8ab4f8] text-[#000]' 
+              : 'bg-[#3c4043] text-[#8ab4f8] hover:bg-[#4a4d51]'
+            }`}
+          >
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={isSpeaking ? 'pause' : 'play'}
+                variants={iconVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                className="material-symbols-outlined text-[28px] absolute"
+                style={{ fontVariationSettings: "'FILL' 1" }}
+              >
+                {isSpeaking ? 'pause' : 'play_arrow'}
+              </motion.span>
             </AnimatePresence>
-            
-            <button
-              onClick={onSpeech}
-              className={`w-14 h-14 flex items-center justify-center rounded-full shadow-lg active:scale-90 transition-all duration-300 cursor-pointer relative z-10 overflow-hidden ${
-                isSpeaking 
-                ? 'bg-white text-[var(--gemma-blue-deep)] scale-105 shadow-[0_0_20px_rgba(46,150,255,0.4)]' 
-                : 'bg-gradient-to-br from-[var(--gemma-blue-deep)] via-[var(--gemma-blue-bright)] to-[var(--gemma-blue-light)] text-white hover:scale-105'
-              }`}
-            >
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.span
-                  key={isSpeaking ? 'pause' : 'play'}
-                  variants={iconVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  className="material-symbols-outlined text-[36px] absolute"
-                  style={{ fontVariationSettings: "'FILL' 1" }}
-                >
-                  {isSpeaking ? 'pause' : 'play_arrow'}
-                </motion.span>
-              </AnimatePresence>
-            </button>
-          </div>
+          </button>
 
           <div className="flex flex-col flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className={`text-[15px] font-bold tracking-tight transition-colors duration-300 ${isSpeaking ? 'text-[var(--gemma-blue-light)]' : 'text-white/90'}`}>
-                {isSpeaking ? 'Playing Audio' : 'Voice Message'}
+              <span className={`text-sm font-semibold tracking-wide transition-colors ${isSpeaking ? 'text-[#8ab4f8]' : 'text-[#e2e2e2]'}`}>
+                {isSpeaking ? 'Playing Audio...' : 'Voice Response'}
               </span>
               {isGenerating && (
-                <div className="w-1.5 h-1.5 rounded-full bg-[var(--gemma-blue-bright)] animate-pulse" />
+                <div className="w-2 h-2 rounded-full bg-[#8ab4f8] animate-pulse" />
               )}
             </div>
             
-            <div className="flex items-center gap-2 h-6 mt-0.5">
+            <div className="flex items-center gap-3 h-6 mt-0.5">
               {isSpeaking ? (
-                <div className="flex items-end gap-[2px] h-4">
+                <div className="flex items-end gap-[3px] h-4">
                   {bars.map((_, i) => (
                     <motion.div
                       key={i}
                       animate={{ 
-                        height: [4, 14, 8, 18, 6, 12, 4],
-                        opacity: [0.5, 1, 0.7, 1, 0.6, 1, 0.5]
+                        height: [4, 16, 8, 14, 6, 12, 4],
                       }}
                       transition={{
                         repeat: Infinity,
-                        duration: 0.8 + Math.random() * 0.7,
+                        duration: 1 + Math.random() * 0.5,
                         ease: "easeInOut",
-                        delay: i * 0.08
+                        delay: i * 0.05
                       }}
-                      className="w-[3px] bg-gradient-to-t from-[var(--gemma-blue-deep)] to-[var(--gemma-blue-bright)] rounded-full"
+                      className="w-[2px] bg-[#8ab4f8] rounded-full"
                     />
                   ))}
                 </div>
               ) : (
-                <span className="text-[12px] text-white/40 font-medium truncate">
-                  {modelName || 'Gemma AI Intelligence'}
+                <span className="text-xs text-[#808080] font-medium truncate">
+                  Generated by {modelName || 'Gemini Flash 3.1 TTS'}
                 </span>
               )}
             </div>
           </div>
 
-          {/* End Decoration / Mode Icon */}
-          <div className="flex-shrink-0 ml-2">
-            <motion.div
-              animate={isSpeaking ? { 
-                scale: [1, 1.2, 1],
-                rotate: [0, 10, -10, 0]
-              } : {}}
-              transition={{ repeat: Infinity, duration: 3 }}
-              className={`w-10 h-10 rounded-2xl flex items-center justify-center transition-colors duration-500 ${
-                isSpeaking 
-                ? 'bg-[var(--gemma-blue-bright)]/10 text-[var(--gemma-blue-bright)]' 
-                : 'bg-white/5 text-white/20'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[22px]" style={{ fontVariationSettings: isSpeaking ? "'FILL' 1" : "" }}>
-                {isSpeaking ? 'waves' : 'graphic_eq'}
+          <div className="flex-shrink-0 flex items-center gap-1">
+            <div className={`p-2 rounded-full ${isSpeaking ? 'text-[#8ab4f8]' : 'text-[#5f6368]'}`}>
+              <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: isSpeaking ? "'FILL' 1" : "" }}>
+                {isSpeaking ? 'equalizer' : 'graphic_eq'}
               </span>
-            </motion.div>
+            </div>
           </div>
         </div>
       </motion.div>
 
-      {/* Modernized Feedback Controls */}
+      {/* Modern MD3 Feedback */}
       {!isGenerating && !isTemporary && handleFeedback && (
-        <div className="mt-4 flex items-center gap-3 px-2">
+        <div className="mt-3 flex items-center gap-2 px-1">
           <button
             onClick={() => handleFeedback(localFeedback === 'like' ? null : 'like')}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300 cursor-pointer ${
+            className={`flex items-center gap-2 px-4 py-1.5 rounded-full border transition-all ${
               localFeedback === 'like' 
-              ? 'bg-[var(--gemma-blue-bright)]/10 border-[var(--gemma-blue-bright)] text-[var(--gemma-blue-bright)] shadow-[0_0_12px_rgba(46,150,255,0.2)]' 
-              : 'bg-transparent border-white/10 text-white/40 hover:bg-white/5 hover:border-white/20'
+              ? 'bg-[#8ab4f8]/10 border-[#8ab4f8] text-[#8ab4f8]' 
+              : 'bg-transparent border-[#3c4043] text-[#808080] hover:bg-[#282a2d] hover:border-[#5f6368]'
             }`}
           >
             <span
@@ -175,15 +138,15 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
             >
               thumb_up
             </span>
-            <span className="text-[11px] font-bold uppercase tracking-wider">Helpful</span>
+            <span className="text-xs font-semibold">Good</span>
           </button>
           
           <button
             onClick={() => handleFeedback(localFeedback === 'dislike' ? null : 'dislike')}
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-full border transition-all duration-300 cursor-pointer ${
+            className={`flex items-center justify-center w-10 h-10 rounded-full border transition-all ${
               localFeedback === 'dislike' 
-              ? 'bg-red-500/10 border-red-500/50 text-red-400' 
-              : 'bg-transparent border-white/10 text-white/40 hover:bg-white/5 hover:border-white/20'
+              ? 'bg-[#f28b82]/10 border-[#f28b82] text-[#f28b82]' 
+              : 'bg-transparent border-[#3c4043] text-[#808080] hover:bg-[#282a2d] hover:border-[#5f6368]'
             }`}
           >
             <span
@@ -198,4 +161,5 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
     </div>
   );
 };
+
 
