@@ -195,6 +195,7 @@ export default function App() {
                         <TTSInput
                           onVoice={(text) => handleSend(text)}
                           onOpenVoiceSelection={() => setIsVoiceSelectionOpen(true)}
+                          onModelConfigClick={() => setIsModelSelectorOpen(true)}
                           isTyping={isTyping}
                           selectedModel={selectedModel}
                         />

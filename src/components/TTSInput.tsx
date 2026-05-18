@@ -6,6 +6,7 @@ import { SUPABASE_ENDPOINT, supabase } from '../config';
 interface TTSInputProps {
   onVoice: (text: string) => void;
   onOpenVoiceSelection: () => void;
+  onModelConfigClick: () => void;
   isTyping: boolean;
   selectedModel: { id: string; name: string };
 }
@@ -13,6 +14,7 @@ interface TTSInputProps {
 export const TTSInput: React.FC<TTSInputProps> = ({
   onVoice,
   onOpenVoiceSelection,
+  onModelConfigClick,
   isTyping,
   selectedModel
 }) => {
@@ -37,13 +39,24 @@ export const TTSInput: React.FC<TTSInputProps> = ({
       exit={{ opacity: 0, y: -20 }}
       className="w-full max-w-2xl mx-auto p-6 flex flex-col gap-6"
     >
-      <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-medium text-[#e2e2e2] tracking-tight">
-          Text to Speech
-        </h2>
-        <p className="text-sm text-[#808080]">
-          Enter the text you want to convert to audio using {selectedModel.name}.
-        </p>
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-2">
+          <h2 className="text-2xl font-medium text-[#e2e2e2] tracking-tight">
+            Text to Speech
+          </h2>
+          <p className="text-sm text-[#808080]">
+            Enter the text you want to convert to audio using {selectedModel.name}.
+          </p>
+        </div>
+        
+        <button
+          onClick={onModelConfigClick}
+          className="p-3 rounded-full hover:bg-[#1a1c1e] border border-[#3c4043] transition-all active:scale-90 group"
+        >
+          <span className="material-symbols-outlined text-[24px] text-[#808080] group-hover:text-[#8ab4f8]">
+            tune
+          </span>
+        </button>
       </div>
 
       <div className="relative group">
