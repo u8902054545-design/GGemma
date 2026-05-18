@@ -2,7 +2,7 @@ export const audioEasing = {
   standard: [0.2, 0, 0, 1],
   decelerated: [0, 0, 1, 1],
   accelerated: [0.3, 0, 1, 1]
-};
+} as const;
 
 export const audioPhysics = {
   player: {
@@ -16,7 +16,8 @@ export const audioPhysics = {
     stiffness: 400,
     damping: 28
   }
-};
+} as const;
+
 
 export const playerVariants = {
   initial: {
