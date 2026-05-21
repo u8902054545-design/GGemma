@@ -42,7 +42,7 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${filename || 'audio'}.mp3`;
+        a.download = `${filename || 'audio'}.pcm`;
         document.body.appendChild(a);
         a.click();
         window.URL.revokeObjectURL(url);
