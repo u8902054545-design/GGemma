@@ -256,7 +256,7 @@ export default function App() {
                         animate={{ opacity: 1 }}
                         className="p-6 pb-20 max-w-4xl w-full mx-auto flex flex-col"
                       >
-                        {messages.filter(msg => msg.modelName && msg.modelName !== 'Gemini 3.1 Flash TTS Preview').map((msg, index) => (
+                        {messages.filter(msg => msg.role === 'user' || msg.modelName !== 'Gemini 3.1 Flash TTS Preview').map((msg, index) => (
                           <ChatMessage
                             key={msg.id}
                             messageId={msg.id}
