@@ -42,21 +42,12 @@ export const TTSInput: React.FC<TTSInputProps> = ({
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-2">
           <h2 className="text-2xl font-medium text-[#e2e2e2] tracking-tight">
-            Text to Speech
+            Text to speech
           </h2>
           <p className="text-sm text-[#808080]">
             Enter the text you want to convert to audio using {selectedModel.name}.
           </p>
         </div>
-        
-        <button
-          onClick={onModelConfigClick}
-          className="p-3 rounded-full hover:bg-[#1a1c1e] border border-[#3c4043] transition-all active:scale-90 group"
-        >
-          <span className="material-symbols-outlined text-[24px] text-[#808080] group-hover:text-[#8ab4f8]">
-            tune
-          </span>
-        </button>
       </div>
 
       <div className="relative group">
@@ -74,17 +65,17 @@ export const TTSInput: React.FC<TTSInputProps> = ({
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-2">
         <button
           onClick={onOpenVoiceSelection}
-          className="flex items-center gap-3 px-5 py-3 rounded-full hover:bg-[#1a1c1e] border border-[#3c4043] transition-all active:scale-95 group w-full sm:w-auto"
+          className="flex items-center gap-4 px-6 py-4 rounded-[20px] bg-[#2b2930] hover:bg-[#36343b] transition-all active:scale-95 group w-full sm:w-auto"
         >
           <span className="material-symbols-outlined text-[24px] text-[#8ab4f8]">
             record_voice_over
           </span>
           <div className="flex flex-col items-start">
-            <span className="text-xs text-[#808080] font-medium uppercase tracking-wider">Voice Selection</span>
-            <span className="text-sm text-[#e2e2e2] font-semibold">{selectedVoice}</span>
+            <span className="text-[11px] text-[#8ab4f8] font-medium leading-none mb-1">Voice selection</span>
+            <span className="text-base text-[#e6e1e5] font-medium leading-none">{selectedVoice}</span>
           </div>
-          <span className="material-symbols-outlined text-[20px] text-[#808080] group-hover:translate-x-0.5 transition-transform ml-1">
-            chevron_right
+          <span className="material-symbols-outlined text-[20px] text-[#938f99] ml-auto sm:ml-2">
+            expand_more
           </span>
         </button>
 
@@ -110,27 +101,6 @@ export const TTSInput: React.FC<TTSInputProps> = ({
             </>
           )}
         </motion.button>
-      </div>
-
-      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="p-4 rounded-xl bg-[#1e1e1e] border border-[#3c4043] flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-[#8ab4f8]/10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-[#8ab4f8]">high_quality</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-[#e2e2e2]">High Quality</span>
-            <span className="text-xs text-[#808080]">Crystal clear audio output</span>
-          </div>
-        </div>
-        <div className="p-4 rounded-xl bg-[#1e1e1e] border border-[#3c4043] flex items-center gap-4">
-          <div className="w-10 h-10 rounded-full bg-[#f28b82]/10 flex items-center justify-center">
-            <span className="material-symbols-outlined text-[#f28b82]">speed</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-medium text-[#e2e2e2]">Fast Generation</span>
-            <span className="text-xs text-[#808080]">Instant voice conversion</span>
-          </div>
-        </div>
       </div>
     </motion.div>
   );

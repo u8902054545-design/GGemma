@@ -23,6 +23,7 @@ import { modelPageVariants, mainContentBackdropVariants } from './motion/modelPa
 import { SUPABASE_ENDPOINT, supabase } from './config';
 import { TTSInput } from './components/TTSInput';
 import { VoiceSelection } from './components/Settings/voiceSelection';
+import { TTSHeader } from './components/TTSHeader';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -57,7 +58,8 @@ export default function App() {
     stopRequest,
     snackbarMessage,
     isSnackbarOpen,
-    setIsSnackbarOpen
+    setIsSnackbarOpen,
+    models
   } = useChat(() => refreshChats(true), isTemporary);
 
   useEffect(() => {
@@ -153,6 +155,7 @@ export default function App() {
               onNewChat={() => {
                 if (isTemporary) clearTempMessages();
                 setIsTemporary(false);
+                if (isTTSModel) setSelectedModel(models[0]);
                 handleCreateNewChat(setMessages, setChatId as any, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false));
               }}
               deleteChatFromDB={deleteChat}
@@ -161,21 +164,29 @@ export default function App() {
             />
 
             <div className="h-full w-full flex flex-col bg-black relative shadow-2xl">
-              <ChatHeader
-                messages={messages}
-                chatTitle={isTemporary ? "Temporary Chat" : chatTitle}
-                chatId={chatId}
-                isPinned={chats.find(c => c.id === chatId)?.is_pinned || false}
-                setMessages={setMessages}
-                setChatId={setChatId}
-                setChatTitle={setChatTitle}
-                onMenuClick={() => toggleState(isSidebarOpen, setIsSidebarOpen)}
-                isSidebarOpen={isSidebarOpen}
-                deleteChatFromDB={deleteChat}
-                togglePin={togglePin}
-                isTemporary={isTemporary}
-                onTemporaryChatClick={handleTemporaryToggle}
-              />
+              {isTTSModel ? (
+                <TTSHeader
+                  onMenuClick={() => toggleState(isSidebarOpen, setIsSidebarOpen)}
+                  isSidebarOpen={isSidebarOpen}
+                  onModelConfigClick={() => setIsModelSelectorOpen(true)}
+                />
+              ) : (
+                <ChatHeader
+                  messages={messages}
+                  chatTitle={isTemporary ? "Temporary Chat" : chatTitle}
+                  chatId={chatId}
+                  isPinned={chats.find(c => c.id === chatId)?.is_pinned || false}
+                  setMessages={setMessages}
+                  setChatId={setChatId}
+                  setChatTitle={setChatTitle}
+                  onMenuClick={() => toggleState(isSidebarOpen, setIsSidebarOpen)}
+                  isSidebarOpen={isSidebarOpen}
+                  deleteChatFromDB={deleteChat}
+                  togglePin={togglePin}
+                  isTemporary={isTemporary}
+                  onTemporaryChatClick={handleTemporaryToggle}
+                />
+              )}
 
               <div className="flex-1 relative overflow-hidden flex flex-col">
                 <main
@@ -201,8 +212,8 @@ export default function App() {
                         />
                         {messages.length > 0 && (
                           <div className="p-6 pb-20 max-w-4xl w-full mx-auto flex flex-col border-t border-[#3c4043] mt-8">
-                             <h3 className="text-[#808080] text-sm font-medium mb-6 uppercase tracking-widest">History</h3>
-                             {messages.map((msg, index) => (
+                             <h3 className="text-[#808080] text-sm font-medium mb-6 tracking-widest">History</h3>
+                             {messages.filter(msg => msg.role === 'ai').map((msg, index) => (
                               <ChatMessage
                                 key={msg.id}
                                 messageId={msg.id}
@@ -245,7 +256,7 @@ export default function App() {
                         animate={{ opacity: 1 }}
                         className="p-6 pb-20 max-w-4xl w-full mx-auto flex flex-col"
                       >
-                        {messages.map((msg, index) => (
+                        {messages.filter(msg => msg.modelName !== 'Gemini 3.1 Flash TTS Preview').map((msg, index) => (
                           <ChatMessage
                             key={msg.id}
                             messageId={msg.id}

@@ -134,6 +134,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
                 localFeedback={localFeedback}
                 handleFeedback={handleFeedback}
                 isTemporary={isTemporary}
+                content={cleanContent}
               />
             ) : (
               <motion.div layout="position" className="min-h-[1.5em]">

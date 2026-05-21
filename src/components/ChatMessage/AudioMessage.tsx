@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChatMessageHeader } from './ChatMessageHeader';
 import { playerVariants, iconVariants } from '../../motion/audioAnimations';
+import { AudioDownloadDialog } from './AudioDownloadDialog';
 
 interface AudioMessageProps {
   isSpeaking: boolean;
@@ -14,6 +15,7 @@ interface AudioMessageProps {
   localFeedback?: 'like' | 'dislike' | null;
   handleFeedback?: (type: 'like' | 'dislike' | null) => void;
   isTemporary?: boolean;
+  content?: string;
 }
 
 export const AudioMessage: React.FC<AudioMessageProps> = ({
@@ -26,9 +28,34 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
   isGenerating = false,
   localFeedback,
   handleFeedback,
-  isTemporary = false
+  isTemporary = false,
+  content = ""
 }) => {
   const bars = Array.from({ length: 16 });
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false);
+
+  const handleDownloadConfirm = async (filename: string) => {
+    try {
+      // In a real app, you'd fetch the actual audio blob from the last generation
+      // For now we'll simulate the download of what's currently being played or last generated
+      const lastAudioUrl = localStorage.getItem('last_audio_url');
+      if (lastAudioUrl) {
+        const response = await fetch(lastAudioUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${filename || 'audio'}.mp3`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }
+    } catch (err) {
+      console.error('Download failed:', err);
+    }
+    setIsDownloadOpen(false);
+  };
 
   return (
     <div className="flex flex-col w-full group/audio max-w-2xl">
@@ -77,7 +104,7 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
           <div className="flex flex-col flex-1 min-w-0">
             <div className="flex items-center gap-2">
               <span className={`text-sm font-semibold tracking-wide transition-colors ${isSpeaking ? 'text-[#8ab4f8]' : 'text-[#e2e2e2]'}`}>
-                {isSpeaking ? 'Playing Audio...' : 'Voice Response'}
+                {isSpeaking ? 'Playing audio...' : 'Voice response'}
               </span>
               {isGenerating && (
                 <div className="w-2 h-2 rounded-full bg-[#8ab4f8] animate-pulse" />
@@ -112,6 +139,14 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
           </div>
 
           <div className="flex-shrink-0 flex items-center gap-1">
+             <button
+              onClick={() => setIsDownloadOpen(true)}
+              className="p-2.5 hover:bg-white/5 rounded-full transition-colors text-[#808080] hover:text-[#e2e2e2] active:scale-90"
+            >
+              <span className="material-symbols-outlined text-[22px]">
+                download
+              </span>
+            </button>
             <div className={`p-2 rounded-full ${isSpeaking ? 'text-[#8ab4f8]' : 'text-[#5f6368]'}`}>
               <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: isSpeaking ? "'FILL' 1" : "" }}>
                 {isSpeaking ? 'equalizer' : 'graphic_eq'}
@@ -145,7 +180,7 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
             onClick={() => handleFeedback(localFeedback === 'dislike' ? null : 'dislike')}
             className={`flex items-center justify-center w-10 h-10 rounded-full border transition-all ${
               localFeedback === 'dislike' 
-              ? 'bg-[#f28b82]/10 border-[#f28b82] text-[#f28b82]' 
+              ? 'bg-[#8ab4f8]/10 border-[#8ab4f8] text-[#8ab4f8]' 
               : 'bg-transparent border-[#3c4043] text-[#808080] hover:bg-[#282a2d] hover:border-[#5f6368]'
             }`}
           >
@@ -158,6 +193,13 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
           </button>
         </div>
       )}
+
+      <AudioDownloadDialog
+        isOpen={isDownloadOpen}
+        onClose={() => setIsDownloadOpen(false)}
+        onConfirm={handleDownloadConfirm}
+        defaultFilename={content.slice(0, 20).trim() || 'audio_response'}
+      />
     </div>
   );
 };
