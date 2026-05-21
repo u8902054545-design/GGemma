@@ -117,7 +117,7 @@ export const useChatSender = (
         
         const { data: { publicUrl } } = supabase.storage
           .from('chat-audio')
-          .getPublicUrl(`${userId}/${serverMessageId || aiMsgId}.pcm`);
+          .getPublicUrl(`${userId}/${serverMessageId || aiMsgId}.mp3`);
 
         setAudioBufferCache(publicUrl, audioBuffer);
 

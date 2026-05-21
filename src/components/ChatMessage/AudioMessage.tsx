@@ -36,11 +36,8 @@ export const AudioMessage: React.FC<AudioMessageProps> = ({
 
   const handleDownloadConfirm = async (filename: string) => {
     try {
-      // In a real app, you'd fetch the actual audio blob from the last generation
-      // For now we'll simulate the download of what's currently being played or last generated
-      const lastAudioUrl = localStorage.getItem('last_audio_url');
-      if (lastAudioUrl) {
-        const response = await fetch(lastAudioUrl);
+      if (content && content.startsWith('http')) {
+        const response = await fetch(content);
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');

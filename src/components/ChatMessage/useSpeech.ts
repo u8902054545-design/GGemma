@@ -10,7 +10,7 @@ export const setAudioBufferCache = (key: string, buffer: ArrayBuffer) => {
 
 export const useSpeech = (text: string, modelName?: string) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const { playPcmBuffer, stop: stopPcm, isPlaying: isPcmPlaying } = useVoicePlayer();
+  const { playAudioBuffer, stop: stopPcm, isPlaying: isPcmPlaying } = useVoicePlayer();
 
   const stop = useCallback(() => {
     window.speechSynthesis.cancel();
@@ -30,7 +30,7 @@ export const useSpeech = (text: string, modelName?: string) => {
 
     if (audioBufferCache[trimmedText]) {
       setIsSpeaking(true);
-      await playPcmBuffer(audioBufferCache[trimmedText]);
+      await playAudioBuffer(audioBufferCache[trimmedText]);
       return;
     }
 
@@ -44,7 +44,7 @@ export const useSpeech = (text: string, modelName?: string) => {
         if (!response.ok) throw new Error('Failed to fetch audio file');
         const audioData = await response.arrayBuffer();
         audioBufferCache[trimmedText] = audioData;
-        await playPcmBuffer(audioData);
+        await playAudioBuffer(audioData);
         return;
       }
 
@@ -70,7 +70,7 @@ export const useSpeech = (text: string, modelName?: string) => {
 
       const audioData = await response.arrayBuffer();
       audioBufferCache[trimmedText] = audioData;
-      await playPcmBuffer(audioData);
+      await playAudioBuffer(audioData);
 
     } catch (error) {
       console.error('TTS Error, falling back to Web Speech API', error);

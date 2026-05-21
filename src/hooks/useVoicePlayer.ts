@@ -14,24 +14,15 @@ export const useVoicePlayer = () => {
     setIsPlaying(false);
   }, []);
 
-  const playPcmBuffer = useCallback(async (buffer: ArrayBuffer) => {
+  const playAudioBuffer = useCallback(async (buffer: ArrayBuffer) => {
     try {
       if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)({
-          sampleRate: 24000,
-        });
+        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
         nextStartTimeRef.current = audioContextRef.current.currentTime;
       }
 
-      const pcmData = new Int16Array(buffer);
-      const float32Data = new Float32Array(pcmData.length);
-      
-      for (let i = 0; i < pcmData.length; i++) {
-        float32Data[i] = pcmData[i] / 32768.0;
-      }
-
-      const audioBuffer = audioContextRef.current.createBuffer(1, float32Data.length, 24000);
-      audioBuffer.getChannelData(0).set(float32Data);
+      // decodeAudioData handles MP3, WAV, etc.
+      const audioBuffer = await audioContextRef.current.decodeAudioData(buffer.slice(0));
 
       const source = audioContextRef.current.createBufferSource();
       source.buffer = audioBuffer;
@@ -50,10 +41,10 @@ export const useVoicePlayer = () => {
       };
 
     } catch (error) {
-      console.error('Error playing PCM buffer:', error);
+      console.error('Error playing audio buffer:', error);
       stop();
     }
   }, [stop]);
 
-  return { playPcmBuffer, stop, isPlaying };
+  return { playAudioBuffer, stop, isPlaying };
 };
