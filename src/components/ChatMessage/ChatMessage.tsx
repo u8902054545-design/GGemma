@@ -1,17 +1,12 @@
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import remarkMath from 'remark-math';
-import rehypeKatex from 'rehype-katex';
-import 'katex/dist/katex.min.css';
 import { GemmaSkeleton } from '../GemmaSkeleton';
 import { mdEasing, mdDuration } from '../../motion/transitions';
 import { ChatMessageProps } from './types';
 import { useMessageLogic } from './useMessageLogic';
 import { ChatMessageHeader } from './ChatMessageHeader';
-import { CodeBlock } from './CodeBlock';
-import { AudioMessage } from './AudioMessage';
+import { MarkdownContent } from './MarkdownContent';
+import { MessageActions } from './MessageActions';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
@@ -36,7 +31,6 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   const isAI = role === 'ai';
   const isStopped = content.includes('_STOPPED_');
   const cleanContent = content.replace('_STOPPED_', '');
-  const isAudioModel = modelName === 'Gemini 3.1 Flash TTS Preview';
 
   const {
     isThoughtExpanded,
@@ -69,7 +63,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
       transition={{ duration: mdDuration.short4, ease: mdEasing.decelerate }}
       className={`flex flex-col mb-8 ${isAI ? 'items-start w-full' : 'items-end'}`}
     >
-      {isAI && !isAudioModel && (
+      {isAI && (
         <ChatMessageHeader
           hasThought={!!thought}
           isExpanded={isThoughtExpanded}
@@ -122,86 +116,27 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               <div className="min-h-[40px] flex items-center">
                 <GemmaSkeleton />
               </div>
-            ) : isAI && isAudioModel ? (
-              <AudioMessage
-                isSpeaking={isSpeaking}
-                onSpeech={handleSpeech}
-                modelName={modelName}
-                hasThought={!!thought}
-                isThoughtExpanded={isThoughtExpanded}
-                onToggleThought={() => setIsThoughtExpanded(!isThoughtExpanded)}
-                isGenerating={isGenerating}
-                localFeedback={localFeedback}
-                handleFeedback={handleFeedback}
-                isTemporary={isTemporary}
-                content={cleanContent}
-              />
             ) : (
-              <motion.div layout="position" className="min-h-[1.5em]">
-                {isAI ? (
-                  <ReactMarkdown
-                    remarkPlugins={[remarkGfm, remarkMath]}
-                    rehypePlugins={[rehypeKatex]}
-                    components={{
-                      pre: ({ children }) => <>{children}</>,
-                      code({ inline, className, children }: any) {
-                        const match = /language-(\w+)/.exec(className || '');
-                        const codeString = String(children).replace(/\n$/, '');
-                        return !inline && match ? (
-                          <CodeBlock
-                            language={match[1]}
-                            value={codeString}
-                            isCopied={copiedText === codeString}
-                            onCopy={handleCopy}
-                          />
-                        ) : (
-                          <code className="bg-[var(--md-sys-color-surface-container-high)] px-1.5 py-0.5 rounded text-sm font-mono text-[var(--md-sys-color-primary)]">
-                            {children}
-                          </code>
-                        );
-                      },
-                      p: ({ children }) => <p className="mb-4 last:mb-0 break-words">{children}</p>,
-                      table: ({ children }) => (
-                        <div className="my-4 overflow-x-auto rounded-lg border border-[var(--md-sys-color-outline-variant)]">
-                          <table className="w-full border-collapse text-sm text-left">
-                            {children}
-                          </table>
-                        </div>
-                      ),
-                      thead: ({ children }) => <thead className="bg-[var(--md-sys-color-surface-container-high)]">{children}</thead>,
-                      th: ({ children }) => <th className="px-4 py-2 border-b border-[var(--md-sys-color-outline-variant)] font-semibold">{children}</th>,
-                      td: ({ children }) => <td className="px-4 py-2 border-b border-[var(--md-sys-color-outline-variant)]">{children}</td>,
-                      ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>,
-                      ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>,
-                      a: ({ href, children }) => (
-                        <a href={href} target="_blank" rel="noopener noreferrer" className="text-[var(--md-sys-color-primary)] hover:underline">
-                          {children}
-                        </a>
-                      ),
-                    }}
-                  >
-                    {mainContent}
-                  </ReactMarkdown>
-                ) : (
-                  <div className="whitespace-pre-wrap break-words">
-                    {mainContent}
-                  </div>
-                )}
-
-                {isStopped && (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="mt-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)] w-fit select-none"
-                  >
-                    <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-primary)]">
-                      info
-                    </span>
-                    <span className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)]">
-                      Generation stopped by user
-                    </span>
-                  </motion.div>
-                )}
+              <MarkdownContent
+                content={mainContent}
+                isAI={isAI}
+                copiedText={copiedText}
+                handleCopy={handleCopy}
+              />
+            )}
+            
+            {isAI && isStopped && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="mt-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)] w-fit select-none"
+              >
+                <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-primary)]">
+                  info
+                </span>
+                <span className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)]">
+                  Generation stopped by user
+                </span>
               </motion.div>
             )}
           </div>
@@ -225,54 +160,16 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           </button>
         )}
 
-        {isAI && !isGenerating && mainContent && !isAudioModel && (
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: mdDuration.medium4, ease: mdEasing.standard }}
-            className="mt-4 flex flex-col gap-3 w-full select-none"
-          >
-            <div className="flex items-center gap-1">
-              {!isTemporary && (
-                <>
-                  <button
-                    onClick={() => handleFeedback(localFeedback === 'like' ? null : 'like')}
-                    className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
-                      localFeedback === 'like' ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
-                    }`}
-                  >
-                    <span className={`material-symbols-outlined text-[20px] ${localFeedback === 'like' ? 'FILL' : ''}`} style={{ fontVariationSettings: localFeedback === 'like' ? "'FILL' 1" : "" }}>
-                      thumb_up
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => handleFeedback(localFeedback === 'dislike' ? null : 'dislike')}
-                    className={`p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer ${
-                      localFeedback === 'dislike' ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'
-                    }`}
-                  >
-                    <span className={`material-symbols-outlined text-[20px] ${localFeedback === 'dislike' ? 'FILL' : ''}`} style={{ fontVariationSettings: localFeedback === 'dislike' ? "'FILL' 1" : "" }}>
-                      thumb_down
-                    </span>
-                  </button>
-                </>
-              )}
-              <button
-                onClick={() => handleCopy(mainContent)}
-                className="p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] transition-colors cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[20px]">
-                  {copiedText === mainContent ? 'check' : 'content_copy'}
-                </span>
-              </button>
-            </div>
-
-            {isLast && (
-              <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-70 leading-tight">
-                Gemma is an AI and may make mistakes. Verify its responses.
-              </p>
-            )}
-          </motion.div>
+        {isAI && !isGenerating && mainContent && (
+          <MessageActions
+            isTemporary={isTemporary}
+            localFeedback={localFeedback}
+            handleFeedback={handleFeedback}
+            handleCopy={handleCopy}
+            content={mainContent}
+            copiedText={copiedText}
+            isLast={isLast}
+          />
         )}
       </div>
     </motion.div>

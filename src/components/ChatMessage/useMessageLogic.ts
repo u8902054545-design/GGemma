@@ -13,14 +13,7 @@ export const useMessageLogic = (
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [localFeedback, setLocalFeedback] = useState<'like' | 'dislike' | null>(initialFeedback || null);
 
-  const isAudioUrl = useMemo(() => content.trim().startsWith('http'), [content]);
-  const isAudioModel = modelName === 'Gemini 3.1 Flash TTS Preview';
-
   const { thought, mainContent } = useMemo(() => {
-    if (isAudioUrl && isAudioModel) {
-      return { thought: null, mainContent: '' };
-    }
-
     const thoughtMatch = content.match(/^\*([\s\S]*?)\*/);
     if (thoughtMatch) {
       const extractedThought = thoughtMatch[1].trim();
@@ -31,7 +24,7 @@ export const useMessageLogic = (
       };
     }
     return { thought: null, mainContent: content.trim() };
-  }, [content, isAudioUrl, isAudioModel]);
+  }, [content]);
 
   const { speak, isSpeaking } = useSpeech(content, modelName);
 

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { SUPABASE_ENDPOINT, supabase } from '../config';
 import { Message } from './chatTypes';
 import { saveTempMessages } from '../TemporaryChat/temporaryStorage';
-import { setAudioBufferCache } from '../components/ChatMessage/useSpeech';
+import { processImage, updateChatTitle } from './useChatSenderUtils';
 
 interface SelectedModel {
   id: string;
@@ -47,12 +47,9 @@ export const useChatSender = (
     let localImageUrl = '';
 
     if (file) {
-      localImageUrl = URL.createObjectURL(file);
-      base64Image = await new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.onloadend = () => resolve(reader.result as string);
-        reader.readAsDataURL(file);
-      });
+      const processed = await processImage(file);
+      base64Image = processed.base64;
+      localImageUrl = processed.localUrl;
     }
 
     const newUserMsg: Message = {
@@ -65,10 +62,7 @@ export const useChatSender = (
 
     const updatedMessages = [...messages, newUserMsg];
     setMessages(updatedMessages);
-
-    if (isTemporary) {
-      saveTempMessages(updatedMessages);
-    }
+    if (isTemporary) saveTempMessages(updatedMessages);
 
     setInput('');
     setIsTyping(true);
@@ -80,8 +74,6 @@ export const useChatSender = (
 
     try {
       const signal = createSignal();
-      const isAudioModel = selectedModel.name === 'Gemini 3.1 Flash TTS Preview';
-
       const response = await fetch(SUPABASE_ENDPOINT, {
         method: 'POST',
         headers: {
@@ -98,8 +90,7 @@ export const useChatSender = (
           image: base64Image || null,
           isTemporary: isTemporary,
           history: isTemporary ? updatedMessages : undefined,
-          voice: currentVoice,
-          isAudioOnly: isAudioModel
+          voice: currentVoice
         }),
       });
 
@@ -109,96 +100,35 @@ export const useChatSender = (
       }
 
       const modelNameFromServer = response.headers.get('x-model-name') || selectedModel.name;
-      const serverMessageId = response.headers.get('x-ai-message-id');
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedContent = "";
 
-      if (isAudioModel) {
-        const audioBuffer = await response.arrayBuffer();
-        const userId = session?.user?.id || 'temp';
-        
-        const { data: { publicUrl } } = supabase.storage
-          .from('chat-audio')
-          .getPublicUrl(`${userId}/${serverMessageId || aiMsgId}.pcm`);
+      if (!reader) throw new Error('ReadableStream not supported');
 
-        setAudioBufferCache(publicUrl, audioBuffer);
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        accumulatedContent += decoder.decode(value, { stream: true });
 
         setMessages(prev => {
           const newMessages = [...prev];
           const lastIdx = newMessages.length - 1;
           if (lastIdx >= 0 && newMessages[lastIdx].id === aiMsgId) {
-            newMessages[lastIdx] = {
-              id: serverMessageId || aiMsgId,
-              role: 'ai',
-              content: publicUrl,
-              modelName: modelNameFromServer,
-              voice: currentVoice
-            };
-            if (isTemporary) {
-              saveTempMessages(newMessages);
-            }
+            newMessages[lastIdx] = { ...newMessages[lastIdx], content: accumulatedContent, modelName: modelNameFromServer };
+            if (isTemporary) saveTempMessages(newMessages);
           }
           return newMessages;
         });
-      } else {
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-        let accumulatedContent = "";
-
-        if (!reader) throw new Error('ReadableStream not supported');
-
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          const chunk = decoder.decode(value, { stream: true });
-          accumulatedContent += chunk;
-
-          setMessages(prev => {
-            const newMessages = [...prev];
-            const lastIdx = newMessages.length - 1;
-            if (lastIdx >= 0 && newMessages[lastIdx].id === aiMsgId) {
-              newMessages[lastIdx] = {
-                ...newMessages[lastIdx],
-                content: accumulatedContent,
-                modelName: modelNameFromServer
-              };
-              if (isTemporary) {
-                saveTempMessages(newMessages);
-              }
-            }
-            return newMessages;
-          });
-        }
       }
 
       if (isFirstMessage && !isTemporary) {
-        let attempts = 0;
-        const maxAttempts = 5;
-
-        const updateTitle = async () => {
-          const { data } = await supabase
-            .from('chats')
-            .select('title')
-            .eq('id', chatId)
-            .maybeSingle();
-
-          if (data?.title && data.title !== 'Untitled Chat') {
-            if (setChatTitle) setChatTitle(data.title);
-            if (onNewChatCreated) onNewChatCreated();
-          } else if (attempts < maxAttempts) {
-            attempts++;
-            setTimeout(updateTitle, 1000);
-          } else {
-            if (onNewChatCreated) onNewChatCreated();
-          }
-        };
-
-        await updateTitle();
+        await updateChatTitle(chatId, setChatTitle, onNewChatCreated);
       }
 
     } catch (error: any) {
-      if (error.name === 'AbortError') {
-        console.log('Stream aborted');
-      } else {
+      if (error.name !== 'AbortError') {
         setMessages(prev => prev.filter(msg => msg.id !== aiMsgId));
         setSnackbarMessage(error.message);
         setIsSnackbarOpen(true);

@@ -1,0 +1,155 @@
+.markdown-content strong {
+  font-weight: 700;
+  color: var(--md-sys-color-primary);
+}
+
+.markdown-content p {
+  margin-bottom: 1.2rem;
+  line-height: 1.6;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.code-container {
+  width: 100%;
+  max-width: 100%;
+  position: relative;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e1e1e;
+  padding: 8px 16px;
+  border-radius: 14px 14px 0 0;
+  border: 1px solid var(--md-sys-color-outline);
+  border-bottom: none;
+}
+
+.code-lang {
+  font-family: monospace;
+  font-size: 12px;
+  text-transform: uppercase;
+  color: var(--md-sys-color-on-surface-variant);
+  letter-spacing: 0.5px;
+}
+
+.copy-button {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--md-sys-color-on-surface-variant);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: transparent;
+  border: none;
+}
+
+.copy-button:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.copy-button span {
+  font-size: 12px;
+}
+
+.code-gradient-border {
+  padding: 1.5px;
+  border-radius: 0 0 14px 14px;
+  background: linear-gradient(90deg, var(--gemma-blue-deep), var(--gemma-blue-bright), var(--gemma-blue-light), var(--gemma-blue-deep));
+  background-size: 200% 200%;
+  animation: animated-gradient-slow 8s ease infinite;
+  overflow: hidden;
+}
+
+.code-gradient-border > div {
+  border-radius: 0 0 12px 12px !important;
+  overflow-x: auto !important;
+}
+
+.code-gradient-border > div::-webkit-scrollbar {
+  height: 5px;
+}
+
+.code-gradient-border > div::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+md-circular-progress {
+  --md-circular-progress-size: 24px;
+  --md-circular-progress-active-indicator-color: var(--gemma-blue-bright);
+  --md-circular-progress-active-indicator-width: 12;
+}
+
+textarea::-webkit-scrollbar {
+  width: 4px;
+}
+
+textarea::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+}
+
+textarea {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
+.markdown-content table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1.5rem 0;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.markdown-content th {
+  background-color: var(--md-sys-color-surface-container-high);
+  padding: 12px 16px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+  text-align: left;
+}
+
+.markdown-content td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.markdown-content tr:last-child td {
+  border-bottom: none;
+}
+
+.markdown-content ul, .markdown-content ol {
+  margin-bottom: 1rem;
+  padding-left: 1.5rem;
+}
+
+.markdown-content li {
+  margin-bottom: 0.5rem;
+}
+
+.katex-display {
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.5rem 0;
+}
+
+.katex {
+  font-size: 1.1em;
+  line-height: 1.2;
+}
+
+.markdown-content p {
+  transition: max-height 0.3s ease;
+}

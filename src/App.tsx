@@ -1,13 +1,11 @@
-import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
 import { useUserChats } from './hooks/useUserChats';
 import { useSearch } from './hooks/useSearch';
 import { ChatHeader } from './components/ChatHeader';
-import { ChatMessage } from './components/ChatMessage';
 import { ChatInput } from './components/ChatInput';
-import { StartScreen } from './components/StartScreen';
 import { Sidebar } from './components/Sidebar';
 import Snackbar from './components/Snackbar';
 import Login from './components/Login';
@@ -16,118 +14,65 @@ import { FullscreenImage } from './components/FullscreenImage';
 import { handleScrollLogic, scrollToBottomInstant } from './Functions/scrollUtils';
 import { handleChatSelection, handleCreateNewChat } from './Functions/chatUtils';
 import { toggleState, closeState, handleImagePreview } from './Functions/uiUtils';
-import { TemporaryChatPage } from './TemporaryChat/TemporaryChatPage';
 import { clearTempMessages } from './TemporaryChat/temporaryStorage';
-import { ModelSelectorPage } from './components/ModelSelectorPage';
-import { modelPageVariants, mainContentBackdropVariants } from './motion/modelPageTransitions';
+import { mainContentBackdropVariants } from './motion/modelPageTransitions';
 import { SUPABASE_ENDPOINT, supabase } from './config';
-import { TTSInput } from './components/TTSInput';
 import { VoiceSelection } from './components/Settings/voiceSelection';
-import { TTSHeader } from './components/TTSHeader';
+import { ChatArea } from './components/ChatArea';
+import { GemmaBottomSheet } from './components/GemmaBottomSheet';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
   const { chats, loading: chatsLoading, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
-
   const [isTemporary, setIsTemporary] = useState(false);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
 
   const {
-    messages,
-    setMessages,
-    input,
-    setInput,
-    selectedModel,
-    setSelectedModel,
-    isTyping,
-    messagesEndRef,
-    handleSend,
-    handleFeedback,
-    chatId,
-    setChatId,
-    chatTitle,
-    setChatTitle,
-    loadChatMessages,
-    stopRequest,
-    snackbarMessage,
-    isSnackbarOpen,
-    setIsSnackbarOpen,
-    models
+    messages, setMessages, input, setInput, selectedModel, setSelectedModel,
+    isTyping, messagesEndRef, handleSend, handleFeedback, chatId, setChatId,
+    chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
+    isSnackbarOpen, setIsSnackbarOpen, models
   } = useChat(() => refreshChats(true), isTemporary);
 
   useEffect(() => {
     const syncSettings = async () => {
       if (!user) return;
-
       try {
         const { data: { session } } = await supabase.auth.getSession();
         const response = await fetch(`${SUPABASE_ENDPOINT}?type=settings`, {
           method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${session?.access_token}`,
-          }
+          headers: { 'Authorization': `Bearer ${session?.access_token}` }
         });
         const data = await response.json();
-        if (data) {
-          if (data.selected_model_id && data.selected_model_id !== selectedModel.id) {
-            setSelectedModel({
-              id: data.selected_model_id,
-              name: data.selected_model_name || data.selected_model_id
-            });
-          }
-          if (data.selected_voice) {
-            localStorage.setItem('selected_voice', data.selected_voice);
-          }
+        if (data && data.selected_model_id && data.selected_model_id !== selectedModel.id) {
+          setSelectedModel({ id: data.selected_model_id, name: data.selected_model_name || data.selected_model_id });
         }
-      } catch (err) {
-        console.error('Settings sync error:', err);
-      }
+      } catch (err) { console.error('Settings sync error:', err); }
     };
-
     syncSettings();
   }, [user]);
 
-  const isAutoGemma = useMemo(() => selectedModel.id === 'auto', [selectedModel.id]);
-  const isTTSModel = useMemo(() => selectedModel.id === 'Gemini 3.1 Flash TTS Preview', [selectedModel.id]);
-
-  const handleScroll = useCallback(() => {
-    handleScrollLogic(scrollContainerRef, setShowScrollButton);
-  }, []);
+  const handleScroll = useCallback(() => handleScrollLogic(scrollContainerRef, setShowScrollButton), []);
 
   const handleTemporaryToggle = () => {
-    if (!isTemporary) {
-      handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
-      setIsTemporary(true);
-    } else {
-      setIsTemporary(false);
-      clearTempMessages();
-      handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
-    }
+    handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
+    setIsTemporary(!isTemporary);
+    if (isTemporary) clearTempMessages();
   };
 
-  if (authLoading) {
-    return <div className="h-screen w-full bg-black" />;
-  }
+  if (authLoading) return <div className="h-screen w-full bg-black" />;
 
   return (
     <div className="h-screen w-full bg-black overflow-hidden relative">
       <AnimatePresence>
         {!user && (
-          <motion.div
-            key="login-screen"
-            variants={pageVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-            className="fixed inset-0 z-[200] bg-black"
-          >
+          <motion.div key="login-screen" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="fixed inset-0 z-[200] bg-black">
             <Login onLoginSuccess={signInWithGoogle} />
           </motion.div>
         )}
@@ -135,11 +80,7 @@ export default function App() {
 
       {user && (
         <>
-          <motion.div
-            variants={mainContentBackdropVariants}
-            animate={isModelSelectorOpen ? "pushed" : "idle"}
-            className="h-full w-full flex flex-col bg-black relative"
-          >
+          <motion.div variants={mainContentBackdropVariants} animate={isModelSelectorOpen ? "pushed" : "idle"} className="h-full w-full flex flex-col bg-black relative">
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={() => closeState(setIsSidebarOpen)}
@@ -155,7 +96,6 @@ export default function App() {
               onNewChat={() => {
                 if (isTemporary) clearTempMessages();
                 setIsTemporary(false);
-                if (isTTSModel) setSelectedModel(models[0]);
                 handleCreateNewChat(setMessages, setChatId as any, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false));
               }}
               deleteChatFromDB={deleteChat}
@@ -164,119 +104,37 @@ export default function App() {
             />
 
             <div className="h-full w-full flex flex-col bg-black relative shadow-2xl">
-              {isTTSModel ? (
-                <TTSHeader
-                  onMenuClick={() => toggleState(isSidebarOpen, setIsSidebarOpen)}
-                  isSidebarOpen={isSidebarOpen}
-                  onModelConfigClick={() => setIsModelSelectorOpen(true)}
-                />
-              ) : (
-                <ChatHeader
-                  messages={messages}
-                  chatTitle={isTemporary ? "Temporary Chat" : chatTitle}
-                  chatId={chatId}
-                  isPinned={chats.find(c => c.id === chatId)?.is_pinned || false}
-                  setMessages={setMessages}
-                  setChatId={setChatId}
-                  setChatTitle={setChatTitle}
-                  onMenuClick={() => toggleState(isSidebarOpen, setIsSidebarOpen)}
-                  isSidebarOpen={isSidebarOpen}
-                  deleteChatFromDB={deleteChat}
-                  togglePin={togglePin}
-                  isTemporary={isTemporary}
-                  onTemporaryChatClick={handleTemporaryToggle}
-                />
-              )}
+              <ChatHeader
+                messages={messages}
+                chatTitle={isTemporary ? "Temporary Chat" : chatTitle}
+                chatId={chatId}
+                isPinned={chats.find(c => c.id === chatId)?.is_pinned || false}
+                setMessages={setMessages}
+                setChatId={setChatId}
+                setChatTitle={setChatTitle}
+                onMenuClick={() => toggleState(isSidebarOpen, setIsSidebarOpen)}
+                isSidebarOpen={isSidebarOpen}
+                deleteChatFromDB={deleteChat}
+                togglePin={togglePin}
+                isTemporary={isTemporary}
+                onTemporaryChatClick={handleTemporaryToggle}
+              />
 
               <div className="flex-1 relative overflow-hidden flex flex-col">
-                <main
-                  ref={scrollContainerRef}
-                  onScroll={handleScroll}
-                  className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth"
-                >
-                  <AnimatePresence mode="wait">
-                    {isTTSModel ? (
-                      <motion.div
-                        key="tts-interface"
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="flex-1 flex flex-col pt-8"
-                      >
-                        <TTSInput
-                          onVoice={(text) => handleSend(text)}
-                          onOpenVoiceSelection={() => setIsVoiceSelectionOpen(true)}
-                          onModelConfigClick={() => setIsModelSelectorOpen(true)}
-                          isTyping={isTyping}
-                          selectedModel={selectedModel}
-                        />
-                        {messages.length > 0 && (
-                          <div className="p-6 pb-20 max-w-4xl w-full mx-auto flex flex-col border-t border-[#3c4043] mt-8">
-                             <h3 className="text-[#808080] text-sm font-medium mb-6 tracking-widest">History</h3>
-                             {messages.filter(msg => msg.role === 'ai').map((msg, index) => (
-                              <ChatMessage
-                                key={msg.id}
-                                messageId={msg.id}
-                                role={msg.role}
-                                content={msg.content}
-                                imageUrl={msg.imageUrl}
-                                modelName={msg.modelName}
-                                feedback={msg.feedback}
-                                onFeedback={handleFeedback}
-                                isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
-                                isLast={index === messages.length - 1}
-                                onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
-                                isTemporary={isTemporary}
-                              />
-                            ))}
-                            <div ref={messagesEndRef} className="h-1" />
-                          </div>
-                        )}
-                      </motion.div>
-                    ) : isTemporary && messages.length === 0 ? (
-                      <TemporaryChatPage key="temp-page" />
-                    ) : messages.length === 0 ? (
-                      <motion.div
-                        key="start-screen-anim"
-                        variants={pageVariants}
-                        initial="initial"
-                        animate="animate"
-                        exit="exit"
-                        className="absolute inset-0 flex flex-col"
-                      >
-                        <StartScreen
-                          userName={user.user_metadata?.full_name || user.email}
-                          onSelectSuggestion={(text) => handleSend(text, isSearchActive)}
-                        />
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="chat-content-anim"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        className="p-6 pb-20 max-w-4xl w-full mx-auto flex flex-col"
-                      >
-                        {messages.filter(msg => msg.role === 'user' || msg.modelName !== 'Gemini 3.1 Flash TTS Preview').map((msg, index) => (
-                          <ChatMessage
-                            key={msg.id}
-                            messageId={msg.id}
-                            role={msg.role}
-                            content={msg.content}
-                            imageUrl={msg.imageUrl}
-                            modelName={msg.modelName}
-                            feedback={msg.feedback}
-                            onFeedback={handleFeedback}
-                            isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
-                            isLast={index === messages.length - 1}
-                            onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
-                            isTemporary={isTemporary}
-                          />
-                        ))}
-                        <div ref={messagesEndRef} className="h-1" />
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </main>
+                <ChatArea
+                  messages={messages}
+                  isTyping={isTyping}
+                  isTemporary={isTemporary}
+                  user={user}
+                  scrollContainerRef={scrollContainerRef}
+                  handleScroll={handleScroll}
+                  handleSend={handleSend}
+                  isSearchActive={isSearchActive}
+                  handleFeedback={handleFeedback}
+                  handleImagePreview={handleImagePreview}
+                  setFullscreenImage={setFullscreenImage}
+                  messagesEndRef={messagesEndRef}
+                />
 
                 <AnimatePresence>
                   {showScrollButton && messages.length > 0 && (
@@ -285,82 +143,47 @@ export default function App() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       onClick={() => scrollToBottomInstant(messagesEndRef)}
-                      className="absolute bottom-6 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[#1e1e1e] border border-[#3c4043] text-[#a8c7fa] shadow-2xl hover:bg-[#282a2d] transition-colors cursor-pointer"
+                      className="absolute bottom-6 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[#1e1e1e] border border-[#3c4043] text-[#a8c7fa] shadow-2xl hover:bg-[#282a2d] transition-colors cursor-pointer bg-transparent"
                     >
-                      <span className="material-symbols-outlined">
-                        arrow_downward
-                      </span>
+                      <span className="material-symbols-outlined">arrow_downward</span>
                     </motion.button>
                   )}
                 </AnimatePresence>
               </div>
 
-              {!isTTSModel && (
-                <ChatInput
-                  input={input}
-                  setInput={setInput}
-                  handleSend={handleSend}
-                  stopRequest={stopRequest}
-                  selectedModel={selectedModel}
-                  isTyping={isTyping}
-                  isSearchActive={isSearchActive}
-                  onSearchClick={toggleSearch}
-                  onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
-                  onModelConfigClick={() => setIsModelSelectorOpen(true)}
-                />
-              )}
+              <ChatInput
+                input={input}
+                setInput={setInput}
+                handleSend={handleSend}
+                stopRequest={stopRequest}
+                selectedModel={selectedModel}
+                isTyping={isTyping}
+                isSearchActive={isSearchActive}
+                onSearchClick={toggleSearch}
+                onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
+                onModelConfigClick={() => setIsModelSelectorOpen(true)}
+              />
             </div>
           </motion.div>
 
-          <AnimatePresence>
-            {isModelSelectorOpen && (
-              <motion.div
-                key="model-selector-overlay"
-                variants={modelPageVariants}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                style={{ willChange: 'transform' }}
-                className="fixed inset-0 z-[150] bg-black"
-              >
-                <ModelSelectorPage
-                  selectedModel={selectedModel}
-                  setSelectedModel={(model) => {
-                    setSelectedModel(model);
-                    if (model.id !== 'auto') {
-                       setIsModelSelectorOpen(false);
-                    }
-                  }}
-                  isAutoGemma={isAutoGemma}
-                  onClose={() => setIsModelSelectorOpen(false)}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <GemmaBottomSheet
+            isOpen={isModelSelectorOpen}
+            onOpenChange={setIsModelSelectorOpen}
+            selectedModel={selectedModel}
+            onModelSelect={setSelectedModel}
+            models={models}
+          />
 
           <AnimatePresence>
             {isVoiceSelectionOpen && (
-              <VoiceSelection
-                isOpen={isVoiceSelectionOpen}
-                onClose={() => setIsVoiceSelectionOpen(false)}
-              />
+              <VoiceSelection isOpen={isVoiceSelectionOpen} onClose={() => setIsVoiceSelectionOpen(false)} />
             )}
           </AnimatePresence>
 
-          <FullscreenImage
-            src={fullscreenImage}
-            isOpen={!!fullscreenImage}
-            onClose={() => setFullscreenImage(null)}
-          />
-
-          <Snackbar
-            message={snackbarMessage}
-            isOpen={isSnackbarOpen}
-            onClose={() => closeState(setIsSnackbarOpen)}
-          />
+          <FullscreenImage src={fullscreenImage} isOpen={!!fullscreenImage} onClose={() => setFullscreenImage(null)} />
+          <Snackbar message={snackbarMessage} isOpen={isSnackbarOpen} onClose={() => closeState(setIsSnackbarOpen)} />
         </>
       )}
     </div>
   );
 }
-

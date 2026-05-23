@@ -19,7 +19,7 @@ export const useSpeech = (text: string, modelName?: string) => {
   }, [stopPcm]);
 
   const speak = useCallback(async () => {
-    if (!text && modelName !== 'Gemini 3.1 Flash TTS Preview') return;
+    if (!text) return;
 
     if (isSpeaking || isPcmPlaying) {
       stop();
@@ -34,20 +34,9 @@ export const useSpeech = (text: string, modelName?: string) => {
       return;
     }
 
-    const isAudioUrl = trimmedText.startsWith('http');
-    const isAudioModel = modelName === 'Gemini 3.1 Flash TTS Preview';
     setIsSpeaking(true);
 
     try {
-      if (isAudioUrl) {
-        const response = await fetch(trimmedText);
-        if (!response.ok) throw new Error('Failed to fetch audio file');
-        const audioData = await response.arrayBuffer();
-        audioBufferCache[trimmedText] = audioData;
-        await playPcmBuffer(audioData);
-        return;
-      }
-
       const selectedVoice = localStorage.getItem('selected_voice') || 'Zephyr';
       const { data: { session } } = await supabase.auth.getSession();
       const accessToken = session?.access_token;
@@ -60,9 +49,8 @@ export const useSpeech = (text: string, modelName?: string) => {
         },
         body: JSON.stringify({
           message: text,
-          publicModelName: modelName || 'Gemini 3.1 Flash TTS Preview',
+          publicModelName: modelName,
           voice: selectedVoice,
-          isAudioOnly: isAudioModel
         }),
       });
 
@@ -75,18 +63,14 @@ export const useSpeech = (text: string, modelName?: string) => {
     } catch (error) {
       console.error('TTS Error, falling back to Web Speech API', error);
 
-      if (!isAudioModel && !isAudioUrl) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        const voices = window.speechSynthesis.getVoices();
-        const russianVoice = voices.find(voice => voice.lang.includes('ru-RU'));
-        if (russianVoice) utterance.voice = russianVoice;
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      const russianVoice = voices.find(voice => voice.lang.includes('ru-RU'));
+      if (russianVoice) utterance.voice = russianVoice;
 
-        utterance.onend = () => setIsSpeaking(false);
-        utterance.onerror = () => setIsSpeaking(false);
-        window.speechSynthesis.speak(utterance);
-      } else {
-        setIsSpeaking(false);
-      }
+      utterance.onend = () => setIsSpeaking(false);
+      utterance.onerror = () => setIsSpeaking(false);
+      window.speechSynthesis.speak(utterance);
     }
   }, [text, modelName, isSpeaking, isPcmPlaying, stop, playPcmBuffer]);
 
