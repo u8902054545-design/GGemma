@@ -51,6 +51,7 @@ export const useSpeech = (text: string, modelName?: string) => {
           message: text,
           publicModelName: modelName,
           voice: selectedVoice,
+          isAudioOnly: true
         }),
       });
 
