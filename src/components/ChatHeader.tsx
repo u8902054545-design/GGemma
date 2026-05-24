@@ -61,7 +61,8 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   };
 
   return (
-    <header className="px-4 py-3 flex justify-between items-center sticky top-0 z-50 bg-black h-[64px]">
+    <header className="sticky top-0 z-50 bg-black h-[64px] flex justify-center">
+      <div className="w-full max-w-[1200px] px-4 flex justify-between items-center h-full">
       <div className="flex items-center gap-2 flex-1 overflow-hidden">
         <div className="w-10 h-10 flex items-center justify-center shrink-0">
           <AnimatePresence initial={false}>
@@ -159,6 +160,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       />
       <RenameDialog isOpen={isRenameOpen} onClose={() => setIsRenameOpen(false)} currentTitle={chatTitle} onConfirm={handleRenameConfirm} />
       <DeleteConfirmDialog isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDeleteConfirm} />
+      </div>
     </header>
   );
 };

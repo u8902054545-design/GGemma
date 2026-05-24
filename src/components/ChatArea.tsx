@@ -52,7 +52,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
             key="chat-content-anim"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="p-6 pb-20 max-w-4xl w-full mx-auto flex flex-col"
+            className="p-4 md:p-6 pb-20 max-w-[1200px] w-full mx-auto flex flex-col"
           >
             {messages.map((msg, index) => (
               <ChatMessage

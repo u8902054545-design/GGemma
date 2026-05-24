@@ -37,7 +37,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({ userName, onSelectSugg
   const firstName = userName?.split(' ')[0] || 'User';
 
   return (
-    <div className="flex-1 flex flex-col items-center justify-start w-full max-w-4xl mx-auto pt-12 pb-10">
+    <div className="flex-1 flex flex-col items-center justify-start w-full max-w-6xl mx-auto pt-12 pb-10">
       <div className="mb-6 flex flex-col items-center">
         <div className="w-16 h-16 flex items-center justify-center">
            <GemmaIcon className="w-full h-full" />
