@@ -33,7 +33,7 @@ export default function App() {
   const [isTemporary, setIsTemporary] = useState(false);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
-  const { t } = useLanguage();
+  const { t, language, setLanguage } = useLanguage();
 
   const {
     messages, setMessages, input, setInput, selectedModel, setSelectedModel,
@@ -52,8 +52,14 @@ export default function App() {
           headers: { 'Authorization': `Bearer ${session?.access_token}` }
         });
         const data = await response.json();
-        if (data && data.selected_model_id && data.selected_model_id !== selectedModel.id) {
-          setSelectedModel({ id: data.selected_model_id, name: data.selected_model_name || data.selected_model_id });
+        
+        if (data) {
+          if (data.selected_model_id && data.selected_model_id !== selectedModel.id) {
+            setSelectedModel({ id: data.selected_model_id, name: data.selected_model_name || data.selected_model_id });
+          }
+          if (data.selected_language && data.selected_language !== language) {
+            setLanguage(data.selected_language);
+          }
         }
       } catch (err) { console.error('Settings sync error:', err); }
     };

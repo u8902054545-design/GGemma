@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase, SUPABASE_ENDPOINT } from '../config';
+import { useAuth } from './useAuth';
 
 type Language = 'en' | 'ru';
 
@@ -282,15 +284,34 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { user } = useAuth();
   const [language, setLanguageState] = useState<Language>(() => {
     const saved = localStorage.getItem('app_language');
     return (saved === 'ru' || saved === 'en') ? saved : 'en';
   });
 
-  const setLanguage = (lang: Language) => {
+  const setLanguage = async (lang: Language) => {
     setLanguageState(lang);
     localStorage.setItem('app_language', lang);
     document.documentElement.lang = lang;
+
+    if (user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        await fetch(SUPABASE_ENDPOINT, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            settings: { selected_language: lang }
+          }),
+        });
+      } catch (err) {
+        console.error('Failed to sync language:', err);
+      }
+    }
   };
 
   useEffect(() => {
