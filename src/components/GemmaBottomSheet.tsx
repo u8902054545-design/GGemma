@@ -1,6 +1,7 @@
 import React from 'react';
 import { Drawer } from 'vaul';
 import { SelectedModel } from '../hooks/chatTypes';
+import { useLanguage } from '../hooks/useLanguage';
 import '@material/web/list/list.js';
 import '@material/web/list/list-item.js';
 
@@ -29,6 +30,8 @@ export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
   onModelSelect,
   models
 }) => {
+  const { t } = useLanguage();
+
   return (
     <Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
       <Drawer.Portal>
@@ -37,7 +40,7 @@ export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
           <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[#49454f] my-4" />
           
           <div className="px-6 py-2">
-            <h2 className="text-[#e6e1e5] text-xl font-medium mb-2">Model selection</h2>
+            <h2 className="text-[#e6e1e5] text-xl font-medium mb-2">{t('model.selector.title')}</h2>
           </div>
 
           <div className="max-h-[70vh] overflow-y-auto pb-8">
@@ -45,15 +48,15 @@ export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
                <md-list-item
                   type="button"
                   onClick={() => {
-                    onModelSelect({ id: 'auto', name: 'Automatic' });
+                    onModelSelect({ id: 'auto', name: t('model.selector.auto.name') });
                     onOpenChange(false);
                   }}
                   style={{
                     '--md-list-item-label-text-color': selectedModel.id === 'auto' ? '#a8c7fa' : '#e6e1e5'
                   }}
                 >
-                  <div slot="headline">Automatic selection</div>
-                  <div slot="supporting-text">System-optimized choice</div>
+                  <div slot="headline">{t('model.selector.auto.title')}</div>
+                  <div slot="supporting-text">{t('model.selector.auto.desc')}</div>
                   <span slot="start" className="material-symbols-outlined text-[#938f99]">
                     magic_button
                   </span>

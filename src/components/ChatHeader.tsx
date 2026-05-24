@@ -7,6 +7,7 @@ import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { ChatActionsMenu } from './ChatHeaderParts/ChatActionsMenu';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface ChatHeaderProps {
   messages: any[];
@@ -34,8 +35,9 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const { t } = useLanguage();
 
-  const displayTitle = isTemporary ? "Temporary Chat" : chatTitle;
+  const displayTitle = isTemporary ? t('chat.temporary') : chatTitle;
 
   const onNewChatClick = () => handleNewChat(setMessages, setChatId, setChatTitle);
 

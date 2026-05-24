@@ -4,11 +4,14 @@ import App from './App.tsx';
 import './index.css';
 import 'material-symbols';
 import {registerSW} from 'virtual:pwa-register';
+import { LanguageProvider } from './hooks/useLanguage';
 
 registerSW({immediate: true});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <LanguageProvider>
+      <App />
+    </LanguageProvider>
   </StrictMode>,
 );

@@ -1,5 +1,6 @@
 import React from 'react';
 import '@material/web/progress/circular-progress.js';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface Chat {
   id: string;
@@ -24,6 +25,8 @@ export const ChatList: React.FC<ChatListProps> = ({
   onChatSelect,
   onLongPress
 }) => {
+  const { t } = useLanguage();
+
   if (loading) {
     return (
       <div className="flex justify-center py-10">
@@ -35,7 +38,7 @@ export const ChatList: React.FC<ChatListProps> = ({
   if (error) {
     return (
       <div className="px-4 py-8 text-center">
-        <p className="text-sm text-[#ffb4ab]">Failed to load chats</p>
+        <p className="text-sm text-[#ffb4ab]">{t('sidebar.load_error')}</p>
       </div>
     );
   }
@@ -43,7 +46,7 @@ export const ChatList: React.FC<ChatListProps> = ({
   if (chats.length === 0) {
     return (
       <div className="px-4 py-8 text-center">
-        <p className="text-xs text-[#938f99]">No chats yet</p>
+        <p className="text-xs text-[#938f99]">{t('sidebar.no_chats')}</p>
       </div>
     );
   }
@@ -75,7 +78,7 @@ export const ChatList: React.FC<ChatListProps> = ({
             }`}
           >
             <span className="truncate flex-1">
-              {chat.title || 'Untitled Chat'}
+              {chat.title || t('sidebar.untitled')}
             </span>
             {chat.is_pinned && (
               <span className="material-symbols-outlined text-[18px] ml-2 opacity-70">

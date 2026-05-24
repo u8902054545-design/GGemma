@@ -1,8 +1,11 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { pageVariants } from '../motion/transitions';
+import { useLanguage } from '../hooks/useLanguage';
 
 export const TemporaryChatPage: React.FC = () => {
+  const { t } = useLanguage();
+
   return (
     <motion.div
       variants={pageVariants}
@@ -19,11 +22,11 @@ export const TemporaryChatPage: React.FC = () => {
         </div>
 
         <h2 className="text-[#e2e2e2] text-2xl font-semibold mb-3 tracking-tight">
-          Temporary Chat
+          {t('chat.temporary')}
         </h2>
         
         <p className="text-[#c4c7c5] text-sm leading-relaxed">
-          Temporary chats aren't saved to your history, and won't be used to train our models. They are deleted as soon as you close them.
+          {t('chat.temporary.desc')}
         </p>
       </div>
     </motion.div>

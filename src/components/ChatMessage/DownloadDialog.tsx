@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface DownloadDialogProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export const DownloadDialog: React.FC<DownloadDialogProps> = ({
 }) => {
   const nameRef = useRef<HTMLInputElement>(null);
   const extRef = useRef<HTMLInputElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -41,7 +43,7 @@ export const DownloadDialog: React.FC<DownloadDialogProps> = ({
       
       <div className="relative w-full max-w-[320px] bg-[var(--md-sys-color-surface-container-high)] rounded-[28px] p-6 shadow-2xl border border-[var(--md-sys-color-outline-variant)]">
         <h2 className="text-xl font-medium mb-6 text-[var(--md-sys-color-on-surface)]">
-          Download Code
+          {t('download.code.title')}
         </h2>
 
         <div className="flex flex-col gap-5 mb-8">
@@ -50,7 +52,7 @@ export const DownloadDialog: React.FC<DownloadDialogProps> = ({
               ref={nameRef}
               type="text"
               defaultValue="script"
-              placeholder="File name"
+              placeholder={t('download.code.filename')}
               className="w-full bg-transparent border border-[var(--md-sys-color-outline)] rounded-lg px-3 py-3 text-[var(--md-sys-color-on-surface)] focus:border-[var(--md-sys-color-primary)] outline-none transition-colors"
             />
           </div>
@@ -60,7 +62,7 @@ export const DownloadDialog: React.FC<DownloadDialogProps> = ({
               ref={extRef}
               type="text"
               defaultValue={defaultExtension}
-              placeholder="Extension"
+              placeholder={t('download.code.extension')}
               className="w-full bg-transparent border border-[var(--md-sys-color-outline)] rounded-lg px-3 py-3 text-[var(--md-sys-color-on-surface)] focus:border-[var(--md-sys-color-primary)] outline-none transition-colors"
             />
           </div>
@@ -71,13 +73,13 @@ export const DownloadDialog: React.FC<DownloadDialogProps> = ({
             onClick={onClose}
             className="px-4 py-2 text-sm font-medium text-[var(--md-sys-color-primary)] hover:bg-[var(--md-sys-color-primary-container)] rounded-full transition-colors"
           >
-            Cancel
+            {t('dialog.cancel')}
           </button>
           <button 
             onClick={handleDownload}
             className="px-4 py-2 text-sm font-medium bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full hover:shadow-md transition-all active:scale-95"
           >
-            Download
+            {t('download.code.button')}
           </button>
         </div>
       </div>

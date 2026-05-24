@@ -4,6 +4,7 @@ import { pageVariants } from '../../motion/transitions';
 import { useVoicePlayer } from '../../hooks/useVoicePlayer';
 import { SUPABASE_ENDPOINT, supabase } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface VoiceSelectionProps {
   isOpen: boolean;
@@ -12,13 +13,14 @@ interface VoiceSelectionProps {
 
 export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [selectedVoice, setSelectedVoice] = useState<string>(() => {
     return localStorage.getItem('selected_voice') || 'Zephyr';
   });
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
   const { playPcmBuffer, stop: stopPcm, isPlaying } = useVoicePlayer();
 
-  const PREVIEW_TEXT = "Hello! I am one of the Gemini voices. How do I sound to you?";
+  const PREVIEW_TEXT = t('settings.voice.preview');
 
   useEffect(() => {
     const fetchRemoteSettings = async () => {
@@ -144,7 +146,7 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
 
       <main className="flex-1 flex flex-col items-start justify-start px-6 pb-8 overflow-y-auto w-full max-w-[600px] mx-auto">
         <h1 className="text-[32px] font-normal text-white mt-2 mb-6 tracking-tight align-left w-full">
-          Choose a voice
+          {t('settings.voice.selection.title')}
         </h1>
 
         <div className="w-full flex flex-col">

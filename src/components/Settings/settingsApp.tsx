@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { pageVariants } from '../../motion/transitions';
 import { VoiceSelection } from './voiceSelection';
+import { LanguageSelection } from './languageSelection';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface SettingsAppProps {
   isOpen: boolean;
@@ -10,6 +12,8 @@ interface SettingsAppProps {
 
 export const SettingsApp: React.FC<SettingsAppProps> = ({ isOpen, onClose }) => {
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
+  const [isLanguageSelectionOpen, setIsLanguageSelectionOpen] = useState(false);
+  const { t } = useLanguage();
 
   if (!isOpen) return null;
 
@@ -33,7 +37,7 @@ export const SettingsApp: React.FC<SettingsAppProps> = ({ isOpen, onClose }) => 
 
       <main className="flex-1 flex flex-col items-start justify-start px-6 pb-8 overflow-y-auto w-full max-w-[600px] mx-auto">
         <h1 className="text-[32px] font-normal text-white mt-2 mb-8 tracking-tight align-left w-full">
-          Application Settings
+          {t('settings.title')}
         </h1>
 
         <div className="w-full flex flex-col gap-1">
@@ -43,8 +47,19 @@ export const SettingsApp: React.FC<SettingsAppProps> = ({ isOpen, onClose }) => 
           >
             <span className="material-symbols-outlined text-[24px] text-[var(--md-sys-color-on-surface-variant)]">voice_selection</span>
             <div className="flex flex-col gap-0.5">
-              <span className="text-[16px] font-medium text-white">Voice and dubbing</span>
-              <span className="text-[14px] text-[#999999]">Voice selection for voicing</span>
+              <span className="text-[16px] font-medium text-white">{t('settings.voice.title')}</span>
+              <span className="text-[14px] text-[#999999]">{t('settings.voice.desc')}</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setIsLanguageSelectionOpen(true)}
+            className="ripple-container w-full py-4 px-3 flex items-center gap-4 hover:bg-white/5 rounded-2xl transition-all text-left active:scale-[0.99]"
+          >
+            <span className="material-symbols-outlined text-[24px] text-[var(--md-sys-color-on-surface-variant)]">language</span>
+            <div className="flex flex-col gap-0.5">
+              <span className="text-[16px] font-medium text-white">{t('settings.language.title')}</span>
+              <span className="text-[14px] text-[#999999]">{t('settings.language.desc')}</span>
             </div>
           </button>
         </div>
@@ -55,6 +70,12 @@ export const SettingsApp: React.FC<SettingsAppProps> = ({ isOpen, onClose }) => 
           <VoiceSelection
             isOpen={isVoiceSelectionOpen}
             onClose={() => setIsVoiceSelectionOpen(false)}
+          />
+        )}
+        {isLanguageSelectionOpen && (
+          <LanguageSelection
+            isOpen={isLanguageSelectionOpen}
+            onClose={() => setIsLanguageSelectionOpen(false)}
           />
         )}
       </AnimatePresence>

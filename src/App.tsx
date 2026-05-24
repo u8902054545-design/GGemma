@@ -20,6 +20,7 @@ import { SUPABASE_ENDPOINT, supabase } from './config';
 import { VoiceSelection } from './components/Settings/voiceSelection';
 import { ChatArea } from './components/ChatArea';
 import { GemmaBottomSheet } from './components/GemmaBottomSheet';
+import { useLanguage } from './hooks/useLanguage';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -32,6 +33,7 @@ export default function App() {
   const [isTemporary, setIsTemporary] = useState(false);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
+  const { t } = useLanguage();
 
   const {
     messages, setMessages, input, setInput, selectedModel, setSelectedModel,
@@ -106,7 +108,7 @@ export default function App() {
             <div className="h-full w-full flex flex-col bg-black relative shadow-2xl">
               <ChatHeader
                 messages={messages}
-                chatTitle={isTemporary ? "Temporary Chat" : chatTitle}
+                chatTitle={isTemporary ? t('chat.temporary') : chatTitle}
                 chatId={chatId}
                 isPinned={chats.find(c => c.id === chatId)?.is_pinned || false}
                 setMessages={setMessages}

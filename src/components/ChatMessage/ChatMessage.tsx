@@ -7,6 +7,7 @@ import { useMessageLogic } from './useMessageLogic';
 import { ChatMessageHeader } from './ChatMessageHeader';
 import { MarkdownContent } from './MarkdownContent';
 import { MessageActions } from './MessageActions';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
@@ -28,6 +29,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   onImageClick,
   isTemporary = false
 }) => {
+  const { t } = useLanguage();
   const isAI = role === 'ai';
   const isStopped = content.includes('_STOPPED_');
   const cleanContent = content.replace('_STOPPED_', '');
@@ -135,9 +137,15 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
                   info
                 </span>
                 <span className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)]">
-                  Generation stopped by user
+                  {t('message.stopped')}
                 </span>
               </motion.div>
+            )}
+
+            {isAI && !isGenerating && (
+              <div className="mt-4 text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-50 select-none">
+                {t('message.warning')}
+              </div>
             )}
           </div>
 
@@ -155,7 +163,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               {isContentExpanded ? 'keyboard_control_key' : 'stat_minus_1'}
             </span>
             <span className="text-xs font-medium uppercase tracking-wider">
-              {isContentExpanded ? 'Collapse' : 'Expand'}
+              {isContentExpanded ? t('message.collapse') : t('message.expand')}
             </span>
           </button>
         )}

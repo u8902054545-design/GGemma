@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase, SUPABASE_ENDPOINT } from '../config';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface SearchResult {
   chat_id: string;
@@ -19,6 +20,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (!query.trim()) {
@@ -80,7 +82,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search chats and messages..."
+              placeholder={t('chat.search.placeholder')}
               className="flex-1 bg-transparent border-none outline-none text-[#e6e1e5] text-base placeholder:text-[#938f99]"
             />
             {query && (
@@ -125,7 +127,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
             {!loading && query.trim() && results.length === 0 && (
               <div className="flex flex-col items-center justify-center p-12 text-[#938f99] gap-2 text-center">
                 <span className="material-symbols-outlined text-[48px] opacity-20">search_off</span>
-                <p className="text-sm font-medium">Nothing found</p>
+                <p className="text-sm font-medium">{t('chat.search.nothing')}</p>
               </div>
             )}
           </div>

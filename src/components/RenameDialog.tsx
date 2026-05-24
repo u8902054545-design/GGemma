@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { mdEasing } from '../motion/transitions';
 import { motion, AnimatePresence } from 'motion/react';
+import { useLanguage } from '../hooks/useLanguage';
 
 interface RenameDialogProps {
   isOpen: boolean;
@@ -13,6 +14,7 @@ interface RenameDialogProps {
 export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, currentTitle, onConfirm }) => {
   const [inputValue, setInputValue] = useState(currentTitle);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (isOpen) {
@@ -47,7 +49,7 @@ export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, cur
                 className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[400px] bg-[#211f26] rounded-[28px] p-6 z-[101] outline-none shadow-xl border border-white/5"
               >
                 <Dialog.Title className="text-[#e6e1e5] text-xl mb-6 font-normal">
-                  Rename chat
+                  {t('dialog.rename.title')}
                 </Dialog.Title>
                 
                 <div className="relative group">
@@ -60,19 +62,19 @@ export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, cur
                     placeholder=" "
                   />
                   <label className="absolute left-3 -top-2.5 bg-[#211f26] px-1 text-xs text-[#938f99] group-focus-within:text-[var(--md-sys-color-primary)] transition-all">
-                    Chat Name
+                    {t('dialog.rename.input')}
                   </label>
                 </div>
 
                 <div className="flex justify-end gap-3 mt-8">
                   <button onClick={onClose} className="px-4 py-2 text-[var(--md-sys-color-primary)] font-medium hover:bg-[var(--md-sys-color-primary)]/10 rounded-full transition-colors">
-                    Cancel
+                    {t('dialog.cancel')}
                   </button>
                   <button
                     onClick={() => { onConfirm(inputValue); onClose(); }}
                     className="px-6 py-2 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full font-medium hover:shadow-md active:scale-95 transition-all"
                   >
-                    Save
+                    {t('dialog.rename.save')}
                   </button>
                 </div>
               </motion.div>

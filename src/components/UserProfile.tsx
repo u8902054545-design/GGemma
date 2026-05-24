@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { pageVariants } from '../motion/transitions';
 import { APP_VERSION } from '../versionApp';
 import { SettingsApp } from './Settings/settingsApp';
+import { useLanguage } from '../hooks/useLanguage';
 
 import '@material/web/progress/circular-progress.js';
 
@@ -12,6 +13,7 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
   const { user, signOut } = useAuth();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const { t } = useLanguage();
 
   if (!user) return null;
 
@@ -84,7 +86,7 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
                   ) : (
                     <>
                       <span className="material-symbols-outlined text-[20px]">logout</span>
-                      <span>Sign out</span>
+                      <span>{t('profile.signout')}</span>
                     </>
                   )}
                 </button>
@@ -92,7 +94,7 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
 
               <div className="mt-6 flex flex-col items-center gap-1">
                 <p className="text-[11px] text-[#555555] tracking-wide">
-                  Version {APP_VERSION}
+                  {t('profile.version')} {APP_VERSION}
                 </p>
               </div>
             </div>
@@ -104,12 +106,12 @@ const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isO
                 className="ripple-container w-full h-12 flex items-center justify-center gap-3 bg-[#111111] hover:bg-[#1a1a1a] text-white border border-[#222222] rounded-full font-medium transition-all disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)]">settings</span>
-                <span>Settings</span>
+                <span>{t('profile.settings')}</span>
               </button>
             </div>
             
             <p className="mt-8 text-[12px] text-[#555555] font-medium tracking-wide">
-              Google Account
+              {t('profile.google_account')}
             </p>
           </main>
 

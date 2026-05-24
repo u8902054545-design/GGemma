@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { GemmaIcon } from './GemmaIcon';
+import { useLanguage } from '../hooks/useLanguage';
 
 type SuggestionCardProps = {
   text: string;
@@ -35,6 +36,7 @@ type StartScreenProps = {
 
 export const StartScreen: React.FC<StartScreenProps> = ({ userName, onSelectSuggestion }) => {
   const firstName = userName?.split(' ')[0] || 'User';
+  const { t } = useLanguage();
 
   return (
     <div className="flex-1 flex flex-col items-center justify-start w-full max-w-6xl mx-auto pt-12 pb-10">
@@ -49,28 +51,28 @@ export const StartScreen: React.FC<StartScreenProps> = ({ userName, onSelectSugg
           <span className="text-gradient">Hello, {firstName}</span>
         </h1>
         <h2 className="text-2xl md:text-3xl font-semibold text-[#444746] tracking-tight">
-          How can I help you today?
+          {t('start.subtitle')}
         </h2>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-2 w-full px-4 mt-4">
         <SuggestionCard 
-          text="Write a script for a show like Stranger Things" 
+          text={t('start.suggestion.stranger')} 
           icon="movie_edit" 
           onClick={onSelectSuggestion} 
         />
         <SuggestionCard 
-          text="How to use Kling AI for professional video creation" 
+          text={t('start.suggestion.kling')} 
           icon="video_settings" 
           onClick={onSelectSuggestion} 
         />
         <SuggestionCard 
-          text="Latest theories about Welcome to Derry Season 2" 
+          text={t('start.suggestion.derry')} 
           icon="mystery" 
           onClick={onSelectSuggestion} 
         />
         <SuggestionCard 
-          text="Create a prompt for a cinematic sci-fi scene" 
+          text={t('start.suggestion.sci-fi')} 
           icon="auto_awesome" 
           onClick={onSelectSuggestion} 
         />

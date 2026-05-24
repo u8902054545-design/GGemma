@@ -4,6 +4,7 @@ import { GemmaIcon } from './GemmaIcon';
 import { GoogleIcon } from './GoogleIcon';
 import Snackbar from './Snackbar';
 import { pageVariants, mdEasing, mdDuration } from '../motion/transitions';
+import { useLanguage } from '../hooks/useLanguage';
 
 import '@material/web/progress/circular-progress.js';
 
@@ -15,6 +16,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showSnack, setShowSnack] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
+  const { t } = useLanguage();
 
   const handleLogin = async () => {
     setIsLoading(true);
@@ -22,7 +24,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
       await onLoginSuccess();
     } catch (error: any) {
       console.error(error);
-      setSnackMessage(error.message || "Ошибка входа");
+      setSnackMessage(error.message || t('login.error'));
       setShowSnack(true);
       setIsLoading(false);
     }
@@ -52,11 +54,11 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         </motion.div>
 
         <h1 className="text-2xl font-medium tracking-tight mb-2 text-[#e3e3e3] text-center">
-          Gemma Deno Dev
+          {t('login.title')}
         </h1>
         
         <p className="text-[#c4c7c5] text-sm mb-10 text-center">
-          Open Access Workspace
+          {t('login.subtitle')}
         </p>
 
         <button
@@ -75,7 +77,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           ) : (
             <>
               <GoogleIcon className="w-5 h-5" />
-              <span>Sign in with Google</span>
+              <span>{t('login.button')}</span>
             </>
           )}
         </button>

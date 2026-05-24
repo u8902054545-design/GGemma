@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ImagePreview } from '../ImagePreview';
 import { searchButtonVariants, searchTextVariants } from '../../motion/searchTransition';
 
+import { useLanguage } from '../../hooks/useLanguage';
+
 interface InputAreaProps {
   input: string;
   setInput: (value: string) => void;
@@ -34,6 +36,8 @@ export const InputArea: React.FC<InputAreaProps> = ({
   isListening,
   toggleListening,
 }) => {
+  const { t } = useLanguage();
+
   return (
     <div 
       className="flex-1 rounded-[32px] shadow-2xl flex flex-col overflow-hidden min-h-[52px] transition-all duration-300 ease-[var(--md-sys-motion-easing-emphasized)]"
@@ -79,7 +83,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
                 isSearchActive ? "text-[#8ab4f8]" : "text-[#9aa0a6]"
               }`}
             >
-              Search
+              {t('chat.search.button')}
             </motion.span>
           </motion.button>
         </div>
@@ -89,7 +93,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
-          placeholder="Ask Gemma"
+          placeholder={t('chat.input.placeholder.gemma')}
           className="flex-1 bg-transparent border-none outline-none resize-none max-h-60 min-h-[52px] px-4 py-3.5 text-[#e2e2e2] placeholder-[#757575] text-[16px] leading-relaxed select-text"
           rows={1}
         />

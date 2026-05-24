@@ -1,5 +1,6 @@
 import React from 'react';
 import { Drawer } from 'vaul';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface SidebarMenuProps {
   isOpen: boolean;
@@ -18,6 +19,8 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
   onRename,
   onDelete
 }) => {
+  const { t } = useLanguage();
+
   return (
     <Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
       <Drawer.Portal>
@@ -35,21 +38,21 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
               <span className="material-symbols-outlined">
                 {selectedChat?.is_pinned ? 'keep_off' : 'keep'}
               </span>
-              <span>{selectedChat?.is_pinned ? 'Unpin a chat' : 'Pin chat'}</span>
+              <span>{selectedChat?.is_pinned ? t('menu.unpin') : t('menu.pin')}</span>
             </button>
             <button
               onClick={onRename}
               className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-gray-200 border-none bg-transparent"
             >
               <span className="material-symbols-outlined">edit</span>
-              <span>Rename chat</span>
+              <span>{t('menu.rename')}</span>
             </button>
             <button
               onClick={onDelete}
               className="w-full flex items-center gap-4 px-6 py-4 hover:bg-white/5 transition-colors text-[#ffb4ab] border-none bg-transparent"
             >
               <span className="material-symbols-outlined">delete</span>
-              <span>Delete chat</span>
+              <span>{t('menu.delete')}</span>
             </button>
           </div>
         </Drawer.Content>

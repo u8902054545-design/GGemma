@@ -6,6 +6,7 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { renameChat, togglePinChat } from './chatHeaderFunctions';
 import { ChatList } from './SidebarParts/ChatList';
 import { SidebarMenu } from './SidebarParts/SidebarMenu';
+import { useLanguage } from '../hooks/useLanguage';
 
 const backdropVariants = {
   closed: { opacity: 0 },
@@ -43,6 +44,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const { t } = useLanguage();
 
   const handleLongPress = (chat: Chat) => {
     setSelectedChat(chat);
@@ -119,7 +121,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div onClick={() => setIsSearchOpen(true)} className="relative group cursor-pointer">
             <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#938f99] text-[20px]">search</span>
             <div className="w-full bg-[#2b2930] text-[#938f99] pl-10 pr-4 py-3 rounded-full text-sm flex items-center transition-colors group-hover:bg-[#36343b]">
-              Search for chats
+              {t('chat.search')}
             </div>
           </div>
 
@@ -128,13 +130,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             className="flex items-center gap-3 px-4 py-3 bg-[var(--md-sys-color-primary-container)] hover:opacity-90 text-[var(--md-sys-color-on-primary-container)] rounded-2xl transition-all active:scale-[0.95]"
           >
             <span className="material-symbols-outlined text-[22px]">edit_square</span>
-            <span className="font-medium text-sm">New chat</span>
+            <span className="font-medium text-sm">{t('chat.new')}</span>
           </button>
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 mt-2 custom-scrollbar">
           <div className="px-4 py-2">
-            <h2 className="text-[14px] font-medium text-[#e6e1e5]">Chats</h2>
+            <h2 className="text-[14px] font-medium text-[#e6e1e5]">{t('sidebar.chats')}</h2>
           </div>
           <ChatList
             chats={chats}
