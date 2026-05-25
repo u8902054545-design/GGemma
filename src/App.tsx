@@ -21,6 +21,7 @@ import { VoiceSelection } from './components/Settings/voiceSelection';
 import { ChatArea } from './components/ChatArea';
 import { GemmaBottomSheet } from './components/GemmaBottomSheet';
 import { useLanguage } from './hooks/useLanguage';
+import { useTheme } from './hooks/useTheme';
 import { ThemeTransition } from './motion/ThemeTransition';
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
   const { t, language, setLanguage } = useLanguage();
+  const { theme, setTheme } = useTheme();
 
   const {
     messages, setMessages, input, setInput, selectedModel, setSelectedModel,
@@ -60,6 +62,9 @@ export default function App() {
           }
           if (data.selected_language && data.selected_language !== language) {
             setLanguage(data.selected_language);
+          }
+          if (data.selected_theme && data.selected_theme !== theme) {
+            setTheme(data.selected_theme);
           }
         }
       } catch (err) { console.error('Settings sync error:', err); }

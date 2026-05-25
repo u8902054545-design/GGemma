@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from './useAuth';
+import { supabase, SUPABASE_ENDPOINT } from '../config';
 
 export type Theme = 'system' | 'dark' | 'light';
 
@@ -67,9 +69,29 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
   }, [resolvedTheme]);
 
-  const setTheme = (newTheme: Theme) => {
+  const { user } = useAuth();
+
+  const setTheme = async (newTheme: Theme) => {
     setThemeState(newTheme);
     localStorage.setItem('app_theme', newTheme);
+
+    if (user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        await fetch(SUPABASE_ENDPOINT, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session?.access_token}`,
+          },
+          body: JSON.stringify({
+            settings: { selected_theme: newTheme }
+          }),
+        });
+      } catch (err) {
+        console.error('Failed to sync theme:', err);
+      }
+    }
   };
 
   return (
