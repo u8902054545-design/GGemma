@@ -7,6 +7,8 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { ChatActionsMenu } from './ChatHeaderParts/ChatActionsMenu';
 import { useLanguage } from '../hooks/useLanguage';
+import '@material/web/iconbutton/icon-button.js';
+import '@material/web/icon/icon.js';
 
 interface ChatHeaderProps {
   messages: any[];
@@ -25,13 +27,14 @@ interface ChatHeaderProps {
   togglePin: (id: string, pinned: boolean) => Promise<void>;
   isTemporary?: boolean;
   onTemporaryChatClick?: () => void;
+  onNewChat?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   messages, chatTitle, chatId, isPinned, selectedModel, isModelSelectorOpen, onModelSelectorToggle,
   setMessages, setChatId, setChatTitle,
   onMenuClick, isSidebarOpen, deleteChatFromDB, togglePin, isTemporary = false,
-  onTemporaryChatClick
+  onTemporaryChatClick, onNewChat
 }) => {
   const isChatStarted = messages.length > 0;
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -40,7 +43,13 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const { t } = useLanguage();
 
-  const onNewChatClick = () => handleNewChat(setMessages, setChatId, setChatTitle);
+  const onNewChatClick = () => {
+    if (onNewChat) {
+      onNewChat();
+    } else {
+      handleNewChat(setMessages, setChatId, setChatTitle);
+    }
+  };
 
   const handleRenameConfirm = (newTitle: string) => renameChat(chatId, newTitle, setChatTitle);
 
@@ -127,7 +136,17 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">edit_square</span>
               </button>
 
-              {!isTemporary && (
+              {isTemporary ? (
+                <md-icon-button 
+                  onClick={() => setIsMenuOpen(true)}
+                  style={{
+                    '--md-icon-button-icon-color': 'var(--md-sys-color-on-surface-variant)',
+                    '--md-icon-button-state-layer-color': 'var(--md-sys-color-on-surface-variant)'
+                  }}
+                >
+                  <md-icon>more_vert</md-icon>
+                </md-icon-button>
+              ) : (
                 <button onClick={() => setIsMenuOpen(true)} className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors flex items-center justify-center bg-transparent">
                   <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">more_vert</span>
                 </button>
@@ -137,7 +156,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         </AnimatePresence>
       </div>
 
-      <ExportMenu isOpen={isDownloadOpen} onOpenChange={setIsDownloadOpen} messages={messages} />
+      <ExportMenu isOpen={isDownloadOpen} onOpenChange={setIsDownloadOpen} messages={messages} isTemporary={isTemporary} />
       <ChatActionsMenu
         isOpen={isMenuOpen}
         onOpenChange={setIsMenuOpen}
@@ -146,6 +165,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         onRename={() => { setIsMenuOpen(false); setTimeout(() => setIsRenameOpen(true), 300); }}
         onExport={() => setIsDownloadOpen(true)}
         onDelete={() => { setIsMenuOpen(false); setTimeout(() => setIsDeleteOpen(true), 300); }}
+        isTemporary={isTemporary}
       />
       <RenameDialog isOpen={isRenameOpen} onClose={() => setIsRenameOpen(false)} currentTitle={chatTitle} onConfirm={handleRenameConfirm} />
       <DeleteConfirmDialog isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDeleteConfirm} />

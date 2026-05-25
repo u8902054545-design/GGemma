@@ -21,7 +21,7 @@ export const TemporaryChatPage: React.FC = () => {
           </span>
         </div>
 
-        <h2 className="text-[var(--md-sys-color-on-surface)] text-2xl font-semibold mb-3 tracking-tight">
+        <h2 className="text-[var(--md-sys-color-primary)] text-2xl font-semibold mb-3 tracking-tight">
           {t('chat.temporary')}
         </h2>
         

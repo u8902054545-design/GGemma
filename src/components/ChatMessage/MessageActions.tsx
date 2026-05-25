@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { mdEasing, mdDuration } from '../../motion/transitions';
+import { useLanguage } from '../../hooks/useLanguage';
 
 interface MessageActionsProps {
   isTemporary: boolean;
@@ -21,6 +22,8 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   copiedText,
   isLast
 }) => {
+  const { t } = useLanguage();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 5 }}
@@ -65,7 +68,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
 
       {isLast && (
         <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-70 leading-tight">
-          Gemma is an AI and may make mistakes. Verify its responses.
+          {t('message.warning')}
         </p>
       )}
     </motion.div>

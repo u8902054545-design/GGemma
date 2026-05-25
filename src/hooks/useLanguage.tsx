@@ -237,8 +237,8 @@ export const translations: Translations = {
     ru: 'Свернуть',
   },
   'message.warning': {
-    en: 'Gemma can make mistakes. Check important info.',
-    ru: 'Gemma может ошибаться. Проверяйте важную информацию.',
+    en: 'Gemma is an AI and may make mistakes. Verify its responses.',
+    ru: 'Gemma — это ИИ, и она может допускать ошибки. Проверяйте её ответы.',
   },
   'export.title': {
     en: 'Export Chat',
@@ -307,6 +307,18 @@ export const translations: Translations = {
   'settings.theme.light': {
     en: 'A light theme',
     ru: 'Светлая тема',
+  },
+  'temp.export.confirm.title': {
+    en: 'Export from Temporary Chat',
+    ru: 'Экспорт из временного чата',
+  },
+  'temp.export.confirm.desc': {
+    en: 'This export is from a temporary chat. Please be careful if there is any confidential information, as the data will be saved locally on your device.',
+    ru: 'Этот экспорт выполняется из временного чата. Пожалуйста, будьте осторожны, если в диалоге есть конфиденциальная информация, так как данные будут сохранены локально на вашем устройстве.',
+  },
+  'temp.export.confirm.accept': {
+    en: 'I accept',
+    ru: 'Принимаю',
   }
   };
 

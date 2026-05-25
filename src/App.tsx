@@ -136,6 +136,11 @@ export default function App() {
                 togglePin={togglePin}
                 isTemporary={isTemporary}
                 onTemporaryChatClick={handleTemporaryToggle}
+                onNewChat={() => {
+                  if (isTemporary) clearTempMessages();
+                  setIsTemporary(false);
+                  handleCreateNewChat(setMessages, setChatId as (id: string) => void, setChatTitle, resetSearch, () => {}, () => refreshChats(false));
+                }}
               />
 
               <div className="flex-1 relative overflow-hidden flex flex-col">

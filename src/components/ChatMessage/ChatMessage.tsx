@@ -141,12 +141,6 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
                 </span>
               </motion.div>
             )}
-
-            {isAI && !isGenerating && (
-              <div className="mt-4 text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-50 select-none">
-                {t('message.warning')}
-              </div>
-            )}
           </div>
 
           {!isContentExpanded && canShowExpand && (
