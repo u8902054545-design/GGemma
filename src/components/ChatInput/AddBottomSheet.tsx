@@ -24,9 +24,9 @@ export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
   return (
     <Drawer.Root open={isOpen} onOpenChange={onClose}>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/50 z-[100]" />
-        <Drawer.Content className="bg-[var(--md-sys-color-surface-container-low)] flex flex-col rounded-t-[32px] fixed bottom-0 left-0 right-0 z-[101] outline-none max-w-[1200px] mx-auto focus:outline-none">
-          <div className="p-4 bg-[var(--md-sys-color-surface-container-low)] rounded-t-[32px] flex-1">
+        <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[100]" />
+        <Drawer.Content className="bg-[var(--md-sys-color-surface)] flex flex-col rounded-t-[32px] fixed bottom-0 left-0 right-0 z-[101] outline-none max-w-[1200px] mx-auto focus:outline-none">
+          <div className="p-4 bg-[var(--md-sys-color-surface)] rounded-t-[32px] flex-1">
             <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[var(--md-sys-color-outline-variant)] mb-8" />
             
             <div className="flex gap-4 mb-6">
