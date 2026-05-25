@@ -19,8 +19,8 @@ export const ExportMenu: React.FC<ExportMenuProps> = ({
   return (
     <Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
       <Drawer.Portal>
-        <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[60]" />
-        <Drawer.Content className="bg-[var(--md-sys-color-surface)] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none border-none max-w-lg mx-auto">
+        <Drawer.Overlay className="fixed inset-0 bg-black/60 z-[190]" />
+        <Drawer.Content className="bg-[var(--md-sys-color-surface)] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[200] outline-none border-none max-w-lg mx-auto">
           <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[var(--md-sys-color-outline)] my-4" />
           <div className="p-4 bg-[var(--md-sys-color-surface)] pb-8">
             <div className="text-[var(--md-sys-color-on-surface)] text-lg font-medium px-4 mb-4 text-center">{t('export.title')}</div>

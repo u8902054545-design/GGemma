@@ -67,3 +67,29 @@ export const downloadHistory = (messages: any[], format: 'txt' | 'json') => {
   a.click();
   URL.revokeObjectURL(url);
 };
+
+export const fetchChatMessages = async (chatId: string) => {
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session?.access_token) throw new Error('Unauthorized');
+
+    const response = await fetch(`${SUPABASE_ENDPOINT}?chat_id=${chatId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${session.access_token}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) throw new Error('Failed to fetch messages');
+
+    const data = await response.json();
+    return data.map((m: any) => ({
+      role: (m.role === 'assistant' || m.role === 'ai' || m.role === 'model') ? 'ai' : 'user',
+      content: m.content
+    }));
+  } catch (error) {
+    console.error('Error fetching messages for export:', error);
+    return [];
+  }
+};

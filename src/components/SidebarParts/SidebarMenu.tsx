@@ -10,6 +10,7 @@ interface SidebarMenuProps {
   onPin: () => void;
   onRename: () => void;
   onDelete: () => void;
+  onExport: () => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
@@ -18,7 +19,8 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
   selectedChat,
   onPin,
   onRename,
-  onDelete
+  onDelete,
+  onExport
 }) => {
   const { t } = useLanguage();
 
@@ -47,6 +49,13 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
             >
               <span className="material-symbols-outlined">edit</span>
               <span>{t('menu.rename')}</span>
+            </button>
+            <button
+              onClick={onExport}
+              className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-on-surface)] border-none bg-transparent"
+            >
+              <span className="material-symbols-outlined">download</span>
+              <span>{t('export.title')}</span>
             </button>
             <button
               onClick={onDelete}

@@ -3,9 +3,10 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SearchOverlay } from './SearchOverlay';
 import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
-import { renameChat, togglePinChat } from './chatHeaderFunctions';
+import { renameChat, togglePinChat, fetchChatMessages } from './chatHeaderFunctions';
 import { ChatList } from './SidebarParts/ChatList';
 import { SidebarMenu } from './SidebarParts/SidebarMenu';
+import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { useLanguage } from '../hooks/useLanguage';
 import { Chat } from '../hooks/chatTypes';
 
@@ -37,12 +38,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isExportOpen, setIsExportOpen] = useState(false);
+  const [exportMessages, setExportMessages] = useState<any[]>([]);
   const { t } = useLanguage();
 
   const handleLongPress = (chat: Chat) => {
     setSelectedChat(chat);
     setIsMenuOpen(true);
     if (window.navigator.vibrate) window.navigator.vibrate(50);
+  };
+
+  const handleExport = async () => {
+    if (selectedChat) {
+      const msgs = await fetchChatMessages(selectedChat.id);
+      setExportMessages(msgs);
+      setIsExportOpen(true);
+    }
   };
 
   const handleRenameConfirm = async (newTitle: string) => {
@@ -148,7 +159,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         selectedChat={selectedChat}
         onPin={handleTogglePin}
         onRename={() => { setIsMenuOpen(false); setTimeout(() => setIsRenameOpen(true), 300); }}
+        onExport={handleExport}
         onDelete={() => { setIsMenuOpen(false); setTimeout(() => setIsDeleteOpen(true), 300); }}
+      />
+
+      <ExportMenu
+        isOpen={isExportOpen}
+        onOpenChange={setIsExportOpen}
+        messages={exportMessages}
       />
 
       <RenameDialog

@@ -12,7 +12,6 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   isSearchActive = false,
   onSearchClick,
   onImageClick,
-  onModelConfigClick,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -121,7 +120,6 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
           isSearchActive={isSearchActive}
           isSearchDisabled={isSearchDisabled}
           onSearchClick={onSearchClick}
-          onModelConfigClick={onModelConfigClick}
           isListening={isListening}
           toggleListening={toggleListening}
         />

@@ -124,6 +124,9 @@ export default function App() {
                 chatTitle={isTemporary ? t('chat.temporary') : chatTitle}
                 chatId={chatId}
                 isPinned={chats.find(c => c.id === chatId)?.is_pinned || false}
+                selectedModel={selectedModel}
+                isModelSelectorOpen={isModelSelectorOpen}
+                onModelSelectorToggle={() => setIsModelSelectorOpen(!isModelSelectorOpen)}
                 setMessages={setMessages}
                 setChatId={setChatId}
                 setChatTitle={setChatTitle}
@@ -176,7 +179,6 @@ export default function App() {
                 isSearchActive={isSearchActive}
                 onSearchClick={toggleSearch}
                 onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
-                onModelConfigClick={() => setIsModelSelectorOpen(true)}
               />
             </div>
           </motion.div>

@@ -16,7 +16,6 @@ interface InputAreaProps {
   isSearchActive: boolean;
   isSearchDisabled: boolean;
   onSearchClick?: () => void;
-  onModelConfigClick?: () => void;
   isListening: boolean;
   toggleListening: () => void;
 }
@@ -32,7 +31,6 @@ export const InputArea: React.FC<InputAreaProps> = ({
   isSearchActive,
   isSearchDisabled,
   onSearchClick,
-  onModelConfigClick,
   isListening,
   toggleListening,
 }) => {
@@ -98,18 +96,6 @@ export const InputArea: React.FC<InputAreaProps> = ({
         />
 
         <div className="flex items-center gap-1 pr-2 pb-2">
-          <button
-            type="button"
-            onClick={onModelConfigClick}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:bg-[var(--md-sys-color-on-surface-variant)]/10 active:scale-90 group"
-          >
-            <span 
-              className="material-symbols-outlined text-[20px] group-hover:text-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-surface-variant)]"
-            >
-              tune
-            </span>
-          </button>
-          
           <button
             type="button"
             onClick={toggleListening}

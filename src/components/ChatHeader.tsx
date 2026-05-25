@@ -14,6 +14,9 @@ interface ChatHeaderProps {
   chatTitle: string;
   chatId: string;
   isPinned: boolean;
+  selectedModel: { id: string, name: string };
+  isModelSelectorOpen: boolean;
+  onModelSelectorToggle: () => void;
   setMessages: (msgs: any[]) => void;
   setChatId: (id: string) => void;
   setChatTitle: (title: string) => void;
@@ -26,7 +29,8 @@ interface ChatHeaderProps {
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
-  messages, chatTitle, chatId, isPinned, setMessages, setChatId, setChatTitle,
+  messages, chatTitle, chatId, isPinned, selectedModel, isModelSelectorOpen, onModelSelectorToggle,
+  setMessages, setChatId, setChatTitle,
   onMenuClick, isSidebarOpen, deleteChatFromDB, togglePin, isTemporary = false,
   onTemporaryChatClick
 }) => {
@@ -36,8 +40,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const { t } = useLanguage();
-
-  const displayTitle = isTemporary ? t('chat.temporary') : chatTitle;
 
   const onNewChatClick = () => handleNewChat(setMessages, setChatId, setChatTitle);
 
@@ -84,19 +86,17 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
           </AnimatePresence>
         </div>
 
-        <AnimatePresence mode="wait">
-          {isChatStarted && displayTitle && (
-            <motion.h1
-              key={displayTitle}
-              initial={{ opacity: 0, x: -5 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -5 }}
-              className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] truncate mr-4 ml-1"
-            >
-              {displayTitle}
-            </motion.h1>
-          )}
-        </AnimatePresence>
+        <button
+          onClick={onModelSelectorToggle}
+          className="flex items-center gap-1 px-3 py-1.5 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors group"
+        >
+          <span className="text-sm font-medium text-[var(--md-sys-color-on-surface)] truncate max-w-[150px]">
+            {selectedModel.name}
+          </span>
+          <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)]">
+            {isModelSelectorOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+          </span>
+        </button>
       </div>
 
       <div className="flex items-center justify-end min-w-[48px] gap-1">
@@ -137,10 +137,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">edit_square</span>
               </button>
 
-              <button onClick={() => setIsDownloadOpen(true)} className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors flex items-center justify-center bg-transparent">
-                <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">download</span>
-              </button>
-
               {!isTemporary && (
                 <button onClick={() => setIsMenuOpen(true)} className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors flex items-center justify-center bg-transparent">
                   <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">more_vert</span>
@@ -158,6 +154,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         isPinned={isPinned}
         onPin={handleTogglePin}
         onRename={() => { setIsMenuOpen(false); setTimeout(() => setIsRenameOpen(true), 300); }}
+        onExport={() => setIsDownloadOpen(true)}
         onDelete={() => { setIsMenuOpen(false); setTimeout(() => setIsDeleteOpen(true), 300); }}
       />
       <RenameDialog isOpen={isRenameOpen} onClose={() => setIsRenameOpen(false)} currentTitle={chatTitle} onConfirm={handleRenameConfirm} />
