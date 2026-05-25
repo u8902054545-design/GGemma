@@ -22,7 +22,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #1e1e1e;
+  background: var(--md-sys-color-surface-container-high);
   padding: 8px 16px;
   border-radius: 14px 14px 0 0;
   border: 1px solid var(--md-sys-color-outline);
@@ -51,8 +51,8 @@
 }
 
 .copy-button:hover {
-  background: rgba(255, 255, 255, 0.05);
-  color: #fff;
+  background: var(--md-sys-color-surface-container-highest);
+  color: var(--md-sys-color-on-surface);
 }
 
 .copy-button span {
@@ -78,7 +78,7 @@
 }
 
 .code-gradient-border > div::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--md-sys-color-outline-variant);
   border-radius: 10px;
 }
 
@@ -93,13 +93,13 @@ textarea::-webkit-scrollbar {
 }
 
 textarea::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--md-sys-color-outline-variant);
   border-radius: 10px;
 }
 
 textarea {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  scrollbar-color: var(--md-sys-color-outline-variant) transparent;
 }
 
 .markdown-content table {

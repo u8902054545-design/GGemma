@@ -133,19 +133,19 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
       animate="animate"
       exit="exit"
       style={{ zIndex: 100001 }}
-      className="fixed inset-0 bg-black flex flex-col font-sans overflow-hidden"
+      className="fixed inset-0 bg-[var(--md-sys-color-background)] flex flex-col font-sans overflow-hidden"
     >
       <header className="w-full p-4 flex items-center justify-start">
         <button
           onClick={() => { stopPcm(); onClose(); }}
-          className="p-3 hover:bg-white/10 rounded-full transition-colors text-[var(--md-sys-color-on-surface-variant)] active:scale-90"
+          className="p-3 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors text-[var(--md-sys-color-on-surface-variant)] active:scale-90"
         >
           <span className="material-symbols-outlined text-[24px]">arrow_back</span>
         </button>
       </header>
 
       <main className="flex-1 flex flex-col items-start justify-start px-6 pb-8 overflow-y-auto w-full max-w-[600px] mx-auto">
-        <h1 className="text-[32px] font-normal text-white mt-2 mb-6 tracking-tight align-left w-full">
+        <h1 className="text-[32px] font-normal text-[var(--md-sys-color-on-surface)] mt-2 mb-6 tracking-tight align-left w-full">
           {t('settings.voice.selection.title')}
         </h1>
 
@@ -158,7 +158,7 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
               <button
                 key={voice}
                 onClick={() => updateVoice(voice)}
-                className="ripple-container w-full py-4 px-3 flex items-center justify-between border-b border-[#111111] hover:bg-white/5 rounded-xl transition-all text-left active:scale-[0.99]"
+                className="ripple-container w-full py-4 px-3 flex items-center justify-between border-b border-[var(--md-sys-color-outline-variant)]/10 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 rounded-xl transition-all text-left active:scale-[0.99]"
               >
                 <div className="flex items-center gap-3">
                   <div className="w-6 h-6 flex items-center justify-center">
@@ -168,16 +168,16 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
                       </span>
                     )}
                   </div>
-                  <span className={`text-[16px] font-medium transition-colors ${isSelected ? 'text-[var(--md-sys-color-primary)]' : 'text-white'}`}>
+                  <span className={`text-[16px] font-medium transition-colors ${isSelected ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface)]'}`}>
                     {voice}
                   </span>
                 </div>
 
                 <div
                   onClick={(e) => handlePlayPause(e, voice)}
-                  className="p-2 hover:bg-white/10 rounded-full transition-colors active:scale-90"
+                  className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors active:scale-90"
                 >
-                  <span className={`material-symbols-outlined text-[22px] ${isPlayingThis ? 'text-[var(--md-sys-color-primary)]' : 'text-[#555555]'}`}>
+                  <span className={`material-symbols-outlined text-[22px] ${isPlayingThis ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'}`}>
                     {isPlayingThis ? 'pause' : 'play_arrow'}
                   </span>
                 </div>

@@ -15,12 +15,12 @@ const SuggestionCard: React.FC<SuggestionCardProps> = ({ text, icon, onClick }) 
       onClick={() => onClick(text)}
       className="relative p-[1px] rounded-xl overflow-hidden cursor-pointer group animate-gradient opacity-60 hover:opacity-100 transition-opacity duration-300"
     >
-      <div className="relative bg-[#0b0b0b] h-full rounded-xl p-3 flex flex-col justify-between hover:bg-[#151515] transition-colors duration-300">
-        <p className="text-[#e2e2e2] text-xs font-medium leading-snug">
+      <div className="relative bg-[var(--md-sys-color-surface)] h-full rounded-xl p-3 flex flex-col justify-between hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors duration-300">
+        <p className="text-[var(--md-sys-color-on-surface)] text-xs font-medium leading-snug">
           {text}
         </p>
         <div className="flex justify-end mt-3">
-          <span className="material-symbols-outlined text-[#c4c7c5] bg-[#282a2d] rounded-full p-1.5 text-[16px] group-hover:text-white transition-colors duration-300">
+          <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] bg-[var(--md-sys-color-surface-container-high)] rounded-full p-1.5 text-[16px] group-hover:text-[var(--md-sys-color-on-surface)] transition-colors duration-300">
             {icon}
           </span>
         </div>
@@ -50,7 +50,7 @@ export const StartScreen: React.FC<StartScreenProps> = ({ userName, onSelectSugg
         <h1 className="text-4xl md:text-5xl font-semibold mb-2 tracking-tight">
           <span className="text-gradient">Hello, {firstName}</span>
         </h1>
-        <h2 className="text-2xl md:text-3xl font-semibold text-[#444746] tracking-tight">
+        <h2 className="text-2xl md:text-3xl font-semibold text-[var(--md-sys-color-on-surface-variant)] tracking-tight">
           {t('start.subtitle')}
         </h2>
       </div>

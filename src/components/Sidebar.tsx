@@ -104,7 +104,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </AnimatePresence>
 
       <aside
-        className="fixed top-0 left-0 h-screen w-[300px] bg-[#1c1b1f] border-r border-white/5 flex flex-col z-[150] shadow-2xl overflow-hidden"
+        className="fixed top-0 left-0 h-screen w-[300px] bg-[var(--md-sys-color-surface)] border-r border-[var(--md-sys-color-outline-variant)]/10 flex flex-col z-[150] shadow-2xl overflow-hidden"
         style={{ 
           transform: isOpen ? 'translateX(0px)' : 'translateX(-300px)',
           transition: 'transform 0.4s cubic-bezier(0.2, 0, 0, 1)'
@@ -112,8 +112,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       >
         <div className="p-4 flex flex-col gap-4 mt-2">
           <div onClick={() => setIsSearchOpen(true)} className="relative group cursor-pointer">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[#938f99] text-[20px]">search</span>
-            <div className="w-full bg-[#2b2930] text-[#938f99] pl-10 pr-4 py-3 rounded-full text-sm flex items-center transition-colors group-hover:bg-[#36343b]">
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[var(--md-sys-color-on-surface-variant)] text-[20px]">search</span>
+            <div className="w-full bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] pl-10 pr-4 py-3 rounded-full text-sm flex items-center transition-colors group-hover:bg-[var(--md-sys-color-surface-container-highest)]">
               {t('chat.search')}
             </div>
           </div>
@@ -129,7 +129,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <div className="flex-1 overflow-y-auto px-2 mt-2 custom-scrollbar">
           <div className="px-4 py-2">
-            <h2 className="text-[14px] font-medium text-[#e6e1e5]">{t('sidebar.chats')}</h2>
+            <h2 className="text-[14px] font-medium text-[var(--md-sys-color-on-surface)]">{t('sidebar.chats')}</h2>
           </div>
           <ChatList
             chats={chats}

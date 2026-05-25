@@ -21,6 +21,7 @@ import { VoiceSelection } from './components/Settings/voiceSelection';
 import { ChatArea } from './components/ChatArea';
 import { GemmaBottomSheet } from './components/GemmaBottomSheet';
 import { useLanguage } from './hooks/useLanguage';
+import { ThemeTransition } from './motion/ThemeTransition';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -74,13 +75,14 @@ export default function App() {
     if (isTemporary) clearTempMessages();
   };
 
-  if (authLoading) return <div className="h-screen w-full bg-black" />;
+  if (authLoading) return <div className="h-screen w-full bg-[var(--md-sys-color-background)]" />;
 
   return (
-    <div className="h-screen w-full bg-black overflow-hidden relative">
+    <div className="h-screen w-full bg-[var(--md-sys-color-background)] overflow-hidden relative">
+      <ThemeTransition />
       <AnimatePresence>
         {!user && (
-          <motion.div key="login-screen" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="fixed inset-0 z-[200] bg-black">
+          <motion.div key="login-screen" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="fixed inset-0 z-[200] bg-[var(--md-sys-color-background)]">
             <Login onLoginSuccess={signInWithGoogle} />
           </motion.div>
         )}
@@ -88,7 +90,7 @@ export default function App() {
 
       {user && (
         <>
-          <motion.div variants={mainContentBackdropVariants} animate={isModelSelectorOpen ? "pushed" : "idle"} className="h-full w-full flex flex-col bg-black relative">
+          <motion.div variants={mainContentBackdropVariants} animate={isModelSelectorOpen ? "pushed" : "idle"} className="h-full w-full flex flex-col bg-[var(--md-sys-color-background)] relative">
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={() => closeState(setIsSidebarOpen)}
@@ -111,7 +113,7 @@ export default function App() {
               togglePin={togglePin}
             />
 
-            <div className="h-full w-full flex flex-col bg-black relative shadow-2xl">
+            <div className="h-full w-full flex flex-col bg-[var(--md-sys-color-background)] relative shadow-2xl">
               <ChatHeader
                 messages={messages}
                 chatTitle={isTemporary ? t('chat.temporary') : chatTitle}
@@ -151,7 +153,7 @@ export default function App() {
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
                       onClick={() => scrollToBottomInstant(messagesEndRef)}
-                      className="absolute bottom-6 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[#1e1e1e] border border-[#3c4043] text-[#a8c7fa] shadow-2xl hover:bg-[#282a2d] transition-colors cursor-pointer bg-transparent"
+                      className="absolute bottom-6 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline)] text-[var(--md-sys-color-primary)] shadow-2xl hover:bg-[var(--md-sys-color-surface-container-highest)] transition-colors cursor-pointer"
                     >
                       <span className="material-symbols-outlined">arrow_downward</span>
                     </motion.button>

@@ -38,7 +38,7 @@ export const ChatMessageHeader: React.FC<HeaderProps> = ({
       {hasThought && (
         <button
           onClick={onToggleThought}
-          className="flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--md-sys-color-surface-container-high)] hover:bg-[#333] transition-colors text-[11px] text-[var(--md-sys-color-on-surface-variant)] border border-[var(--md-sys-color-outline)]/20"
+          className="flex items-center gap-1 px-3 py-1 rounded-full bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)] transition-colors text-[11px] text-[var(--md-sys-color-on-surface-variant)] border border-[var(--md-sys-color-outline)]/20"
         >
           <span>Show thought</span>
           <span className="material-symbols-outlined text-[14px]">

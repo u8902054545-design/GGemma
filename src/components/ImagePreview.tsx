@@ -12,7 +12,7 @@ const ImagePreviewComponent: React.FC<ImagePreviewProps> = ({ url, onRemove, onI
       <img 
         src={url} 
         alt="Preview" 
-        className="w-full h-full object-cover rounded-xl border border-[#333] cursor-pointer hover:border-[#555] transition-all"
+        className="w-full h-full object-cover rounded-xl border border-[var(--md-sys-color-outline)] cursor-pointer hover:border-[var(--md-sys-color-primary)] transition-all"
         onClick={() => onImageClick?.(url)}
       />
       <button
@@ -21,9 +21,9 @@ const ImagePreviewComponent: React.FC<ImagePreviewProps> = ({ url, onRemove, onI
           e.stopPropagation();
           onRemove();
         }}
-        className="absolute -top-2 -right-2 bg-black rounded-full p-0.5 border border-[#333] hover:border-[#555] transition-colors flex items-center justify-center z-10"
+        className="absolute -top-2 -right-2 bg-[var(--md-sys-color-background)] rounded-full p-0.5 border border-[var(--md-sys-color-outline)] hover:border-[var(--md-sys-color-primary)] transition-colors flex items-center justify-center z-10"
       >
-        <span className="material-symbols-outlined text-[18px] text-[#808080] group-hover:text-[#e2e2e2]">
+        <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-on-surface)]">
           close
         </span>
       </button>

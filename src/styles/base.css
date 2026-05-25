@@ -1,4 +1,17 @@
 :root {
+  --google-blue: #a8c7fa;
+  --google-red: #f2b8b5;
+  --gemma-blue-deep: #446eff;
+  --gemma-blue-bright: #2e96ff;
+  --gemma-blue-light: #b1c5ff;
+
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-duration-long2: 500ms;
+  --md-sys-motion-duration-medium4: 400ms;
+  --md-sys-motion-duration-short4: 200ms;
+}
+
+:root[data-theme='dark'], :root:not([data-theme='light']) {
   --md-sys-color-background: #000000;
   --md-sys-color-on-background: #e2e2e2;
   --md-sys-color-surface: #0b0b0b;
@@ -14,17 +27,26 @@
   --md-sys-color-on-primary-container: #d3e3fd;
   --md-sys-color-secondary-container: #333537;
   --md-sys-color-on-secondary-container: #e3e3e3;
-  
-  --google-blue: #a8c7fa;
-  --google-red: #f2b8b5;
-  --gemma-blue-deep: #446eff;
-  --gemma-blue-bright: #2e96ff;
-  --gemma-blue-light: #b1c5ff;
+  --md-sys-color-error: #ffb4ab;
+}
 
-  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
-  --md-sys-motion-duration-long2: 500ms;
-  --md-sys-motion-duration-medium4: 400ms;
-  --md-sys-motion-duration-short4: 200ms;
+:root[data-theme='light'] {
+  --md-sys-color-background: #fdfbff;
+  --md-sys-color-on-background: #1b1b1f;
+  --md-sys-color-surface: #fdfbff;
+  --md-sys-color-surface-container-high: #eae7ec;
+  --md-sys-color-surface-container-highest: #e4e1e6;
+  --md-sys-color-on-surface: #1b1b1f;
+  --md-sys-color-on-surface-variant: #44474e;
+  --md-sys-color-outline: #74777f;
+  --md-sys-color-outline-variant: #c4c6cf;
+  --md-sys-color-primary: #005ac1;
+  --md-sys-color-on-primary: #ffffff;
+  --md-sys-color-primary-container: #d8e2ff;
+  --md-sys-color-on-primary-container: #001a41;
+  --md-sys-color-secondary-container: #e4e1e6;
+  --md-sys-color-on-secondary-container: #1b1b1f;
+  --md-sys-color-error: #ba1a1a;
 }
 
 html, body {
@@ -40,7 +62,7 @@ html, body {
   user-select: none;
   -webkit-user-select: none;
   text-rendering: optimizeLegibility;
-  scroll-behavior: smooth;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .select-text {
@@ -60,13 +82,13 @@ main::-webkit-scrollbar {
 }
 
 main::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--md-sys-color-outline-variant);
   border-radius: 10px;
 }
 
 main {
   scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+  scrollbar-color: var(--md-sys-color-outline-variant) transparent;
 }
 
 .material-symbols-outlined {

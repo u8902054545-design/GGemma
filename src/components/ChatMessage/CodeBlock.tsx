@@ -75,7 +75,7 @@ const CodeBlockComponent: React.FC<CodeBlockProps> = ({ language, value, isCopie
         </div>
       </div>
       
-      <div className="relative w-full overflow-hidden bg-[#0b0b0b]">
+      <div className="relative w-full overflow-hidden bg-[var(--md-sys-color-surface)]">
         <SyntaxHighlighter
           language={language}
           style={atomDark}

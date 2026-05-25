@@ -2,18 +2,21 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { pageVariants } from '../../motion/transitions';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useTheme, Theme } from '../../hooks/useTheme';
 
-interface LanguageSelectionProps {
+interface ThemeSelectionProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const LanguageSelection: React.FC<LanguageSelectionProps> = ({ isOpen, onClose }) => {
-  const { language, setLanguage, t } = useLanguage();
+export const ThemeSelection: React.FC<ThemeSelectionProps> = ({ isOpen, onClose }) => {
+  const { t } = useLanguage();
+  const { theme, setTheme } = useTheme();
 
-  const languages: { code: 'en' | 'ru'; name: string }[] = [
-    { code: 'en', name: t('common.en') },
-    { code: 'ru', name: t('common.ru') },
+  const themes: { id: Theme; name: string; icon: string }[] = [
+    { id: 'system', name: t('settings.theme.system'), icon: 'settings_brightness' },
+    { id: 'dark', name: t('settings.theme.dark'), icon: 'mode_night' },
+    { id: 'light', name: t('settings.theme.light'), icon: 'light_mode' },
   ];
 
   if (!isOpen) return null;
@@ -38,30 +41,33 @@ export const LanguageSelection: React.FC<LanguageSelectionProps> = ({ isOpen, on
 
       <main className="flex-1 flex flex-col items-start justify-start px-6 pb-8 overflow-y-auto w-full max-w-[600px] mx-auto">
         <h1 className="text-[32px] font-normal text-[var(--md-sys-color-on-surface)] mt-2 mb-6 tracking-tight align-left w-full">
-          {t('settings.language.selection.title')}
+          {t('settings.theme.selection.title')}
         </h1>
 
         <div className="w-full flex flex-col">
-          {languages.map((lang) => {
-            const isSelected = language === lang.code;
+          {themes.map((tItem) => {
+            const isSelected = theme === tItem.id;
 
             return (
               <button
-                key={lang.code}
-                onClick={() => setLanguage(lang.code)}
+                key={tItem.id}
+                onClick={() => setTheme(tItem.id)}
                 className="ripple-container w-full py-4 px-3 flex items-center justify-between border-b border-[var(--md-sys-color-outline-variant)]/10 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 rounded-xl transition-all text-left active:scale-[0.99]"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 flex items-center justify-center">
-                    {isSelected && (
-                      <span className="material-symbols-outlined text-[24px] text-[var(--md-sys-color-primary)]">
-                        check
-                      </span>
-                    )}
-                  </div>
-                  <span className={`text-[16px] font-medium transition-colors ${isSelected ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface)]'}`}>
-                    {lang.name}
+                <div className="flex items-center gap-4">
+                  <span className={`material-symbols-outlined text-[24px] ${isSelected ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'}`}>
+                    {tItem.icon}
                   </span>
+                  <span className={`text-[16px] font-medium transition-colors ${isSelected ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface)]'}`}>
+                    {tItem.name}
+                  </span>
+                </div>
+                <div className="w-6 h-6 flex items-center justify-center">
+                  {isSelected && (
+                    <span className="material-symbols-outlined text-[24px] text-[var(--md-sys-color-primary)]">
+                      check
+                    </span>
+                  )}
                 </div>
               </button>
             );

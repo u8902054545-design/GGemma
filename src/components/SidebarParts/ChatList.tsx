@@ -33,7 +33,7 @@ export const ChatList: React.FC<ChatListProps> = ({
   if (error) {
     return (
       <div className="px-4 py-8 text-center">
-        <p className="text-sm text-[#ffb4ab]">{t('sidebar.load_error')}</p>
+        <p className="text-sm text-[var(--md-sys-color-error)]">{t('sidebar.load_error')}</p>
       </div>
     );
   }
@@ -41,7 +41,7 @@ export const ChatList: React.FC<ChatListProps> = ({
   if (chats.length === 0) {
     return (
       <div className="px-4 py-8 text-center">
-        <p className="text-xs text-[#938f99]">{t('sidebar.no_chats')}</p>
+        <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]">{t('sidebar.no_chats')}</p>
       </div>
     );
   }
@@ -69,7 +69,7 @@ export const ChatList: React.FC<ChatListProps> = ({
             className={`group flex items-center px-4 py-3 rounded-full text-sm text-left truncate transition-all duration-200 select-none ${
               isActive
               ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] font-bold'
-              : 'text-[#e6e1e5] hover:bg-[#2b2930]'
+              : 'text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-container-high)]'
             }`}
           >
             <span className="truncate flex-1">

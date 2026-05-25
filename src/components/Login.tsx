@@ -31,10 +31,10 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative bg-black p-4 overflow-hidden font-sans">
+    <div className="min-h-screen flex items-center justify-center relative bg-[var(--md-sys-color-background)] p-4 overflow-hidden font-sans">
       <div className="absolute inset-0 opacity-30 pointer-events-none">
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[#4285F4] blur-[120px]" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[#34A853] blur-[120px]" />
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-[var(--md-sys-color-primary)] blur-[120px]" />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-[var(--md-sys-color-tertiary)] blur-[120px]" />
       </div>
 
       <motion.div
@@ -42,7 +42,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
         initial="initial"
         animate="animate"
         exit="exit"
-        className="relative w-full max-w-[400px] bg-[#111111] rounded-[28px] p-8 flex flex-col items-center border border-white/10 shadow-2xl z-10"
+        className="relative w-full max-w-[400px] bg-[var(--md-sys-color-surface)] rounded-[28px] p-8 flex flex-col items-center border border-[var(--md-sys-color-outline-variant)]/20 shadow-2xl z-10"
       >
         <motion.div
           initial={{ scale: 0.9, opacity: 0 }}
@@ -53,25 +53,25 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           <GemmaIcon className="w-16 h-16" />
         </motion.div>
 
-        <h1 className="text-2xl font-medium tracking-tight mb-2 text-[#e3e3e3] text-center">
+        <h1 className="text-2xl font-medium tracking-tight mb-2 text-[var(--md-sys-color-on-surface)] text-center">
           {t('login.title')}
         </h1>
         
-        <p className="text-[#c4c7c5] text-sm mb-10 text-center">
+        <p className="text-[var(--md-sys-color-on-surface-variant)] text-sm mb-10 text-center">
           {t('login.subtitle')}
         </p>
 
         <button
           onClick={handleLogin}
           disabled={isLoading}
-          className="w-full h-[52px] flex items-center justify-center gap-3 bg-white hover:bg-[#f1f1f1] text-black rounded-full px-6 text-[14px] font-medium transition-all active:scale-[0.98] disabled:opacity-70"
+          className="w-full h-[52px] flex items-center justify-center gap-3 bg-[var(--md-sys-color-primary)] hover:opacity-90 text-[var(--md-sys-color-on-primary)] rounded-full px-6 text-[14px] font-medium transition-all active:scale-[0.98] disabled:opacity-70"
         >
           {isLoading ? (
             <md-circular-progress 
               indeterminate 
               style={{ 
                 '--md-circular-progress-size': '24px',
-                '--md-circular-progress-active-indicator-color': '#000000' 
+                '--md-circular-progress-active-indicator-color': 'var(--md-sys-color-primary)' 
               } as any}
             />
           ) : (
@@ -82,8 +82,8 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           )}
         </button>
 
-        <div className="mt-10 pt-6 border-t border-white/5 w-full flex justify-center">
-          <span className="text-[10px] text-white/30 uppercase tracking-[2px]">
+        <div className="mt-10 pt-6 border-t border-[var(--md-sys-color-outline-variant)]/10 w-full flex justify-center">
+          <span className="text-[10px] text-[var(--md-sys-color-on-surface-variant)]/30 uppercase tracking-[2px]">
             Material Design 3
           </span>
         </div>

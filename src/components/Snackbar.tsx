@@ -22,7 +22,7 @@ const Snackbar: React.FC<SnackbarProps> = ({ message, isOpen, onClose, duration 
       color="secondary" 
       size="small" 
       onClick={handleClose}
-      style={{ color: '#d0bcff', fontWeight: 'bold' }}
+      style={{ color: 'var(--md-sys-color-primary)', fontWeight: 'bold' }}
     >
       OK
     </Button>

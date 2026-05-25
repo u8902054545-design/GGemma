@@ -271,6 +271,30 @@ export const translations: Translations = {
   'model.selector.auto.desc': {
     en: 'System-optimized choice',
     ru: 'Системно оптимизированный выбор',
+  },
+  'settings.theme.title': {
+    en: 'Application Theme',
+    ru: 'Тема приложения',
+  },
+  'settings.theme.desc': {
+    en: 'Change the appearance of the app',
+    ru: 'Измените внешний вид приложения',
+  },
+  'settings.theme.selection.title': {
+    en: 'Theme',
+    ru: 'Тема',
+  },
+  'settings.theme.system': {
+    en: 'System Theme',
+    ru: 'Системная',
+  },
+  'settings.theme.dark': {
+    en: 'Dark theme',
+    ru: 'Тёмная тема',
+  },
+  'settings.theme.light': {
+    en: 'A light theme',
+    ru: 'Светлая тема',
   }
   };
 

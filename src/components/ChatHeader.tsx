@@ -63,7 +63,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-black h-[64px] flex justify-center">
+    <header className="sticky top-0 z-50 bg-[var(--md-sys-color-background)] h-[64px] flex justify-center">
       <div className="w-full max-w-[1200px] px-4 flex justify-between items-center h-full">
       <div className="flex items-center gap-2 flex-1 overflow-hidden">
         <div className="w-10 h-10 flex items-center justify-center shrink-0">
@@ -76,7 +76,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
                 exit={{ opacity: 0, scale: 0.5 }}
                 transition={{ duration: 0.2, ease: mdEasing.standard }}
                 onClick={onMenuClick}
-                className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center bg-transparent"
+                className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors flex items-center justify-center bg-transparent"
               >
                 <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface)]">menu</span>
               </motion.button>
@@ -108,7 +108,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.8 }}
               onClick={onTemporaryChatClick}
-              className={`p-2 rounded-full transition-colors flex items-center justify-center bg-transparent ${isTemporary ? 'bg-[#a8c7fa]/20 text-[#a8c7fa]' : 'hover:bg-white/10 text-[var(--md-sys-color-on-surface-variant)]'}`}
+              className={`p-2 rounded-full transition-colors flex items-center justify-center bg-transparent ${isTemporary ? 'bg-[var(--md-sys-color-primary)]/20 text-[var(--md-sys-color-primary)]' : 'hover:bg-[var(--md-sys-color-on-surface-variant)]/10 text-[var(--md-sys-color-on-surface-variant)]'}`}
             >
               <span className="material-symbols-outlined text-[22px]">chat_dashed</span>
             </motion.button>
@@ -133,16 +133,16 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               exit={{ opacity: 0, scale: 0.8 }}
               className="flex items-center gap-1"
             >
-              <button onClick={onNewChatClick} className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center bg-transparent">
+              <button onClick={onNewChatClick} className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors flex items-center justify-center bg-transparent">
                 <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">edit_square</span>
               </button>
 
-              <button onClick={() => setIsDownloadOpen(true)} className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center bg-transparent">
+              <button onClick={() => setIsDownloadOpen(true)} className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors flex items-center justify-center bg-transparent">
                 <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">download</span>
               </button>
 
               {!isTemporary && (
-                <button onClick={() => setIsMenuOpen(true)} className="p-2 hover:bg-white/10 rounded-full transition-colors flex items-center justify-center bg-transparent">
+                <button onClick={() => setIsMenuOpen(true)} className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors flex items-center justify-center bg-transparent">
                   <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)] text-[22px]">more_vert</span>
                 </button>
               )}

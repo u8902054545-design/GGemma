@@ -5,13 +5,16 @@ import './index.css';
 import 'material-symbols';
 import {registerSW} from 'virtual:pwa-register';
 import { LanguageProvider } from './hooks/useLanguage';
+import { ThemeProvider } from './hooks/useTheme';
 
 registerSW({immediate: true});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <LanguageProvider>
-      <App />
-    </LanguageProvider>
+    <ThemeProvider>
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
+    </ThemeProvider>
   </StrictMode>,
 );

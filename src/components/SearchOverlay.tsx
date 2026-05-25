@@ -65,15 +65,15 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="fixed inset-0 bg-[#1c1b1f] z-[200] flex flex-col"
+          className="fixed inset-0 bg-[var(--md-sys-color-surface)] z-[200] flex flex-col"
         >
-          <div className="p-4 flex items-center gap-3 border-b border-white/5">
+          <div className="p-4 flex items-center gap-3 border-b border-[var(--md-sys-color-outline-variant)]/10">
             <button
               onClick={() => {
                 setQuery('');
                 onClose();
               }}
-              className="p-2 hover:bg-white/10 rounded-full text-[#e6e1e5] transition-colors"
+              className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full text-[var(--md-sys-color-on-surface)] transition-colors"
             >
               <span className="material-symbols-outlined">arrow_back</span>
             </button>
@@ -83,10 +83,10 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder={t('chat.search.placeholder')}
-              className="flex-1 bg-transparent border-none outline-none text-[#e6e1e5] text-base placeholder:text-[#938f99]"
+              className="flex-1 bg-transparent border-none outline-none text-[var(--md-sys-color-on-surface)] text-base placeholder:text-[var(--md-sys-color-on-surface-variant)]"
             />
             {query && (
-              <button onClick={() => setQuery('')} className="text-[#938f99]">
+              <button onClick={() => setQuery('')} className="text-[var(--md-sys-color-on-surface-variant)]">
                 <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             )}
@@ -109,13 +109,13 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
                       setQuery('');
                       onClose();
                     }}
-                    className="w-full px-6 py-4 hover:bg-white/5 rounded-2xl text-left transition-all active:scale-[0.98]"
+                    className="w-full px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 rounded-2xl text-left transition-all active:scale-[0.98]"
                   >
-                    <div className="text-sm font-medium text-[#e6e1e5] truncate">
+                    <div className="text-sm font-medium text-[var(--md-sys-color-on-surface)] truncate">
                       {res.chat_title}
                     </div>
                     {res.content && (
-                      <div className="text-xs text-[#938f99] truncate mt-1 font-normal">
+                      <div className="text-xs text-[var(--md-sys-color-on-surface-variant)] truncate mt-1 font-normal">
                         {res.content}
                       </div>
                     )}
@@ -125,7 +125,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
             )}
 
             {!loading && query.trim() && results.length === 0 && (
-              <div className="flex flex-col items-center justify-center p-12 text-[#938f99] gap-2 text-center">
+              <div className="flex flex-col items-center justify-center p-12 text-[var(--md-sys-color-on-surface-variant)] gap-2 text-center">
                 <span className="material-symbols-outlined text-[48px] opacity-20">search_off</span>
                 <p className="text-sm font-medium">{t('chat.search.nothing')}</p>
               </div>

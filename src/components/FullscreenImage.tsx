@@ -36,9 +36,9 @@ export const FullscreenImage: React.FC<FullscreenImageProps> = ({ src, isOpen, o
                 e.stopPropagation();
                 onClose();
               }}
-              className="flex items-center justify-center w-12 h-12 bg-[#2a2a2a] border border-[#444] rounded-full shadow-lg hover:bg-[#333] transition-all active:scale-90 cursor-pointer"
+              className="flex items-center justify-center w-12 h-12 bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline)] rounded-full shadow-lg hover:bg-[var(--md-sys-color-surface-container-highest)] transition-all active:scale-90 cursor-pointer"
             >
-              <span className="material-symbols-outlined text-[28px] text-white">
+              <span className="material-symbols-outlined text-[28px] text-[var(--md-sys-color-on-surface)]">
                 close
               </span>
             </button>

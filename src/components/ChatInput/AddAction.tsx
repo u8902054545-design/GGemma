@@ -19,16 +19,14 @@ export const AddAction: React.FC<AddActionProps> = ({
         type="button"
         onClick={onAddClick}
         disabled={isImageDisabled}
-        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-xl ${
+        className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-xl bg-[var(--md-sys-color-surface-container-high)] ${
           isImageDisabled 
             ? 'opacity-40 cursor-not-allowed' 
-            : 'hover:bg-[#1a1a1a] active:scale-95 group'
+            : 'hover:bg-[var(--md-sys-color-on-surface-variant)]/10 active:scale-95 group'
         }`}
-        style={{ backgroundColor: '#0f0f0f' }}
       >
         <span 
-          className="material-symbols-outlined text-[24px] group-hover:text-[#8ab4f8]"
-          style={{ color: '#e2e2e2' }}
+          className="material-symbols-outlined text-[24px] group-hover:text-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-surface)]"
         >
           {isImageDisabled ? 'attach_file_off' : 'add'}
         </span>

@@ -40,8 +40,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
 
   return (
     <div 
-      className="flex-1 rounded-[32px] shadow-2xl flex flex-col overflow-hidden min-h-[52px] transition-all duration-300 ease-[var(--md-sys-motion-easing-emphasized)]"
-      style={{ backgroundColor: '#0f0f0f' }}
+      className="flex-1 rounded-[32px] shadow-2xl flex flex-col overflow-hidden min-h-[52px] transition-all duration-300 ease-[var(--md-sys-motion-easing-emphasized)] bg-[var(--md-sys-color-surface-container-high)]"
     >
       {previewUrl && (
         <div className="px-5 pt-3">
@@ -66,12 +65,12 @@ export const InputArea: React.FC<InputAreaProps> = ({
               isSearchDisabled 
                 ? "cursor-not-allowed opacity-40" 
                 : isSearchActive
-                ? "bg-[#8ab4f8]/20 ring-1 ring-[#8ab4f8]/30"
-                : "hover:bg-[#1a1a1a]"
+                ? "bg-[var(--md-sys-color-primary)]/20 ring-1 ring-[var(--md-sys-color-primary)]/30"
+                : "hover:bg-[var(--md-sys-color-on-surface-variant)]/10"
             }`}
           >
             <span className={`material-symbols-outlined text-[20px] shrink-0 transition-colors ${
-              isSearchActive ? "text-[#8ab4f8]" : "text-[#9aa0a6] group-hover:text-[#e2e2e2]"
+              isSearchActive ? "text-[var(--md-sys-color-primary)]" : "text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-on-surface)]"
             }`}>
               {isSearchDisabled ? 'search_off' : 'search'}
             </span>
@@ -80,7 +79,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
               initial="hidden"
               animate={isSearchActive ? "visible" : "hidden"}
               className={`text-sm font-medium whitespace-nowrap overflow-hidden ml-2 ${
-                isSearchActive ? "text-[#8ab4f8]" : "text-[#9aa0a6]"
+                isSearchActive ? "text-[var(--md-sys-color-primary)]" : "text-[var(--md-sys-color-on-surface-variant)]"
               }`}
             >
               {t('chat.search.button')}
@@ -94,7 +93,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           placeholder={t('chat.input.placeholder.gemma')}
-          className="flex-1 bg-transparent border-none outline-none resize-none max-h-60 min-h-[52px] px-4 py-3.5 text-[#e2e2e2] placeholder-[#757575] text-[16px] leading-relaxed select-text"
+          className="flex-1 bg-transparent border-none outline-none resize-none max-h-60 min-h-[52px] px-4 py-3.5 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] text-[16px] leading-relaxed select-text"
           rows={1}
         />
 
@@ -102,11 +101,10 @@ export const InputArea: React.FC<InputAreaProps> = ({
           <button
             type="button"
             onClick={onModelConfigClick}
-            className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:bg-[#1a1a1a] active:scale-90 group"
+            className="w-9 h-9 rounded-full flex items-center justify-center transition-all hover:bg-[var(--md-sys-color-on-surface-variant)]/10 active:scale-90 group"
           >
             <span 
-              className="material-symbols-outlined text-[20px] group-hover:text-[#8ab4f8]"
-              style={{ color: '#9aa0a6' }}
+              className="material-symbols-outlined text-[20px] group-hover:text-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-surface-variant)]"
             >
               tune
             </span>
@@ -116,11 +114,11 @@ export const InputArea: React.FC<InputAreaProps> = ({
             type="button"
             onClick={toggleListening}
             className={`w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90 ${
-              isListening ? "bg-[#EA4335]/20" : "hover:bg-[#1a1a1a]"
+              isListening ? "bg-[#EA4335]/20" : "hover:bg-[var(--md-sys-color-on-surface-variant)]/10"
             }`}
           >
             <span className={`material-symbols-outlined text-[20px] ${
-              isListening ? "text-[#EA4335]" : "text-[#9aa0a6]"
+              isListening ? "text-[#EA4335]" : "text-[var(--md-sys-color-on-surface-variant)]"
             }`}>
               mic
             </span>
