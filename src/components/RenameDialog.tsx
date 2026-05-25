@@ -37,7 +37,7 @@ export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, cur
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="fixed inset-0 bg-black/60 z-[100]" 
+                className="fixed inset-0 bg-black/60 z-[300]" 
                 />
                 </Dialog.Overlay>                <Dialog.Content asChild>
                 <motion.div
@@ -45,7 +45,7 @@ export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, cur
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.9, y: 10 }}
                 transition={{ duration: 0.2, ease: mdEasing.standard }}
-                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[400px] bg-[var(--md-sys-color-surface-container-high)] rounded-[28px] p-6 z-[101] outline-none shadow-xl border border-[var(--md-sys-color-outline-variant)]/10"
+                className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[400px] bg-[var(--md-sys-color-surface-container-high)] rounded-[28px] p-6 z-[310] outline-none shadow-xl border border-[var(--md-sys-color-outline-variant)]/10"
                 >
                 <Dialog.Title className="text-[var(--md-sys-color-on-surface)] text-xl mb-6 font-normal">
                   {t('dialog.rename.title')}
