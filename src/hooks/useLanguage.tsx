@@ -33,8 +33,8 @@ export const translations: Translations = {
     ru: 'Выберите предпочтительный язык',
   },
   'settings.language.selection.title': {
-    en: 'Language',
-    ru: 'Язык',
+    en: 'Select a language',
+    ru: 'Выберите язык',
   },
   'settings.voice.selection.title': {
     en: 'Choose a voice',
@@ -281,8 +281,8 @@ export const translations: Translations = {
     ru: 'Измените внешний вид приложения',
   },
   'settings.theme.selection.title': {
-    en: 'Theme',
-    ru: 'Тема',
+    en: 'Choose a theme',
+    ru: 'Выберите тему',
   },
   'settings.theme.system': {
     en: 'System Theme',
