@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { UserProfile } from './UserProfile';
 import { mdEasing } from '../motion/transitions';
 import { handleNewChat, renameChat, togglePinChat } from './chatHeaderFunctions';
 import { RenameDialog } from './RenameDialog';
@@ -116,16 +115,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         </AnimatePresence>
 
         <AnimatePresence mode="wait" initial={false}>
-          {!isChatStarted ? (
-            <motion.div
-              key="user-avatar"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-            >
-              <UserProfile />
-            </motion.div>
-          ) : (
+          {isChatStarted && (
             <motion.div
               key="chat-controls"
               initial={{ opacity: 0, scale: 0.8 }}

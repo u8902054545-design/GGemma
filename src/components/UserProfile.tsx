@@ -129,7 +129,7 @@ const ProfileDrawerContent = memo(({ isOpen, onClose, user, signOut, t }: any) =
   );
 });
 
-const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+export const ProfileDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
   const { user, signOut } = useAuth();
   const { t } = useLanguage();
 

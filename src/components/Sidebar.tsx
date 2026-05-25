@@ -9,6 +9,9 @@ import { SidebarMenu } from './SidebarParts/SidebarMenu';
 import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { useLanguage } from '../hooks/useLanguage';
 import { Chat } from '../hooks/chatTypes';
+import { useAuth } from '../hooks/useAuth';
+import { ProfileDrawer } from './UserProfile';
+import '@material/web/icon/icon.js';
 
 const backdropVariants = {
   closed: { opacity: 0 },
@@ -39,8 +42,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [exportMessages, setExportMessages] = useState<any[]>([]);
   const { t } = useLanguage();
+  const { user } = useAuth();
+
+  const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0];
+  const userAvatar = user?.user_metadata?.avatar_url;
 
   const handleLongPress = (chat: Chat) => {
     setSelectedChat(chat);
@@ -115,7 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </AnimatePresence>
 
       <aside
-        className="fixed top-0 left-0 h-screen w-[300px] bg-[var(--md-sys-color-surface)] border-r border-[var(--md-sys-color-outline-variant)]/10 flex flex-col z-[150] shadow-2xl overflow-hidden"
+        className="fixed inset-y-0 left-0 h-full w-[300px] bg-[var(--md-sys-color-surface)] border-r border-[var(--md-sys-color-outline-variant)]/10 flex flex-col z-[150] shadow-2xl overflow-hidden"
         style={{ 
           transform: isOpen ? 'translateX(0px)' : 'translateX(-300px)',
           transition: 'transform 0.4s cubic-bezier(0.2, 0, 0, 1)'
@@ -138,7 +146,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-2 mt-2 custom-scrollbar">
+        <div className="flex-1 overflow-y-auto px-2 mt-2 custom-scrollbar min-h-0">
           <div className="px-4 py-2">
             <h2 className="text-[14px] font-medium text-[var(--md-sys-color-on-surface)]">{t('sidebar.chats')}</h2>
           </div>
@@ -150,6 +158,32 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onChatSelect={(id) => { onChatSelect(id); onClose(); }}
             onLongPress={handleLongPress}
           />
+        </div>
+
+        <div className="p-4 border-t border-[var(--md-sys-color-outline-variant)]/10 bg-[var(--md-sys-color-surface)] shrink-0">
+          <button 
+            onClick={() => {
+              onClose();
+              setTimeout(() => setIsProfileOpen(true), 200);
+            }}
+            className="w-full flex items-center gap-3 p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors group"
+          >
+            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-[var(--md-sys-color-outline-variant)]/20">
+              {userAvatar ? (
+                <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-full h-full bg-[var(--md-sys-color-primary)] flex items-center justify-center text-[var(--md-sys-color-on-primary)] text-xs">
+                  {userName?.charAt(0)}
+                </div>
+              )}
+            </div>
+            <span className="flex-1 text-sm font-medium text-[var(--md-sys-color-on-surface)] truncate text-left">
+              {userName}
+            </span>
+            <md-icon className="text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-on-surface)] transition-colors">
+              settings
+            </md-icon>
+          </button>
         </div>
       </aside>
 
@@ -181,6 +215,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDeleteConfirm}
       />
+
+      <ProfileDrawer 
+        isOpen={isProfileOpen} 
+        onClose={() => setIsProfileOpen(false)} 
+      />
     </>
   );
 };
+
