@@ -115,7 +115,6 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
       <div className="flex items-end gap-3 justify-center">
         <AddAction 
           onAddClick={handleAddClick}
-          isImageDisabled={isImageDisabled}
         />
 
         <InputArea 
@@ -164,6 +163,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         onCameraClick={handleCameraClick}
         isSearchActive={isSearchActive}
         onSearchToggle={onSearchClick || (() => {})}
+        isImageDisabled={isImageDisabled}
       />
     </footer>
   );

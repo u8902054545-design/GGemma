@@ -61,6 +61,15 @@ export const InputArea: React.FC<InputAreaProps> = ({
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--md-sys-color-primary-container)] border border-[var(--md-sys-color-primary)]/20 shadow-sm">
                <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-primary)]">search</span>
                <span className="text-[13px] font-medium text-[var(--md-sys-color-on-primary-container)]">{t('chat.add.search')}</span>
+               <button 
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSearchClick?.();
+                }}
+                className="flex items-center justify-center ml-1 hover:bg-[var(--md-sys-color-on-primary-container)]/10 rounded-full transition-colors"
+               >
+                 <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-on-primary-container)]">close</span>
+               </button>
             </div>
           </motion.div>
         )}
