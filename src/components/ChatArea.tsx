@@ -10,14 +10,14 @@ interface ChatAreaProps {
   isTyping: boolean;
   isTemporary: boolean;
   user: any;
-  scrollContainerRef: React.RefObject<HTMLDivElement>;
+  scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   handleScroll: () => void;
   handleSend: (text: string, isSearchActive?: boolean) => void;
   isSearchActive: boolean;
   handleFeedback: (id: string, type: 'like' | 'dislike' | null) => void;
   handleImagePreview: (url: string, setFullscreenImage: (url: string | null) => void) => void;
   setFullscreenImage: (url: string | null) => void;
-  messagesEndRef: React.RefObject<HTMLDivElement>;
+  messagesEndRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export const ChatArea: React.FC<ChatAreaProps> = ({

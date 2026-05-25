@@ -1,3 +1,11 @@
+export interface Chat {
+  id: string;
+  title: string;
+  created_at?: string;
+  user_id?: string;
+  is_pinned: boolean;
+}
+
 export interface SelectedModel {
   id: string;
   name: string;

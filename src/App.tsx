@@ -104,7 +104,7 @@ export default function App() {
               onNewChat={() => {
                 if (isTemporary) clearTempMessages();
                 setIsTemporary(false);
-                handleCreateNewChat(setMessages, setChatId as any, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false));
+                handleCreateNewChat(setMessages, setChatId as (id: string) => void, setChatTitle, resetSearch, () => closeState(setIsSidebarOpen), () => refreshChats(false));
               }}
               deleteChatFromDB={deleteChat}
               setChatTitle={setChatTitle}

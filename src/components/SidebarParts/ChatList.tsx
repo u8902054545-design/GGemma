@@ -1,12 +1,7 @@
 import React from 'react';
 import '@material/web/progress/circular-progress.js';
 import { useLanguage } from '../../hooks/useLanguage';
-
-interface Chat {
-  id: string;
-  title: string;
-  is_pinned: boolean;
-}
+import { Chat } from '../../hooks/chatTypes';
 
 interface ChatListProps {
   chats: Chat[];

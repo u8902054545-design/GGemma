@@ -1,11 +1,12 @@
 import React from 'react';
 import { Drawer } from 'vaul';
 import { useLanguage } from '../../hooks/useLanguage';
+import { Chat } from '../../hooks/chatTypes';
 
 interface SidebarMenuProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  selectedChat: any;
+  selectedChat: Chat | null;
   onPin: () => void;
   onRename: () => void;
   onDelete: () => void;

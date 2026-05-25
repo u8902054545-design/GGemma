@@ -1,6 +1,6 @@
-import { Variants } from 'motion/react';
+import { Variants, Easing } from 'motion/react';
 
-export const mdEasing = {
+export const mdEasing: Record<string, Easing> = {
   standard: [0.2, 0.0, 0, 1.0],
   emphasized: [0.2, 0.0, 0, 1.0],
   decelerate: [0.0, 0.0, 0, 1.0],

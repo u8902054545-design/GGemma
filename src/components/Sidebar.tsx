@@ -7,19 +7,12 @@ import { renameChat, togglePinChat } from './chatHeaderFunctions';
 import { ChatList } from './SidebarParts/ChatList';
 import { SidebarMenu } from './SidebarParts/SidebarMenu';
 import { useLanguage } from '../hooks/useLanguage';
+import { Chat } from '../hooks/chatTypes';
 
 const backdropVariants = {
   closed: { opacity: 0 },
   open: { opacity: 1 }
 };
-
-interface Chat {
-  id: string;
-  title: string;
-  created_at: string;
-  user_id: string;
-  is_pinned: boolean;
-}
 
 interface SidebarProps {
   isOpen: boolean;

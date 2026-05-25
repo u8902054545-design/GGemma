@@ -13,16 +13,6 @@ interface GemmaBottomSheetProps {
   models: SelectedModel[];
 }
 
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      'md-list': any;
-      'md-list-item': any;
-      'md-divider': any;
-    }
-  }
-}
-
 export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
   isOpen,
   onOpenChange,

@@ -5,5 +5,5 @@ export type ChatMessageProps = {
   isGenerating?: boolean;
   messageId?: string;
   feedback?: 'like' | 'dislike' | null;
-  onFeedback?: (id: string, type: 'like' | 'dislike') => void;
+  onFeedback?: (id: string, type: 'like' | 'dislike' | null) => void;
 };

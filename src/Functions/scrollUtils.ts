@@ -1,7 +1,7 @@
 import { RefObject } from 'react';
 
 export const handleScrollLogic = (
-  scrollContainerRef: RefObject<HTMLDivElement>,
+  scrollContainerRef: RefObject<HTMLDivElement | null>,
   setShowScrollButton: (show: boolean) => void
 ) => {
   if (scrollContainerRef.current) {
@@ -12,7 +12,7 @@ export const handleScrollLogic = (
 };
 
 export const scrollToBottomInstant = (
-  messagesEndRef: RefObject<HTMLDivElement>
+  messagesEndRef: RefObject<HTMLDivElement | null>
 ) => {
   messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
 };

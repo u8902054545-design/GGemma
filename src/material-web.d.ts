@@ -1,6 +1,6 @@
-import * as React from 'react';
+import 'react';
 
-declare global {
+declare module 'react' {
   namespace JSX {
     interface IntrinsicElements {
       'md-filled-button': any;
@@ -24,6 +24,14 @@ declare global {
       'md-secondary-tab': any;
       'md-fab': any;
       'md-icon': any;
+      'md-chip-set': any;
+      'md-assist-chip': any;
+      'md-filter-chip': any;
+      'md-input-chip': any;
+      'md-suggestion-chip': any;
+      'md-slider': any;
+      'md-menu': any;
+      'md-menu-item': any;
     }
   }
 }

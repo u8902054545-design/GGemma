@@ -3,7 +3,7 @@ import React from 'react';
 interface AddActionProps {
   onAddClick: () => void;
   isImageDisabled: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement>;
+  fileInputRef: React.RefObject<HTMLInputElement | null>;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 

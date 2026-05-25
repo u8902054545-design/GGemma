@@ -8,7 +8,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 interface InputAreaProps {
   input: string;
   setInput: (value: string) => void;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
+  textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   onKeyDown: (e: React.KeyboardEvent) => void;
   previewUrl: string | null;
   clearSelection: () => void;
