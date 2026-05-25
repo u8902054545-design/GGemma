@@ -3,15 +3,11 @@ import React from 'react';
 interface AddActionProps {
   onAddClick: () => void;
   isImageDisabled: boolean;
-  fileInputRef: React.RefObject<HTMLInputElement | null>;
-  onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export const AddAction: React.FC<AddActionProps> = ({ 
   onAddClick, 
-  isImageDisabled, 
-  fileInputRef, 
-  onFileChange 
+  isImageDisabled
 }) => {
   return (
     <div className="flex-shrink-0">
@@ -31,13 +27,6 @@ export const AddAction: React.FC<AddActionProps> = ({
           {isImageDisabled ? 'attach_file_off' : 'add'}
         </span>
       </button>
-      <input
-        type="file"
-        ref={fileInputRef}
-        onChange={onFileChange}
-        accept="image/*"
-        className="hidden"
-      />
     </div>
   );
 };

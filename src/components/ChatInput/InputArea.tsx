@@ -50,41 +50,23 @@ export const InputArea: React.FC<InputAreaProps> = ({
         </div>
       )}
 
-      <div className="flex items-end w-full px-2">
-        <div className="flex items-center pb-2 pl-2">
-          <motion.button
-            type="button"
-            onClick={!isSearchDisabled ? onSearchClick : undefined}
-            variants={searchButtonVariants}
-            initial="inactive"
-            animate={isSearchActive ? "active" : "inactive"}
-            disabled={isSearchDisabled}
-            className={`relative flex items-center h-9 px-3.5 overflow-hidden rounded-full group transition-all ${
-              isSearchDisabled 
-                ? "cursor-not-allowed opacity-40" 
-                : isSearchActive
-                ? "bg-[var(--md-sys-color-primary)]/20 ring-1 ring-[var(--md-sys-color-primary)]/30"
-                : "hover:bg-[var(--md-sys-color-on-surface-variant)]/10"
-            }`}
+      <AnimatePresence>
+        {isSearchActive && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            className="px-5 overflow-hidden"
           >
-            <span className={`material-symbols-outlined text-[20px] shrink-0 transition-colors ${
-              isSearchActive ? "text-[var(--md-sys-color-primary)]" : "text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-on-surface)]"
-            }`}>
-              {isSearchDisabled ? 'search_off' : 'search'}
-            </span>
-            <motion.span
-              variants={searchTextVariants}
-              initial="hidden"
-              animate={isSearchActive ? "visible" : "hidden"}
-              className={`text-sm font-medium whitespace-nowrap overflow-hidden ml-2 ${
-                isSearchActive ? "text-[var(--md-sys-color-primary)]" : "text-[var(--md-sys-color-on-surface-variant)]"
-              }`}
-            >
-              {t('chat.search.button')}
-            </motion.span>
-          </motion.button>
-        </div>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--md-sys-color-primary-container)] border border-[var(--md-sys-color-primary)]/20 shadow-sm">
+               <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-primary)]">search</span>
+               <span className="text-[13px] font-medium text-[var(--md-sys-color-on-primary-container)]">{t('chat.add.search')}</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
+      <div className="flex items-end w-full px-2">
         <textarea
           ref={textareaRef}
           value={input}

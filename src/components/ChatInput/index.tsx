@@ -4,6 +4,7 @@ import { ChatInputProps } from './types';
 import { AddAction } from './AddAction';
 import { InputArea } from './InputArea';
 import { SendAction } from './SendAction';
+import { AddBottomSheet } from './AddBottomSheet';
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
   input, setInput, handleSend, stopRequest,
@@ -15,7 +16,9 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
   const [isListening, setIsListening] = useState(false);
+  const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const recognitionRef = useRef<any>(null);
 
   const isImageDisabled = selectedModel.id === 'Gemma 2 27B' || selectedModel.id === 'Gemma 3n E4B';
@@ -49,17 +52,25 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   };
 
   const handleAddClick = () => {
+    setIsBottomSheetOpen(true);
+  };
+
+  const handlePhotoClick = () => {
     if (isImageDisabled) return;
     fileInputRef.current?.click();
+  };
+
+  const handleCameraClick = () => {
+    if (isImageDisabled) return;
+    cameraInputRef.current?.click();
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       onFileSelect(file);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      if (cameraInputRef.current) cameraInputRef.current.value = '';
     }
   };
 
@@ -105,8 +116,6 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         <AddAction 
           onAddClick={handleAddClick}
           isImageDisabled={isImageDisabled}
-          fileInputRef={fileInputRef}
-          onFileChange={handleFileChange}
         />
 
         <InputArea 
@@ -131,6 +140,31 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
           isSendDisabled={isSendDisabled}
         />
       </div>
+
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        className="hidden"
+      />
+      <input
+        type="file"
+        ref={cameraInputRef}
+        onChange={handleFileChange}
+        accept="image/*"
+        capture="environment"
+        className="hidden"
+      />
+
+      <AddBottomSheet 
+        isOpen={isBottomSheetOpen}
+        onClose={() => setIsBottomSheetOpen(false)}
+        onPhotoClick={handlePhotoClick}
+        onCameraClick={handleCameraClick}
+        isSearchActive={isSearchActive}
+        onSearchToggle={onSearchClick || (() => {})}
+      />
     </footer>
   );
 };
