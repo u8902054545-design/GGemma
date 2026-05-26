@@ -315,5 +315,13 @@ export const translations: Translations = {
   'temp.export.confirm.accept': {
     en: 'I accept',
     ru: 'Принимаю',
+  },
+  'message.generation_details.title': {
+    en: 'Generation Details',
+    ru: 'Детали генерации',
+  },
+  'message.generation_details.description': {
+    en: 'The response uses a model "{model}"',
+    ru: 'В ответе используется модель "{model}"',
   }
 };

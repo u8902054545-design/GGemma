@@ -11,6 +11,10 @@ interface MessageActionsProps {
   content: string;
   copiedText: string | null;
   isLast: boolean | undefined;
+  onSpeech: () => void;
+  isSpeaking: boolean;
+  isSpeechLoading?: boolean;
+  onShowDetails: () => void;
 }
 
 export const MessageActions: React.FC<MessageActionsProps> = ({
@@ -20,7 +24,11 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   handleCopy,
   content,
   copiedText,
-  isLast
+  isLast,
+  onSpeech,
+  isSpeaking,
+  isSpeechLoading,
+  onShowDetails
 }) => {
   const { t } = useLanguage();
 
@@ -31,7 +39,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
       transition={{ duration: mdDuration.medium4, ease: mdEasing.standard }}
       className="mt-4 flex flex-col gap-3 w-full select-none"
     >
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1 w-full">
         {!isTemporary && (
           <>
             <button
@@ -62,6 +70,35 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
         >
           <span className="material-symbols-outlined text-[20px]">
             {copiedText === content ? 'check' : 'content_copy'}
+          </span>
+        </button>
+
+        <button
+          onClick={onShowDetails}
+          className="p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] transition-colors cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-[20px]">
+            more_horiz
+          </span>
+        </button>
+
+        <button
+          onClick={onSpeech}
+          disabled={isSpeechLoading}
+          className={`ml-auto p-2 rounded-full transition-all duration-200 cursor-pointer flex items-center justify-center relative ${
+            isSpeaking
+              ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-md scale-105'
+              : 'hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)]'
+          } ${isSpeechLoading ? 'opacity-80' : ''}`}
+          title={isSpeaking ? "Stop" : "Listen"}
+        >
+          {isSpeechLoading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+               <md-circular-progress indeterminate style={{ '--md-circular-progress-size': '36px', '--md-circular-progress-active-indicator-width': '3' }}></md-circular-progress>
+            </div>
+          )}
+          <span className="material-symbols-outlined text-[20px]">
+            {isSpeaking ? 'pause' : 'volume_up'}
           </span>
         </button>
       </div>

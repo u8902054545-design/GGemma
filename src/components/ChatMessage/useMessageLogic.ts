@@ -26,7 +26,7 @@ export const useMessageLogic = (
     return { thought: null, mainContent: content.trim() };
   }, [content]);
 
-  const { speak, isSpeaking } = useSpeech(content, modelName);
+  const { speak, isSpeaking, isLoading } = useSpeech(content, modelName);
 
   const shouldShowExpandButton = useMemo(() => {
     return mainContent.length > 1000;
@@ -57,6 +57,7 @@ export const useMessageLogic = (
     localFeedback,
     handleFeedback,
     handleSpeech: speak,
-    isSpeaking
+    isSpeaking,
+    isLoading
   };
 };

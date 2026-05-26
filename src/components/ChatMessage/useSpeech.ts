@@ -10,18 +10,20 @@ export const setAudioBufferCache = (key: string, buffer: ArrayBuffer) => {
 
 export const useSpeech = (text: string, modelName?: string) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { playPcmBuffer, stop: stopPcm, isPlaying: isPcmPlaying } = useVoicePlayer();
 
   const stop = useCallback(() => {
     window.speechSynthesis.cancel();
     stopPcm();
     setIsSpeaking(false);
+    setIsLoading(false);
   }, [stopPcm]);
 
   const speak = useCallback(async () => {
     if (!text) return;
 
-    if (isSpeaking || isPcmPlaying) {
+    if (isSpeaking || isPcmPlaying || isLoading) {
       stop();
       return;
     }
@@ -34,7 +36,7 @@ export const useSpeech = (text: string, modelName?: string) => {
       return;
     }
 
-    setIsSpeaking(true);
+    setIsLoading(true);
 
     try {
       const selectedVoice = localStorage.getItem('selected_voice') || 'Zephyr';
@@ -59,21 +61,25 @@ export const useSpeech = (text: string, modelName?: string) => {
 
       const audioData = await response.arrayBuffer();
       audioBufferCache[trimmedText] = audioData;
+      setIsLoading(false);
+      setIsSpeaking(true);
       await playPcmBuffer(audioData);
 
     } catch (error) {
       console.error('TTS Error, falling back to Web Speech API', error);
+      setIsLoading(false);
 
       const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
       const russianVoice = voices.find(voice => voice.lang.includes('ru-RU'));
       if (russianVoice) utterance.voice = russianVoice;
 
+      utterance.onstart = () => setIsSpeaking(true);
       utterance.onend = () => setIsSpeaking(false);
       utterance.onerror = () => setIsSpeaking(false);
       window.speechSynthesis.speak(utterance);
     }
-  }, [text, modelName, isSpeaking, isPcmPlaying, stop, playPcmBuffer]);
+  }, [text, modelName, isSpeaking, isPcmPlaying, isLoading, stop, playPcmBuffer]);
 
   useEffect(() => {
     setIsSpeaking(isPcmPlaying);
@@ -86,5 +92,5 @@ export const useSpeech = (text: string, modelName?: string) => {
     };
   }, [stopPcm]);
 
-  return { speak, stop, isSpeaking };
+  return { speak, stop, isSpeaking, isLoading };
 };

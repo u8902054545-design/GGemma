@@ -7,6 +7,7 @@ import { useMessageLogic } from './useMessageLogic';
 import { ChatMessageHeader } from './ChatMessageHeader';
 import { MarkdownContent } from './MarkdownContent';
 import { MessageActions } from './MessageActions';
+import { GenerationDetails } from './GenerationDetails';
 import { useLanguage } from '../../hooks/useLanguage';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
@@ -30,6 +31,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   isTemporary = false
 }) => {
   const { t } = useLanguage();
+  const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
   const isStopped = content.includes('_STOPPED_');
   const cleanContent = content.replace('_STOPPED_', '');
@@ -47,7 +49,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
     localFeedback,
     handleFeedback,
     handleSpeech,
-    isSpeaking
+    isSpeaking,
+    isLoading
   } = useMessageLogic(cleanContent, messageId, feedback, onFeedback);
 
   const canShowExpand = !isAI && shouldShowExpandButton;
@@ -70,10 +73,6 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           hasThought={!!thought}
           isExpanded={isThoughtExpanded}
           onToggleThought={() => setIsThoughtExpanded(!isThoughtExpanded)}
-          onSpeech={handleSpeech}
-          isSpeaking={isSpeaking}
-          modelName={modelName}
-          isGenerating={isGenerating}
         />
       )}
 
@@ -163,15 +162,26 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
         )}
 
         {isAI && !isGenerating && mainContent && (
-          <MessageActions
-            isTemporary={isTemporary}
-            localFeedback={localFeedback}
-            handleFeedback={handleFeedback}
-            handleCopy={handleCopy}
-            content={mainContent}
-            copiedText={copiedText}
-            isLast={isLast}
-          />
+          <>
+            <MessageActions
+              isTemporary={isTemporary}
+              localFeedback={localFeedback}
+              handleFeedback={handleFeedback}
+              handleCopy={handleCopy}
+              content={mainContent}
+              copiedText={copiedText}
+              isLast={isLast}
+              onSpeech={handleSpeech}
+              isSpeaking={isSpeaking}
+              isSpeechLoading={isLoading}
+              onShowDetails={() => setIsDetailsOpen(true)}
+            />
+            <GenerationDetails
+              isOpen={isDetailsOpen}
+              onOpenChange={setIsDetailsOpen}
+              modelName={modelName}
+            />
+          </>
         )}
       </div>
     </motion.div>
