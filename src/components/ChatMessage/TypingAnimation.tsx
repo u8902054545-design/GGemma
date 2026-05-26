@@ -9,14 +9,15 @@ export const TypingAnimation: React.FC = () => {
         <motion.div
           className="absolute inset-0 rounded-full"
           style={{
-            padding: '2.5px',
+            padding: '2px',
             background: 'linear-gradient(90deg, #446eff, #2e96ff, #b1c5ff, #446eff)',
             backgroundSize: '200% 100%',
-            boxShadow: '0 0 15px rgba(68, 110, 255, 0.2)',
+            boxShadow: '0 0 12px rgba(68, 110, 255, 0.3)',
           }}
           animate={{
             backgroundPosition: ['0% 0%', '200% 0%'],
-            opacity: [0.7, 1, 0.7],
+            opacity: [0.6, 1, 0.6],
+            filter: ['brightness(1) blur(0.5px)', 'brightness(1.3) blur(1px)', 'brightness(1) blur(0.5px)'],
           }}
           transition={{
             backgroundPosition: {
@@ -28,21 +29,26 @@ export const TypingAnimation: React.FC = () => {
               duration: 2,
               repeat: Infinity,
               ease: "easeInOut"
+            },
+            filter: {
+              duration: 2,
+              repeat: Infinity,
+              ease: "easeInOut"
             }
           }}
         >
-          {/* Inner hole matches theme background surface */}
-          <div className="w-full h-full rounded-full bg-[var(--md-sys-color-surface-container-lowest)]" />
+          {/* Inner hole matches theme background */}
+          <div className="w-full h-full rounded-full bg-[var(--md-sys-color-background)]" />
         </motion.div>
 
-        {/* Dots optimized for both themes: Primary color in light, White in dark */}
+        {/* Dots: Black in light theme, White in dark theme */}
         <div className="relative flex gap-1.5 items-center justify-center z-10">
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="w-1 h-1 rounded-full bg-[var(--md-sys-color-primary)] dark:bg-white"
+              className="w-1 h-1 rounded-full bg-black dark:bg-white"
               style={{
-                boxShadow: '0 0 4px rgba(68, 110, 255, 0.2)'
+                boxShadow: '0 0 4px rgba(0, 0, 0, 0.1) dark:rgba(255, 255, 255, 0.4)'
               }}
             />
           ))}
