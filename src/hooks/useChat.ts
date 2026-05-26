@@ -13,6 +13,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
   const [selectedModel, setSelectedModel] = useState(MODELS[0]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [chatId, setChatId] = useState<string>(() => crypto.randomUUID());
   const [chatTitle, setChatTitle] = useState('');
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -26,7 +27,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
   const { loadChatMessages } = useChatLoader(
     setMessages,
     setChatId,
-    setIsTyping,
+    setIsLoading,
     setSnackbarMessage,
     setIsSnackbarOpen,
     scrollToBottom
@@ -107,6 +108,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
     isDropdownOpen,
     setIsDropdownOpen,
     isTyping,
+    isLoading,
     messagesEndRef,
     scrollToBottom,
     handleSend,

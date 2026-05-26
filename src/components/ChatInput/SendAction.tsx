@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
+import '@material/web/icon/icon.js';
 
 interface SendActionProps {
   isTyping: boolean;
@@ -25,15 +26,10 @@ export const SendAction: React.FC<SendActionProps> = ({
             exit={{ scale: 0.8, opacity: 0 }}
             type="button"
             onClick={stopRequest}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:brightness-125 active:scale-95 shadow-xl"
-            style={{ backgroundColor: '#0f0f0f' }}
+            className="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:brightness-110 active:scale-95 shadow-xl"
+            style={{ backgroundColor: 'var(--md-sys-color-primary-container)' }}
           >
-            <span 
-              className="material-symbols-outlined text-[26px]" 
-              style={{ color: 'var(--gemma-blue-bright)', fontVariationSettings: "'FILL' 1" }}
-            >
-              stop_circle
-            </span>
+            <md-icon style={{ color: 'var(--md-sys-color-on-primary-container)' }}>stop</md-icon>
           </motion.button>
         ) : (
           <motion.button
@@ -50,8 +46,8 @@ export const SendAction: React.FC<SendActionProps> = ({
                 : "hover:brightness-110 active:scale-95"
             }`}
             style={{ 
-              backgroundColor: isSendDisabled ? '#0f0f0f' : 'var(--md-sys-color-primary)',
-              color: isSendDisabled ? '#9aa0a6' : 'var(--md-sys-color-on-primary)'
+              backgroundColor: isSendDisabled ? '#0f0f0f' : 'var(--md-sys-color-primary-container)',
+              color: isSendDisabled ? '#9aa0a6' : 'var(--md-sys-color-on-primary-container)'
             }}
           >
             <span className={`material-symbols-outlined text-[26px] ${

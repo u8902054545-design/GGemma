@@ -40,7 +40,7 @@ export default function App() {
 
   const {
     messages, setMessages, input, setInput, selectedModel, setSelectedModel,
-    isTyping, messagesEndRef, handleSend, handleFeedback, chatId, setChatId,
+    isTyping, isLoading, messagesEndRef, handleSend, handleFeedback, chatId, setChatId,
     chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
     isSnackbarOpen, setIsSnackbarOpen, models
   } = useChat(() => refreshChats(true), isTemporary);
@@ -146,7 +146,7 @@ export default function App() {
               <div className="flex-1 relative overflow-hidden flex flex-col">
                 <ChatArea
                   messages={messages}
-                  isTyping={isTyping}
+                  isTyping={isTyping || isLoading}
                   isTemporary={isTemporary}
                   user={user}
                   scrollContainerRef={scrollContainerRef}

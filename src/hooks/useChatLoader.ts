@@ -4,7 +4,7 @@ import { Message } from './chatTypes';
 export const useChatLoader = (
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
   setChatId: (id: string) => void,
-  setIsTyping: (loading: boolean) => void,
+  setIsLoading: (loading: boolean) => void,
   setSnackbarMessage: (msg: string) => void,
   setIsSnackbarOpen: (open: boolean) => void,
   scrollToBottom: () => void
@@ -12,7 +12,7 @@ export const useChatLoader = (
   const loadChatMessages = async (id: string) => {
     try {
       setMessages([{ id: 'loading-skeleton', role: 'ai', content: '' }]);
-      setIsTyping(true);
+      setIsLoading(true);
       setChatId(id);
 
       const { data: { session } } = await supabase.auth.getSession();
@@ -46,7 +46,7 @@ export const useChatLoader = (
       setSnackbarMessage('Error loading messages');
       setIsSnackbarOpen(true);
     } finally {
-      setIsTyping(false);
+      setIsLoading(false);
     }
   };
 
