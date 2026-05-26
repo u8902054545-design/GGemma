@@ -2,7 +2,7 @@ import React from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { ChatMessage } from './ChatMessage';
 import { TemporaryChatPage } from '../TemporaryChat/TemporaryChatPage';
-import { StartScreen } from './StartScreen';
+import { StartScreen } from './MainScreen/StartScreen';
 import { pageVariants } from '../motion/transitions';
 
 interface ChatAreaProps {
@@ -44,7 +44,6 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
           >
             <StartScreen
               userName={user.user_metadata?.full_name || user.email}
-              onSelectSuggestion={(text) => handleSend(text, isSearchActive)}
             />
           </motion.div>
         ) : (
