@@ -1,7 +1,7 @@
 import React from 'react';
-import '@material/web/progress/circular-progress.js';
 import { useLanguage } from '../../hooks/useLanguage';
 import { Chat } from '../../hooks/chatTypes';
+import { GemmaSkeleton } from '../GemmaSkeleton';
 
 interface ChatListProps {
   chats: Chat[];
@@ -24,8 +24,8 @@ export const ChatList: React.FC<ChatListProps> = ({
 
   if (loading) {
     return (
-      <div className="flex justify-center py-10">
-        <md-circular-progress indeterminate style={{ '--md-circular-progress-size': '32px' }} />
+      <div className="flex flex-col gap-3 px-4 py-4">
+        <GemmaSkeleton />
       </div>
     );
   }

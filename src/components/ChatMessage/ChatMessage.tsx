@@ -1,6 +1,6 @@
 import React, { memo } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { GemmaSkeleton } from '../GemmaSkeleton';
+import { TypingAnimation } from './TypingAnimation';
 import { mdEasing, mdDuration } from '../../motion/transitions';
 import { ChatMessageProps } from './types';
 import { useMessageLogic } from './useMessageLogic';
@@ -115,7 +115,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           <div className={`text-[16px] leading-relaxed markdown-content select-text`}>
             {isAI && isGenerating && !mainContent ? (
               <div className="min-h-[40px] flex items-center">
-                <GemmaSkeleton />
+                <TypingAnimation />
               </div>
             ) : (
               <MarkdownContent
