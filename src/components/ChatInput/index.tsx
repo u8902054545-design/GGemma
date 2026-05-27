@@ -5,6 +5,8 @@ import { AddAction } from './AddAction';
 import { InputArea } from './InputArea';
 import { SendAction } from './SendAction';
 import { AddBottomSheet } from './AddBottomSheet';
+import { VideoPreview } from '../VideoPreview';
+import { AnimatePresence } from 'motion/react';
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
   input, setInput, handleSend, stopRequest,
@@ -17,11 +19,14 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
   const [isListening, setIsListening] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
   const recognitionRef = useRef<any>(null);
 
   const isImageDisabled = selectedModel.id === 'Gemma 2 27B' || selectedModel.id === 'Gemma 3n E4B';
+  const isVideoDisabled = !(selectedModel.id === 'Gemma 4 31B' || selectedModel.id === 'Gemma 4 26B');
   const isSearchDisabled = false;
 
   const { 
@@ -65,12 +70,26 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
     cameraInputRef.current?.click();
   };
 
+  const handleVideoClick = () => {
+    if (isVideoDisabled) return;
+    videoInputRef.current?.click();
+  };
+
+  const handleMediaClick = (url: string) => {
+    if (selectedFile?.type.startsWith('video/')) {
+      setPreviewVideoUrl(url);
+    } else {
+      onImageClick?.(url);
+    }
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       onFileSelect(file);
       if (fileInputRef.current) fileInputRef.current.value = '';
       if (cameraInputRef.current) cameraInputRef.current.value = '';
+      if (videoInputRef.current) videoInputRef.current.value = '';
     }
   };
 
@@ -123,8 +142,9 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
           textareaRef={textareaRef}
           onKeyDown={onKeyDown}
           previewUrl={previewUrl}
+          selectedFile={selectedFile}
           clearSelection={clearSelection}
-          onImageClick={onImageClick}
+          onMediaClick={handleMediaClick}
           isSearchActive={isSearchActive}
           isSearchDisabled={isSearchDisabled}
           onSearchClick={onSearchClick}
@@ -155,16 +175,34 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         capture="environment"
         className="hidden"
       />
+      <input
+        type="file"
+        ref={videoInputRef}
+        onChange={handleFileChange}
+        accept="video/*"
+        className="hidden"
+      />
 
       <AddBottomSheet 
         isOpen={isBottomSheetOpen}
         onClose={() => setIsBottomSheetOpen(false)}
         onPhotoClick={handlePhotoClick}
         onCameraClick={handleCameraClick}
+        onVideoClick={handleVideoClick}
         isSearchActive={isSearchActive}
         onSearchToggle={onSearchClick || (() => {})}
         isImageDisabled={isImageDisabled}
+        isVideoDisabled={isVideoDisabled}
       />
+
+      <AnimatePresence>
+        {previewVideoUrl && (
+          <VideoPreview 
+            url={previewVideoUrl} 
+            onClose={() => setPreviewVideoUrl(null)} 
+          />
+        )}
+      </AnimatePresence>
     </footer>
   );
 };

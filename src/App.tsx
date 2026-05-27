@@ -20,6 +20,7 @@ import { SUPABASE_ENDPOINT, supabase } from './config';
 import { VoiceSelection } from './components/Settings/voiceSelection';
 import { ChatArea } from './components/ChatArea';
 import { GemmaBottomSheet } from './components/GemmaBottomSheet';
+import { VideoPreview } from './components/VideoPreview';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
 import { ThemeTransition } from './motion/ThemeTransition';
@@ -32,6 +33,7 @@ export default function App() {
   const [showScrollButton, setShowScrollButton] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
+  const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
   const [isTemporary, setIsTemporary] = useState(false);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
@@ -156,6 +158,7 @@ export default function App() {
                   handleFeedback={handleFeedback}
                   handleImagePreview={handleImagePreview}
                   setFullscreenImage={setFullscreenImage}
+                  onVideoClick={setPreviewVideoUrl}
                   messagesEndRef={messagesEndRef}
                 />
 
@@ -203,6 +206,14 @@ export default function App() {
           </AnimatePresence>
 
           <FullscreenImage src={fullscreenImage} isOpen={!!fullscreenImage} onClose={() => setFullscreenImage(null)} />
+          <AnimatePresence>
+            {previewVideoUrl && (
+              <VideoPreview 
+                url={previewVideoUrl} 
+                onClose={() => setPreviewVideoUrl(null)} 
+              />
+            )}
+          </AnimatePresence>
           <Snackbar message={snackbarMessage} isOpen={isSnackbarOpen} onClose={() => closeState(setIsSnackbarOpen)} />
         </>
       )}

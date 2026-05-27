@@ -17,12 +17,15 @@ interface ChatAreaProps {
   handleFeedback: (id: string, type: 'like' | 'dislike' | null) => void;
   handleImagePreview: (url: string, setFullscreenImage: (url: string | null) => void) => void;
   setFullscreenImage: (url: string | null) => void;
+  onVideoClick?: (url: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
 }
 
 export const ChatArea: React.FC<ChatAreaProps> = ({
   messages, isTyping, isTemporary, user, scrollContainerRef, handleScroll,
-  handleSend, isSearchActive, handleFeedback, handleImagePreview, setFullscreenImage, messagesEndRef
+  handleSend, isSearchActive, handleFeedback, handleImagePreview, setFullscreenImage, 
+  onVideoClick,
+  messagesEndRef
 }) => {
   return (
     <main
@@ -60,12 +63,14 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 role={msg.role}
                 content={msg.content}
                 imageUrl={msg.imageUrl}
+                videoUrl={msg.videoUrl}
                 modelName={msg.modelName}
                 feedback={msg.feedback}
                 onFeedback={handleFeedback}
                 isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
                 isLast={index === messages.length - 1}
                 onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
+                onVideoClick={onVideoClick}
                 isTemporary={isTemporary}
               />
             ))}

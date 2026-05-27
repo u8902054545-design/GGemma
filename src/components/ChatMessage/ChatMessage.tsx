@@ -13,14 +13,17 @@ import { useLanguage } from '../../hooks/useLanguage';
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
   onImageClick?: (url: string) => void;
+  onVideoClick?: (url: string) => void;
   isTemporary?: boolean;
   imageUrl?: string;
+  videoUrl?: string;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   role,
   content,
   imageUrl,
+  videoUrl,
   modelName,
   isGenerating,
   messageId,
@@ -28,6 +31,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   onFeedback,
   isLast,
   onImageClick,
+  onVideoClick,
   isTemporary = false
 }) => {
   const { t } = useLanguage();
@@ -58,6 +62,12 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   const handleImageClick = () => {
     if (imageUrl && onImageClick) {
       onImageClick(imageUrl);
+    }
+  };
+
+  const handleVideoClick = () => {
+    if (videoUrl && onVideoClick) {
+      onVideoClick(videoUrl);
     }
   };
 
@@ -109,6 +119,21 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
                 className="max-w-full h-auto object-contain max-h-[400px] rounded-lg"
                 onError={(e) => console.error("Image load error:", imageUrl)}
               />
+            </div>
+          )}
+
+          {videoUrl && (
+            <div
+              className="mb-3 overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-opacity relative group"
+              onClick={handleVideoClick}
+            >
+              <video
+                src={videoUrl}
+                className="max-w-full h-auto object-contain max-h-[400px] rounded-lg opacity-80"
+              />
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="material-symbols-outlined text-white text-[48px] bg-black/20 rounded-full p-2">play_circle</span>
+              </div>
             </div>
           )}
 

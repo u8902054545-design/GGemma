@@ -11,9 +11,11 @@ interface AddBottomSheetProps {
   onClose: () => void;
   onPhotoClick: () => void;
   onCameraClick: () => void;
+  onVideoClick: () => void;
   isSearchActive: boolean;
   onSearchToggle: () => void;
   isImageDisabled?: boolean;
+  isVideoDisabled?: boolean;
 }
 
 export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
@@ -21,9 +23,11 @@ export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
   onClose,
   onPhotoClick,
   onCameraClick,
+  onVideoClick,
   isSearchActive,
   onSearchToggle,
-  isImageDisabled = false
+  isImageDisabled = false,
+  isVideoDisabled = false
 }) => {
   const { t } = useLanguage();
 
@@ -68,6 +72,22 @@ export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
                 <div slot="headline">{t('chat.add.camera')}</div>
                 <md-icon slot="start">
                   {isImageDisabled ? 'no_photography' : 'photo_camera'}
+                </md-icon>
+              </md-list-item>
+
+              <md-list-item
+                type="button"
+                disabled={isVideoDisabled}
+                onClick={() => { onVideoClick(); onClose(); }}
+                style={{
+                  '--md-list-item-label-text-color': 'var(--md-sys-color-on-surface)',
+                  '--md-list-item-supporting-text-color': 'var(--md-sys-color-on-surface-variant)',
+                  'cursor': isVideoDisabled ? 'not-allowed' : 'pointer'
+                }}
+              >
+                <div slot="headline">{t('chat.add.video')}</div>
+                <md-icon slot="start">
+                  {isVideoDisabled ? 'videocam_off' : 'videocam'}
                 </md-icon>
               </md-list-item>
 

@@ -44,19 +44,25 @@ export const useChatSender = (
     const currentVoice = localStorage.getItem('selected_voice') || 'Zephyr';
 
     let base64Image = '';
-    let localImageUrl = '';
+    let base64Video = '';
+    let localMediaUrl = '';
 
     if (file) {
       const processed = await processImage(file);
-      base64Image = processed.base64;
-      localImageUrl = processed.localUrl;
+      if (file.type.startsWith('video/')) {
+        base64Video = processed.base64;
+      } else {
+        base64Image = processed.base64;
+      }
+      localMediaUrl = processed.localUrl;
     }
 
     const newUserMsg: Message = {
       id: crypto.randomUUID(),
       role: 'user',
       content: userText,
-      imageUrl: localImageUrl,
+      imageUrl: file && !file.type.startsWith('video/') ? localMediaUrl : undefined,
+      videoUrl: file && file.type.startsWith('video/') ? localMediaUrl : undefined,
       voice: currentVoice
     };
 
@@ -88,6 +94,7 @@ export const useChatSender = (
           chat_id: isTemporary ? `temp_${chatId}` : chatId,
           isSearchActive: isSearchActive,
           image: base64Image || null,
+          video: base64Video || null,
           isTemporary: isTemporary,
           history: isTemporary ? updatedMessages : undefined,
           voice: currentVoice

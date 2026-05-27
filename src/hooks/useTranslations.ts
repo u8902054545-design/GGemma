@@ -88,6 +88,10 @@ export const translations: Translations = {
     en: 'Internet search',
     ru: 'Поиск в интернете',
   },
+  'chat.add.video': {
+    en: 'Video',
+    ru: 'Видео',
+  },
   'chat.temporary.desc': {
     en: "Temporary chats aren't saved to your history, and won't be used to train our models. They are deleted as soon as you close them.",
     ru: 'Временные чаты не сохраняются в истории и не используются для обучения моделей. Они удаляются сразу после закрытия.',

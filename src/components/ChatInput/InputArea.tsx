@@ -11,8 +11,9 @@ interface InputAreaProps {
   textareaRef: React.RefObject<HTMLTextAreaElement | null>;
   onKeyDown: (e: React.KeyboardEvent) => void;
   previewUrl: string | null;
+  selectedFile: File | null;
   clearSelection: () => void;
-  onImageClick?: (url: string) => void;
+  onMediaClick?: (url: string) => void;
   isSearchActive: boolean;
   isSearchDisabled: boolean;
   onSearchClick?: () => void;
@@ -26,8 +27,9 @@ export const InputArea: React.FC<InputAreaProps> = ({
   textareaRef,
   onKeyDown,
   previewUrl,
+  selectedFile,
   clearSelection,
-  onImageClick,
+  onMediaClick,
   isSearchActive,
   isSearchDisabled,
   onSearchClick,
@@ -35,6 +37,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
   toggleListening,
 }) => {
   const { t } = useLanguage();
+  const mediaType = selectedFile?.type.startsWith('video/') ? 'video' : 'image';
 
   return (
     <div 
@@ -45,7 +48,8 @@ export const InputArea: React.FC<InputAreaProps> = ({
           <ImagePreview 
             url={previewUrl} 
             onRemove={clearSelection}
-            onImageClick={onImageClick}
+            onMediaClick={onMediaClick}
+            type={mediaType}
           />
         </div>
       )}

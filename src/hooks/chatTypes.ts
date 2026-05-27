@@ -16,6 +16,7 @@ export type Message = {
   role: 'user' | 'ai';
   content: string;
   imageUrl?: string;
+  videoUrl?: string;
   modelName?: string;
   feedback?: 'like' | 'dislike' | null;
   voice?: string;
