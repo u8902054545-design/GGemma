@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import { motion } from 'motion/react';
 
 interface VideoPreviewProps {
   url: string;
@@ -35,7 +35,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ url, onClose }) => {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
     };
-  }, []);
+  }, [url]);
 
   return (
     <motion.div
@@ -53,10 +53,10 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ url, onClose }) => {
           ref={videoRef}
           src={url}
           className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl"
+          controls
           playsInline
         />
 
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute -top-12 right-0 md:-right-12 w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center backdrop-blur-md transition-colors"
@@ -64,7 +64,6 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ url, onClose }) => {
           <span className="material-symbols-outlined text-white">close</span>
         </button>
 
-        {/* Play/Pause Button Container */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <button
             onClick={togglePlay}

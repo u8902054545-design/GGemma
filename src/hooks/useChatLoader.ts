@@ -36,7 +36,8 @@ export const useChatLoader = (
         content: m.content,
         feedback: m.feedback,
         modelName: m.model_name,
-        imageUrl: m.image_url
+        imageUrl: m.image_url,
+        videoUrl: m.video_url
       }));
 
       setMessages(formattedMessages);
