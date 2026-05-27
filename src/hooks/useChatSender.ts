@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { SUPABASE_ENDPOINT, supabase } from '../config';
-import { Message } from './chatTypes';
+import { Message, ImportedCode } from './chatTypes';
 import { saveTempMessages } from '../TemporaryChat/temporaryStorage';
 import { processImage, updateChatTitle } from './useChatSenderUtils';
 
@@ -26,9 +26,14 @@ export const useChatSender = (
   setChatTitle?: (title: string) => void,
   isTemporary: boolean = false
 ) => {
-  const handleSend = useCallback(async (overrideInput?: string, isSearchActive: boolean = false, file?: File) => {
+  const handleSend = useCallback(async (
+    overrideInput?: string, 
+    isSearchActive: boolean = false, 
+    file?: File,
+    codes?: ImportedCode[]
+  ) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
-    if ((!textToSend.trim() && !file) || isTyping) return;
+    if ((!textToSend.trim() && !file && (!codes || codes.length === 0)) || isTyping) return;
 
     const { data: { session } } = await supabase.auth.getSession();
     const accessToken = session?.access_token;
@@ -63,6 +68,7 @@ export const useChatSender = (
       content: userText,
       imageUrl: file && !file.type.startsWith('video/') ? localMediaUrl : undefined,
       videoUrl: file && file.type.startsWith('video/') ? localMediaUrl : undefined,
+      codes: codes,
       voice: currentVoice
     };
 
@@ -95,6 +101,7 @@ export const useChatSender = (
           isSearchActive: isSearchActive,
           image: base64Image || null,
           video: base64Video || null,
+          codes: codes || null,
           isTemporary: isTemporary,
           history: isTemporary ? updatedMessages : undefined,
           voice: currentVoice

@@ -14,7 +14,10 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   isTyping,
   isSearchActive = false,
   onSearchClick,
+  onCodeImportClick,
   onImageClick,
+  importedCodes = [],
+  onRemoveCode,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -94,9 +97,9 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   };
 
   const handleWrappedSend = () => {
-    if (!input.trim() && !selectedFile) return;
+    if (!input.trim() && !selectedFile && importedCodes.length === 0) return;
     
-    handleSend(undefined, isSearchActive, selectedFile || undefined);
+    handleSend(undefined, isSearchActive, selectedFile || undefined, importedCodes);
     clearSelection();
   };
 
@@ -127,10 +130,31 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
     recognition.start();
   };
 
-  const isSendDisabled = !input.trim() && !selectedFile;
+  const isSendDisabled = !input.trim() && !selectedFile && importedCodes.length === 0;
 
   return (
     <footer className="w-full max-w-[1200px] mx-auto z-50 relative pb-8 px-2">
+      {importedCodes.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto pb-3 px-1 no-scrollbar mb-1 max-w-full">
+          {importedCodes.map((code) => (
+            <div 
+              key={code.id}
+              className="flex items-center gap-2 px-3 py-2 bg-[var(--md-sys-color-surface-container-high)] rounded-xl border border-[var(--md-sys-color-outline-variant)] flex-shrink-0 animate-in fade-in zoom-in duration-200"
+            >
+              <md-icon style={{ fontSize: '20px', color: 'var(--md-sys-color-primary)' }}>code</md-icon>
+              <span className="text-sm font-medium text-[var(--md-sys-color-on-surface)] truncate max-w-[150px]">
+                {code.filename}
+              </span>
+              <button 
+                onClick={() => onRemoveCode?.(code.id)}
+                className="ml-1 p-0.5 rounded-full hover:bg-[var(--md-sys-color-on-surface-variant)]/10 text-[var(--md-sys-color-on-surface-variant)] flex items-center justify-center"
+              >
+                <md-icon style={{ fontSize: '18px' }}>close</md-icon>
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
       <div className="flex items-end gap-3 justify-center">
         <AddAction 
           onAddClick={handleAddClick}
@@ -191,6 +215,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         onVideoClick={handleVideoClick}
         isSearchActive={isSearchActive}
         onSearchToggle={onSearchClick || (() => {})}
+        onCodeImportClick={onCodeImportClick || (() => {})}
         isImageDisabled={isImageDisabled}
         isVideoDisabled={isVideoDisabled}
       />

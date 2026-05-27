@@ -92,6 +92,26 @@ export const translations: Translations = {
     en: 'Video',
     ru: 'Видео',
   },
+  'chat.add.code': {
+    en: 'Import code',
+    ru: 'Импорт кода',
+  },
+  'chat.import.code': {
+    en: 'Import Code',
+    ru: 'Импорт кода',
+  },
+  'chat.import.button': {
+    en: 'Import',
+    ru: 'Импортировать',
+  },
+  'chat.import.filename': {
+    en: 'Filename',
+    ru: 'Название файла',
+  },
+  'chat.import.placeholder': {
+    en: 'Paste your code here...',
+    ru: 'Вставьте ваш код здесь...',
+  },
   'chat.temporary.desc': {
     en: "Temporary chats aren't saved to your history, and won't be used to train our models. They are deleted as soon as you close them.",
     ru: 'Временные чаты не сохраняются в истории и не используются для обучения моделей. Они удаляются сразу после закрытия.',

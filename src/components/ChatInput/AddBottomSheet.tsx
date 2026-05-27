@@ -14,6 +14,7 @@ interface AddBottomSheetProps {
   onVideoClick: () => void;
   isSearchActive: boolean;
   onSearchToggle: () => void;
+  onCodeImportClick: () => void;
   isImageDisabled?: boolean;
   isVideoDisabled?: boolean;
 }
@@ -26,6 +27,7 @@ export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
   onVideoClick,
   isSearchActive,
   onSearchToggle,
+  onCodeImportClick,
   isImageDisabled = false,
   isVideoDisabled = false
 }) => {
@@ -88,6 +90,21 @@ export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
                 <div slot="headline">{t('chat.add.video')}</div>
                 <md-icon slot="start">
                   {isVideoDisabled ? 'videocam_off' : 'videocam'}
+                </md-icon>
+              </md-list-item>
+
+              <md-list-item
+                type="button"
+                onClick={() => { onCodeImportClick(); onClose(); }}
+                style={{
+                  '--md-list-item-label-text-color': 'var(--md-sys-color-on-surface)',
+                  '--md-list-item-supporting-text-color': 'var(--md-sys-color-on-surface-variant)',
+                  'cursor': 'pointer'
+                }}
+              >
+                <div slot="headline">{t('chat.add.code') || 'Import code'}</div>
+                <md-icon slot="start">
+                  code
                 </md-icon>
               </md-list-item>
 

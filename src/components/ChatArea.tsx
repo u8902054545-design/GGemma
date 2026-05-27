@@ -64,6 +64,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 content={msg.content}
                 imageUrl={msg.imageUrl}
                 videoUrl={msg.videoUrl}
+                codes={msg.codes}
                 modelName={msg.modelName}
                 feedback={msg.feedback}
                 onFeedback={handleFeedback}

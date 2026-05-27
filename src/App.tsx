@@ -21,6 +21,7 @@ import { VoiceSelection } from './components/Settings/voiceSelection';
 import { ChatArea } from './components/ChatArea';
 import { GemmaBottomSheet } from './components/GemmaBottomSheet';
 import { VideoPreview } from './components/VideoPreview';
+import { CodeImportPage } from './components/CodeImport/CodeImportPage';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
 import { ThemeTransition } from './motion/ThemeTransition';
@@ -37,6 +38,8 @@ export default function App() {
   const [isTemporary, setIsTemporary] = useState(false);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
+  const [isCodeImportOpen, setIsCodeImportOpen] = useState(false);
+  const [importedCodes, setImportedCodes] = useState<any[]>([]);
   const { t, language, setLanguage } = useLanguage();
   const { theme, setTheme } = useTheme();
 
@@ -80,6 +83,32 @@ export default function App() {
     handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
     setIsTemporary(!isTemporary);
     if (isTemporary) clearTempMessages();
+  };
+
+  const handleImportCode = (filename: string, code: string) => {
+    const newCode = {
+      id: crypto.randomUUID(),
+      filename,
+      code
+    };
+    setImportedCodes(prev => [...prev, newCode]);
+    setIsCodeImportOpen(false);
+  };
+
+  const handleRemoveCode = (id: string) => {
+    setImportedCodes(prev => prev.filter(c => c.id !== id));
+  };
+
+  const handleCustomSend = async (text?: string, isSearch?: boolean, file?: File, codes?: any[]) => {
+    let finalInput = text || input;
+    
+    if (codes && codes.length > 0) {
+      const codesMarkdown = codes.map(c => `File: ${c.filename}\n\`\`\`\n${c.code}\n\`\`\``).join('\n\n');
+      finalInput = finalInput ? `${finalInput}\n\n${codesMarkdown}` : codesMarkdown;
+    }
+    
+    await handleSend(finalInput, isSearch, file);
+    setImportedCodes([]);
   };
 
   if (authLoading) return <div className="h-screen w-full bg-[var(--md-sys-color-background)]" />;
@@ -180,13 +209,16 @@ export default function App() {
               <ChatInput
                 input={input}
                 setInput={setInput}
-                handleSend={handleSend}
+                handleSend={handleCustomSend}
                 stopRequest={stopRequest}
                 selectedModel={selectedModel}
                 isTyping={isTyping}
                 isSearchActive={isSearchActive}
                 onSearchClick={toggleSearch}
+                onCodeImportClick={() => setIsCodeImportOpen(true)}
                 onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
+                importedCodes={importedCodes}
+                onRemoveCode={handleRemoveCode}
               />
             </div>
           </motion.div>
@@ -202,6 +234,15 @@ export default function App() {
           <AnimatePresence>
             {isVoiceSelectionOpen && (
               <VoiceSelection isOpen={isVoiceSelectionOpen} onClose={() => setIsVoiceSelectionOpen(false)} />
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {isCodeImportOpen && (
+              <CodeImportPage 
+                onClose={() => setIsCodeImportOpen(false)} 
+                onImport={handleImportCode}
+              />
             )}
           </AnimatePresence>
 

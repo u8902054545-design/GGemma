@@ -2,7 +2,6 @@ import React from 'react';
 
 interface AddActionProps {
   onAddClick: () => void;
-  isImageDisabled: boolean;
 }
 
 export const AddAction: React.FC<AddActionProps> = ({ 

@@ -8,7 +8,9 @@ import { ChatMessageHeader } from './ChatMessageHeader';
 import { MarkdownContent } from './MarkdownContent';
 import { MessageActions } from './MessageActions';
 import { GenerationDetails } from './GenerationDetails';
+import { CodeBlock } from './CodeBlock';
 import { useLanguage } from '../../hooks/useLanguage';
+import { ImportedCode } from '../../hooks/chatTypes';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
@@ -17,6 +19,7 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   isTemporary?: boolean;
   imageUrl?: string;
   videoUrl?: string;
+  codes?: ImportedCode[];
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
@@ -24,6 +27,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   content,
   imageUrl,
   videoUrl,
+  codes,
   modelName,
   isGenerating,
   messageId,
@@ -149,6 +153,17 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
                 copiedText={copiedText}
                 handleCopy={handleCopy}
               />
+            )}
+
+            {codes && codes.length > 0 && (
+              <div className="mt-3 flex flex-wrap gap-2">
+                {codes.map((c, idx) => (
+                  <div key={c.id || idx} className="flex items-center gap-2 px-3 py-2 bg-[var(--md-sys-color-surface-container-highest)] rounded-xl border border-[var(--md-sys-color-outline-variant)] w-fit">
+                    <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-primary)]">code</span>
+                    <span className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] truncate max-w-[200px]">{c.filename}</span>
+                  </div>
+                ))}
+              </div>
             )}
             
             {isAI && isStopped && (

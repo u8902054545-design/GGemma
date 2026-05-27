@@ -11,12 +11,19 @@ export interface SelectedModel {
   name: string;
 }
 
+export interface ImportedCode {
+  id: string;
+  filename: string;
+  code: string;
+}
+
 export type Message = {
   id: string;
   role: 'user' | 'ai';
   content: string;
   imageUrl?: string;
   videoUrl?: string;
+  codes?: ImportedCode[];
   modelName?: string;
   feedback?: 'like' | 'dislike' | null;
   voice?: string;
