@@ -8,9 +8,11 @@ import { ChatMessageHeader } from './ChatMessageHeader';
 import { MarkdownContent } from './MarkdownContent';
 import { MessageActions } from './MessageActions';
 import { GenerationDetails } from './GenerationDetails';
-import { CodeBlock } from './CodeBlock';
-import { useLanguage } from '../../hooks/useLanguage';
 import { ImportedCode } from '../../hooks/chatTypes';
+import { MessageMedia } from './MessageMedia';
+import { StoppedIndicator } from './StoppedIndicator';
+import { ExpandButton } from './ExpandButton';
+import { ImportedCodes } from './ImportedCodes';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
@@ -38,7 +40,6 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   onVideoClick,
   isTemporary = false
 }) => {
-  const { t } = useLanguage();
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
   const isStopped = content.includes('_STOPPED_');
@@ -62,18 +63,6 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   } = useMessageLogic(cleanContent, messageId, feedback, onFeedback);
 
   const canShowExpand = !isAI && shouldShowExpandButton;
-
-  const handleImageClick = () => {
-    if (imageUrl && onImageClick) {
-      onImageClick(imageUrl);
-    }
-  };
-
-  const handleVideoClick = () => {
-    if (videoUrl && onVideoClick) {
-      onVideoClick(videoUrl);
-    }
-  };
 
   return (
     <motion.div
@@ -112,34 +101,12 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               : 'max-w-[85%] bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] px-5 py-3 rounded-[24px] rounded-tr-[4px] shadow-sm inline-block'
           } ${!isContentExpanded && canShowExpand ? 'max-h-[300px] overflow-hidden' : 'max-h-full'}`}
         >
-          {imageUrl && (
-            <div
-              className="mb-3 overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-opacity"
-              onClick={handleImageClick}
-            >
-              <img
-                src={imageUrl}
-                alt="Uploaded"
-                className="max-w-full h-auto object-contain max-h-[400px] rounded-lg"
-                onError={(e) => console.error("Image load error:", imageUrl)}
-              />
-            </div>
-          )}
-
-          {videoUrl && (
-            <div
-              className="mb-3 overflow-hidden rounded-lg cursor-pointer hover:opacity-90 transition-opacity relative group"
-              onClick={handleVideoClick}
-            >
-              <video
-                src={videoUrl}
-                className="max-w-full h-auto object-contain max-h-[400px] rounded-lg opacity-80"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <span className="material-symbols-outlined text-white text-[48px] bg-black/20 rounded-full p-2">play_circle</span>
-              </div>
-            </div>
-          )}
+          <MessageMedia 
+            imageUrl={imageUrl}
+            videoUrl={videoUrl}
+            onImageClick={() => imageUrl && onImageClick?.(imageUrl)}
+            onVideoClick={() => videoUrl && onVideoClick?.(videoUrl)}
+          />
 
           <div className={`text-[16px] leading-relaxed markdown-content select-text`}>
             {isAI && isGenerating && !mainContent ? (
@@ -155,31 +122,9 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               />
             )}
 
-            {codes && codes.length > 0 && (
-              <div className="mt-3 flex flex-wrap gap-2">
-                {codes.map((c, idx) => (
-                  <div key={c.id || idx} className="flex items-center gap-2 px-3 py-2 bg-[var(--md-sys-color-surface-container-highest)] rounded-xl border border-[var(--md-sys-color-outline-variant)] w-fit">
-                    <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-primary)]">code</span>
-                    <span className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] truncate max-w-[200px]">{c.filename}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            <ImportedCodes codes={codes || []} />
             
-            {isAI && isStopped && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="mt-4 flex items-center gap-2 px-3 py-2 rounded-lg bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)] w-fit select-none"
-              >
-                <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-primary)]">
-                  info
-                </span>
-                <span className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)]">
-                  {t('message.stopped')}
-                </span>
-              </motion.div>
-            )}
+            {isAI && isStopped && <StoppedIndicator />}
           </div>
 
           {!isContentExpanded && canShowExpand && (
@@ -188,17 +133,10 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
         </div>
 
         {canShowExpand && (
-          <button
-            onClick={() => setIsContentExpanded(!isContentExpanded)}
-            className="mt-2 flex items-center gap-1.5 px-3 py-1.5 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-primary)] transition-all cursor-pointer select-none"
-          >
-            <span className="material-symbols-outlined text-[20px]">
-              {isContentExpanded ? 'keyboard_control_key' : 'stat_minus_1'}
-            </span>
-            <span className="text-xs font-medium uppercase tracking-wider">
-              {isContentExpanded ? t('message.collapse') : t('message.expand')}
-            </span>
-          </button>
+          <ExpandButton 
+            isExpanded={isContentExpanded} 
+            onToggle={() => setIsContentExpanded(!isContentExpanded)} 
+          />
         )}
 
         {isAI && !isGenerating && mainContent && (

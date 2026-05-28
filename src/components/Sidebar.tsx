@@ -11,6 +11,9 @@ import { useLanguage } from '../hooks/useLanguage';
 import { Chat } from '../hooks/chatTypes';
 import { useAuth } from '../hooks/useAuth';
 import { ProfileDrawer } from './UserProfile';
+import { SidebarSearch } from './SidebarParts/SidebarSearch';
+import { NewChatButton } from './SidebarParts/NewChatButton';
+import { SidebarProfile } from './SidebarParts/SidebarProfile';
 import '@material/web/icon/icon.js';
 
 const backdropVariants = {
@@ -130,20 +133,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}
       >
         <div className="p-4 flex flex-col gap-4 mt-2">
-          <div onClick={() => setIsSearchOpen(true)} className="relative group cursor-pointer">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[var(--md-sys-color-on-surface-variant)] text-[20px]">search</span>
-            <div className="w-full bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] pl-10 pr-4 py-3 rounded-full text-sm flex items-center transition-colors group-hover:bg-[var(--md-sys-color-surface-container-highest)]">
-              {t('chat.search')}
-            </div>
-          </div>
+          <SidebarSearch onClick={() => setIsSearchOpen(true)} />
 
-          <button
-            onClick={() => { onNewChat(); onClose(); }}
-            className="flex items-center gap-3 px-4 py-3 bg-[var(--md-sys-color-primary-container)] hover:opacity-90 text-[var(--md-sys-color-on-primary-container)] rounded-2xl transition-all active:scale-[0.95]"
-          >
-            <span className="material-symbols-outlined text-[22px]">edit_square</span>
-            <span className="font-medium text-sm">{t('chat.new')}</span>
-          </button>
+          <NewChatButton onClick={() => { onNewChat(); onClose(); }} />
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 mt-2 custom-scrollbar min-h-0">
@@ -160,31 +152,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           />
         </div>
 
-        <div className="p-4 border-t border-[var(--md-sys-color-outline-variant)]/10 bg-[var(--md-sys-color-surface)] shrink-0">
-          <button 
-            onClick={() => {
-              onClose();
-              setTimeout(() => setIsProfileOpen(true), 200);
-            }}
-            className="w-full flex items-center gap-3 p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors group"
-          >
-            <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 border border-[var(--md-sys-color-outline-variant)]/20">
-              {userAvatar ? (
-                <img src={userAvatar} alt="Profile" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full bg-[var(--md-sys-color-primary)] flex items-center justify-center text-[var(--md-sys-color-on-primary)] text-xs">
-                  {userName?.charAt(0)}
-                </div>
-              )}
-            </div>
-            <span className="flex-1 text-sm font-medium text-[var(--md-sys-color-on-surface)] truncate text-left">
-              {userName}
-            </span>
-            <md-icon className="text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-on-surface)] transition-colors">
-              settings
-            </md-icon>
-          </button>
-        </div>
+        <SidebarProfile 
+          userAvatar={userAvatar}
+          userName={userName}
+          onClick={() => {
+            onClose();
+            setTimeout(() => setIsProfileOpen(true), 200);
+          }}
+        />
       </aside>
 
       <SidebarMenu
@@ -223,4 +198,3 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </>
   );
 };
-

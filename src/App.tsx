@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
@@ -7,24 +7,21 @@ import { useSearch } from './hooks/useSearch';
 import { ChatHeader } from './components/ChatHeader';
 import { ChatInput } from './components/ChatInput';
 import { Sidebar } from './components/Sidebar';
-import Snackbar from './components/Snackbar';
 import Login from './components/Login';
 import { pageVariants } from './motion/transitions';
-import { FullscreenImage } from './components/FullscreenImage';
-import { handleScrollLogic, scrollToBottomInstant } from './Functions/scrollUtils';
+import { handleScrollLogic } from './Functions/scrollUtils';
 import { handleChatSelection, handleCreateNewChat } from './Functions/chatUtils';
 import { toggleState, closeState, handleImagePreview } from './Functions/uiUtils';
 import { clearTempMessages } from './TemporaryChat/temporaryStorage';
 import { mainContentBackdropVariants } from './motion/modelPageTransitions';
-import { SUPABASE_ENDPOINT, supabase } from './config';
-import { VoiceSelection } from './components/Settings/voiceSelection';
 import { ChatArea } from './components/ChatArea';
 import { GemmaBottomSheet } from './components/GemmaBottomSheet';
-import { VideoPreview } from './components/VideoPreview';
-import { CodeImportPage } from './components/CodeImport/CodeImportPage';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
 import { ThemeTransition } from './motion/ThemeTransition';
+import { useSettingsSync } from './hooks/useSettingsSync';
+import { ScrollToBottomButton } from './components/ScrollToBottomButton';
+import { AppModals } from './components/AppModals';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -50,32 +47,7 @@ export default function App() {
     isSnackbarOpen, setIsSnackbarOpen, models
   } = useChat(() => refreshChats(true), isTemporary);
 
-  useEffect(() => {
-    const syncSettings = async () => {
-      if (!user) return;
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        const response = await fetch(`${SUPABASE_ENDPOINT}?type=settings`, {
-          method: 'GET',
-          headers: { 'Authorization': `Bearer ${session?.access_token}` }
-        });
-        const data = await response.json();
-        
-        if (data) {
-          if (data.selected_model_id && data.selected_model_id !== selectedModel.id) {
-            setSelectedModel({ id: data.selected_model_id, name: data.selected_model_name || data.selected_model_id });
-          }
-          if (data.selected_language && data.selected_language !== language) {
-            setLanguage(data.selected_language);
-          }
-          if (data.selected_theme && data.selected_theme !== theme) {
-            setTheme(data.selected_theme);
-          }
-        }
-      } catch (err) { console.error('Settings sync error:', err); }
-    };
-    syncSettings();
-  }, [user]);
+  useSettingsSync({ user, selectedModelId: selectedModel.id, language, theme, setSelectedModel, setLanguage, setTheme });
 
   const handleScroll = useCallback(() => handleScrollLogic(scrollContainerRef, setShowScrollButton), []);
 
@@ -86,27 +58,17 @@ export default function App() {
   };
 
   const handleImportCode = (filename: string, code: string) => {
-    const newCode = {
-      id: crypto.randomUUID(),
-      filename,
-      code
-    };
+    const newCode = { id: crypto.randomUUID(), filename, code };
     setImportedCodes(prev => [...prev, newCode]);
     setIsCodeImportOpen(false);
   };
 
-  const handleRemoveCode = (id: string) => {
-    setImportedCodes(prev => prev.filter(c => c.id !== id));
-  };
-
   const handleCustomSend = async (text?: string, isSearch?: boolean, file?: File, codes?: any[]) => {
     let finalInput = text || input;
-    
     if (codes && codes.length > 0) {
       const codesMarkdown = codes.map(c => `File: ${c.filename}\n\`\`\`\n${c.code}\n\`\`\``).join('\n\n');
       finalInput = finalInput ? `${finalInput}\n\n${codesMarkdown}` : codesMarkdown;
     }
-    
     await handleSend(finalInput, isSearch, file);
     setImportedCodes([]);
   };
@@ -192,17 +154,7 @@ export default function App() {
                 />
 
                 <AnimatePresence>
-                  {showScrollButton && messages.length > 0 && (
-                    <motion.button
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      onClick={() => scrollToBottomInstant(messagesEndRef)}
-                      className="absolute bottom-6 right-6 z-[60] flex h-12 w-12 items-center justify-center rounded-full bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline)] text-[var(--md-sys-color-primary)] shadow-2xl hover:bg-[var(--md-sys-color-surface-container-highest)] transition-colors cursor-pointer"
-                    >
-                      <span className="material-symbols-outlined">arrow_downward</span>
-                    </motion.button>
-                  )}
+                  <ScrollToBottomButton show={showScrollButton && messages.length > 0} messagesEndRef={messagesEndRef} />
                 </AnimatePresence>
               </div>
 
@@ -218,44 +170,27 @@ export default function App() {
                 onCodeImportClick={() => setIsCodeImportOpen(true)}
                 onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
                 importedCodes={importedCodes}
-                onRemoveCode={handleRemoveCode}
+                onRemoveCode={(id) => setImportedCodes(prev => prev.filter(c => c.id !== id))}
               />
             </div>
           </motion.div>
 
-          <GemmaBottomSheet
-            isOpen={isModelSelectorOpen}
-            onOpenChange={setIsModelSelectorOpen}
-            selectedModel={selectedModel}
-            onModelSelect={setSelectedModel}
-            models={models}
+          <GemmaBottomSheet isOpen={isModelSelectorOpen} onOpenChange={setIsModelSelectorOpen} selectedModel={selectedModel} onModelSelect={setSelectedModel} models={models} />
+
+          <AppModals 
+            isVoiceSelectionOpen={isVoiceSelectionOpen}
+            setIsVoiceSelectionOpen={setIsVoiceSelectionOpen}
+            isCodeImportOpen={isCodeImportOpen}
+            setIsCodeImportOpen={setIsCodeImportOpen}
+            previewVideoUrl={previewVideoUrl}
+            setPreviewVideoUrl={setPreviewVideoUrl}
+            fullscreenImage={fullscreenImage}
+            setFullscreenImage={setFullscreenImage}
+            snackbarMessage={snackbarMessage}
+            isSnackbarOpen={isSnackbarOpen}
+            setIsSnackbarOpen={setIsSnackbarOpen}
+            handleImportCode={handleImportCode}
           />
-
-          <AnimatePresence>
-            {isVoiceSelectionOpen && (
-              <VoiceSelection isOpen={isVoiceSelectionOpen} onClose={() => setIsVoiceSelectionOpen(false)} />
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {isCodeImportOpen && (
-              <CodeImportPage 
-                onClose={() => setIsCodeImportOpen(false)} 
-                onImport={handleImportCode}
-              />
-            )}
-          </AnimatePresence>
-
-          <FullscreenImage src={fullscreenImage} isOpen={!!fullscreenImage} onClose={() => setFullscreenImage(null)} />
-          <AnimatePresence>
-            {previewVideoUrl && (
-              <VideoPreview 
-                url={previewVideoUrl} 
-                onClose={() => setPreviewVideoUrl(null)} 
-              />
-            )}
-          </AnimatePresence>
-          <Snackbar message={snackbarMessage} isOpen={isSnackbarOpen} onClose={() => closeState(setIsSnackbarOpen)} />
         </>
       )}
     </div>
