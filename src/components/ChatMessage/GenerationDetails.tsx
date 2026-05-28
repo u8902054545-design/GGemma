@@ -1,6 +1,6 @@
 import React from 'react';
 import { Drawer } from 'vaul';
-import { GemmaIcon } from '../GemmaIcon';
+import { GemmaIcon } from '../IconsApp/GemmaIcon';
 import { useLanguage } from '../../hooks/useLanguage';
 
 interface GenerationDetailsProps {

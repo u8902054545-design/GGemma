@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
-import { GemmaIcon } from '../GemmaIcon';
+import { GemmaIcon } from '../IconsApp/GemmaIcon';
 import { useLanguage } from '../../hooks/useLanguage';
 import { getRandomGreeting } from './Greetings';
 

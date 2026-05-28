@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { GemmaIcon } from './GemmaIcon';
-import { GoogleIcon } from './GoogleIcon';
+import { GemmaIcon } from './IconsApp/GemmaIcon';
+import { GoogleIcon } from './IconsApp/GoogleIcon';
 import Snackbar from './Snackbar';
 import { pageVariants, mdEasing, mdDuration } from '../motion/transitions';
 import { useLanguage } from '../hooks/useLanguage';
