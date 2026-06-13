@@ -2,6 +2,7 @@ import React from 'react';
 import { Drawer } from 'vaul';
 import { SelectedModel } from '../hooks/chatTypes';
 import { useLanguage } from '../hooks/useLanguage';
+import { modelDescriptions } from '../modelDescriptions';
 import '@material/web/list/list.js';
 import '@material/web/list/list-item.js';
 
@@ -20,7 +21,7 @@ export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
   onModelSelect,
   models
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
@@ -33,7 +34,7 @@ export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
             <h2 className="text-[var(--md-sys-color-on-surface)] text-xl font-medium mb-2">{t('model.selector.title')}</h2>
           </div>
 
-          <div className="max-h-[70vh] overflow-y-auto pb-8">
+          <div className="max-h-[70vh] overflow-y-auto overflow-x-hidden pb-8">
             <md-list style={{ '--md-list-container-color': 'transparent' }}>
                <md-list-item
                   type="button"
@@ -72,6 +73,7 @@ export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
                   }}
                 >
                   <div slot="headline">{model.name}</div>
+                  <div slot="supporting-text">{modelDescriptions[model.id]?.[language] || ''}</div>
                   {selectedModel.id === model.id && (
                     <span slot="end" className="material-symbols-outlined text-[var(--md-sys-color-primary)]">
                       check
