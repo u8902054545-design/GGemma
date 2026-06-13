@@ -1,9 +1,9 @@
 import { Variants } from 'motion/react';
 
 // Official Material Design 3 Emphasized Easing
-const md3Emphasized = [0.2, 0, 0, 1];
-const md3Decelerate = [0, 0, 0, 1];
-const md3Accelerate = [0.3, 0, 1, 1];
+const md3Emphasized = [0.2, 0, 0, 1] as const;
+const md3Decelerate = [0, 0, 0, 1] as const;
+const md3Accelerate = [0.3, 0, 1, 1] as const;
 
 export const profileVariants: Variants = {
   initial: {

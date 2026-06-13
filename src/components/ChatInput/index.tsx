@@ -6,10 +6,10 @@ import { InputArea } from './InputArea';
 import { SendAction } from './SendAction';
 import { AddBottomSheet } from './AddBottomSheet';
 import { VideoPreview } from '../VideoPreview';
-import { AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { ImportedCodesList } from './ImportedCodesList';
 import { HiddenInputs } from './HiddenInputs';
-import { useSpeechRecognition } from './useSpeechRecognition';
+import { VoiceInput } from './VoiceInput';
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
   input, setInput, handleSend, stopRequest,
@@ -40,11 +40,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
     clearSelection 
   } = useImageUpload();
 
-  const { isListening, toggleListening } = useSpeechRecognition((transcript) => {
-    const newInput = input + (input ? " " : "") + transcript;
-    setInput(newInput);
-    setTimeout(() => handleSend(), 150);
-  });
+  const [isVoiceInputActive, setIsVoiceInputActive] = useState(false);
 
   useEffect(() => {
     if (isImageDisabled && selectedFile) {
@@ -102,21 +98,48 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
       <div className="flex items-end gap-3 justify-center">
         <AddAction onAddClick={() => setIsBottomSheetOpen(true)} />
 
-        <InputArea 
-          input={input}
-          setInput={setInput}
-          textareaRef={textareaRef}
-          onKeyDown={onKeyDown}
-          previewUrl={previewUrl}
-          selectedFile={selectedFile}
-          clearSelection={clearSelection}
-          onMediaClick={handleMediaClick}
-          isSearchActive={isSearchActive}
-          isSearchDisabled={isSearchDisabled}
-          onSearchClick={onSearchClick}
-          isListening={isListening}
-          toggleListening={toggleListening}
-        />
+        <AnimatePresence mode="wait">
+          {!isVoiceInputActive ? (
+            <motion.div
+              key="input-area-wrapper"
+              initial={{ opacity: 0, scale: 0.95, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 10 }}
+              transition={{ duration: 0.25, ease: [0.2, 0.0, 0, 1.0] }}
+              className="flex-1 flex min-w-0"
+            >
+              <InputArea 
+                input={input}
+                setInput={setInput}
+                textareaRef={textareaRef}
+                onKeyDown={onKeyDown}
+                previewUrl={previewUrl}
+                selectedFile={selectedFile}
+                clearSelection={clearSelection}
+                onMediaClick={handleMediaClick}
+                isSearchActive={isSearchActive}
+                isSearchDisabled={isSearchDisabled}
+                onSearchClick={onSearchClick}
+                isListening={false}
+                toggleListening={() => setIsVoiceInputActive(true)}
+              />
+            </motion.div>
+          ) : (
+            <VoiceInput 
+              key="voice-input"
+              onCancel={() => setIsVoiceInputActive(false)}
+              onConfirm={(text) => {
+                if (text) {
+                  setInput(input + (input ? " " : "") + text);
+                }
+                setIsVoiceInputActive(false);
+                setTimeout(() => {
+                  textareaRef.current?.focus();
+                }, 100);
+              }}
+            />
+          )}
+        </AnimatePresence>
 
         <SendAction 
           isTyping={isTyping}

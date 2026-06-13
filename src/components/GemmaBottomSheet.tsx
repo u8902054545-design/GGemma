@@ -72,9 +72,6 @@ export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
                   }}
                 >
                   <div slot="headline">{model.name}</div>
-                  <span slot="start" className="material-symbols-outlined text-[var(--md-sys-color-on-surface-variant)]">
-                    deployed_code
-                  </span>
                   {selectedModel.id === model.id && (
                     <span slot="end" className="material-symbols-outlined text-[var(--md-sys-color-primary)]">
                       check
