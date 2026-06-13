@@ -96,7 +96,9 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
       />
       
       <div className="flex items-end gap-3 justify-center">
-        <AddAction onAddClick={() => setIsBottomSheetOpen(true)} />
+        {!isVoiceInputActive && (
+          <AddAction onAddClick={() => setIsBottomSheetOpen(true)} />
+        )}
 
         <AnimatePresence mode="wait">
           {!isVoiceInputActive ? (
@@ -141,12 +143,14 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
           )}
         </AnimatePresence>
 
-        <SendAction 
-          isTyping={isTyping}
-          stopRequest={stopRequest}
-          handleWrappedSend={handleWrappedSend}
-          isSendDisabled={isSendDisabled}
-        />
+        {!isVoiceInputActive && (
+          <SendAction 
+            isTyping={isTyping}
+            stopRequest={stopRequest}
+            handleWrappedSend={handleWrappedSend}
+            isSendDisabled={isSendDisabled}
+          />
+        )}
       </div>
 
       <HiddenInputs 

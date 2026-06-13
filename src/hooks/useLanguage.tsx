@@ -18,7 +18,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const { user } = useAuth();
   const [language, setLanguageState] = useState<Language>(() => {
     const saved = localStorage.getItem('app_language');
-    return (saved === 'ru' || saved === 'en') ? saved : 'en';
+    if (saved === 'ru' || saved === 'en') return saved;
+    const systemLang = navigator.language.split('-')[0];
+    return systemLang === 'ru' ? 'ru' : 'en';
   });
 
   const setLanguage = async (lang: Language) => {

@@ -35,9 +35,12 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
 
     const recognition = new SpeechRecognition();
     recognitionRef.current = recognition;
-    recognition.lang = language === 'ru' ? 'ru-RU' : 'en-US';
+    // Force OS language for better native speech recognition, fallback to ru-RU
+    recognition.lang = navigator.language || 'ru-RU';
     recognition.interimResults = true;
-    recognition.continuous = true;
+    // Set continuous to false to avoid the notorious Android Chrome duplication bug
+    // where event.results populates with overlapping or duplicate phrases.
+    recognition.continuous = false;
 
     recognition.onstart = () => {
       setIsListening(true);
@@ -71,16 +74,17 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
       let finalSpeech = '';
       let interimSpeech = '';
 
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
+      for (let i = 0; i < event.results.length; ++i) {
+        const text = event.results[i][0].transcript.trim();
         if (event.results[i].isFinal) {
-          finalSpeech += event.results[i][0].transcript;
+          finalSpeech += (finalSpeech ? ' ' : '') + text;
         } else {
-          interimSpeech += event.results[i][0].transcript;
+          interimSpeech += (interimSpeech ? ' ' : '') + text;
         }
       }
 
       if (finalSpeech) {
-        setTranscript(prev => prev + (prev ? ' ' : '') + finalSpeech);
+        setTranscript(finalSpeech);
       }
       setInterimTranscript(interimSpeech);
     };
