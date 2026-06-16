@@ -7,6 +7,7 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { ChatActionsMenu } from './ChatHeaderParts/ChatActionsMenu';
 import { useLanguage } from '../hooks/useLanguage';
+import { useChatHistory } from '../hooks/useChatHistory';
 import '@material/web/iconbutton/icon-button.js';
 import '@material/web/icon/icon.js';
 
@@ -42,6 +43,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const { t } = useLanguage();
+  const { isChatHistoryEnabled } = useChatHistory();
 
   const onNewChatClick = () => {
     if (onNewChat) {
@@ -109,7 +111,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
       <div className="flex items-center justify-end min-w-[48px] gap-1">
         <AnimatePresence mode="wait">
-          {!isChatStarted && (
+          {!isChatStarted && isChatHistoryEnabled && (
             <motion.button
               key="temp-chat-toggle"
               initial={{ opacity: 0, scale: 0.8 }}

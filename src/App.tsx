@@ -22,6 +22,7 @@ import { ThemeTransition } from './motion/ThemeTransition';
 import { useSettingsSync } from './hooks/useSettingsSync';
 import { ScrollToBottomButton } from './components/ScrollToBottomButton';
 import { AppModals } from './components/AppModals';
+import { useChatHistory } from './hooks/useChatHistory';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -46,6 +47,16 @@ export default function App() {
     chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
     isSnackbarOpen, setIsSnackbarOpen, models
   } = useChat(() => refreshChats(true), isTemporary);
+
+  const { isChatHistoryEnabled } = useChatHistory();
+
+  React.useEffect(() => {
+    if (!isChatHistoryEnabled && isTemporary) {
+      setIsTemporary(false);
+      clearTempMessages();
+      handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
+    }
+  }, [isChatHistoryEnabled, isTemporary, setMessages, setChatId, setChatTitle, resetSearch]);
 
   useSettingsSync({ user, selectedModelId: selectedModel.id, language, theme, setSelectedModel, setLanguage, setTheme });
 

@@ -14,6 +14,8 @@ import { ProfileDrawer } from './UserProfile';
 import { SidebarSearch } from './SidebarParts/SidebarSearch';
 import { NewChatButton } from './SidebarParts/NewChatButton';
 import { SidebarProfile } from './SidebarParts/SidebarProfile';
+import { useChatHistory } from '../hooks/useChatHistory';
+import { ChatHistorySelection } from './Settings/chatHistorySelection';
 import '@material/web/icon/icon.js';
 
 const backdropVariants = {
@@ -46,9 +48,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isChatHistorySelectionOpen, setIsChatHistorySelectionOpen] = useState(false);
   const [exportMessages, setExportMessages] = useState<any[]>([]);
   const { t } = useLanguage();
   const { user } = useAuth();
+  const { isChatHistoryEnabled } = useChatHistory();
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0];
   const userAvatar = user?.user_metadata?.avatar_url;
@@ -142,14 +146,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="px-4 py-2">
             <h2 className="text-[14px] font-medium text-[var(--md-sys-color-on-surface)]">{t('sidebar.chats')}</h2>
           </div>
-          <ChatList
-            chats={chats}
-            loading={loading}
-            error={error}
-            currentChatId={currentChatId}
-            onChatSelect={(id) => { onChatSelect(id); onClose(); }}
-            onLongPress={handleLongPress}
-          />
+          {!isChatHistoryEnabled ? (
+            <div className="flex flex-col items-center justify-center h-[50%] px-4 text-center mt-8">
+              <span className="material-symbols-outlined text-[48px] text-[var(--md-sys-color-on-surface-variant)]/50 mb-4">
+                history_off
+              </span>
+              <p className="text-[var(--md-sys-color-on-surface)] font-medium mb-2">
+                {t('sidebar.historyDisabled')}
+              </p>
+              <button
+                onClick={() => setIsChatHistorySelectionOpen(true)}
+                className="px-4 py-2 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full text-sm font-medium transition-transform active:scale-95 mt-2"
+              >
+                {t('sidebar.enableHistory')}
+              </button>
+            </div>
+          ) : (
+            <ChatList
+              chats={chats}
+              loading={loading}
+              error={error}
+              currentChatId={currentChatId}
+              onChatSelect={(id) => { onChatSelect(id); onClose(); }}
+              onLongPress={handleLongPress}
+            />
+          )}
         </div>
 
         <SidebarProfile 
@@ -161,6 +182,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }}
         />
       </aside>
+
+      <AnimatePresence>
+        {isChatHistorySelectionOpen && (
+          <ChatHistorySelection
+            isOpen={isChatHistorySelectionOpen}
+            onClose={() => setIsChatHistorySelectionOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <SidebarMenu
         isOpen={isMenuOpen}

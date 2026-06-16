@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { supabase, SUPABASE_ENDPOINT } from '../config';
 import { useLanguage } from '../hooks/useLanguage';
+import { useChatHistory } from '../hooks/useChatHistory';
 
 interface SearchResult {
   chat_id: string;
@@ -21,9 +22,10 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
+  const { isChatHistoryEnabled } = useChatHistory();
 
   useEffect(() => {
-    if (!query.trim()) {
+    if (!query.trim() || !isChatHistoryEnabled) {
       setResults([]);
       return;
     }
@@ -31,9 +33,10 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
       handleSearch(query);
     }, 500);
     return () => clearTimeout(delayDebounce);
-  }, [query]);
+  }, [query, isChatHistoryEnabled]);
 
   const handleSearch = async (text: string) => {
+    if (!isChatHistoryEnabled) return;
     setLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();

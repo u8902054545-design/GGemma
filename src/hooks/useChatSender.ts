@@ -3,6 +3,7 @@ import { SUPABASE_ENDPOINT, supabase } from '../config';
 import { Message, ImportedCode } from './chatTypes';
 import { saveTempMessages } from '../TemporaryChat/temporaryStorage';
 import { processImage, updateChatTitle } from './useChatSenderUtils';
+import { useChatHistory } from './useChatHistory';
 
 interface SelectedModel {
   id: string;
@@ -26,6 +27,8 @@ export const useChatSender = (
   setChatTitle?: (title: string) => void,
   isTemporary: boolean = false
 ) => {
+  const { isChatHistoryEnabled } = useChatHistory();
+
   const handleSend = useCallback(async (
     overrideInput?: string, 
     isSearchActive: boolean = false, 
@@ -102,8 +105,8 @@ export const useChatSender = (
           image: base64Image || null,
           video: base64Video || null,
           codes: codes || null,
-          isTemporary: isTemporary,
-          history: isTemporary ? updatedMessages : undefined,
+          isTemporary: isTemporary || !isChatHistoryEnabled,
+          history: (isTemporary || !isChatHistoryEnabled) ? updatedMessages : undefined,
           voice: currentVoice
         }),
       });

@@ -7,17 +7,20 @@ import {registerSW} from 'virtual:pwa-register';
 import { LanguageProvider } from './hooks/useLanguage';
 import { ThemeProvider } from './hooks/useTheme';
 import { AuthProvider } from './hooks/useAuth';
+import { ChatHistoryProvider } from './hooks/useChatHistory';
 
 registerSW({immediate: true});
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
-      <ThemeProvider>
-        <LanguageProvider>
-          <App />
-        </LanguageProvider>
-      </ThemeProvider>
+      <ChatHistoryProvider>
+        <ThemeProvider>
+          <LanguageProvider>
+            <App />
+          </LanguageProvider>
+        </ThemeProvider>
+      </ChatHistoryProvider>
     </AuthProvider>
   </StrictMode>,
 );
