@@ -85,6 +85,8 @@ export const ru = {
   'settings.chatHistory.menuDesc': 'Управление историей чатов',
   'sidebar.historyDisabled': 'История чатов отключена',
   'sidebar.enableHistory': 'Включить',
+  'errors.historyDisabled.chat': 'Невозможно открыть чат при выключенной истории',
+  'errors.historyDisabled.send': 'Отправка сообщений в старых чатах невозможна при выключенной истории',
   'temp.export.confirm.title': 'Экспорт из временного чата',
   'temp.export.confirm.desc': 'Этот экспорт выполняется из временного чата. Пожалуйста, будьте осторожны, если в диалоге есть конфиденциальная информация, так как данные будут сохранены локально на вашем устройстве.',
   'temp.export.confirm.accept': 'Принимаю',

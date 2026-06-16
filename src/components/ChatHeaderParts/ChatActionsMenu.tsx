@@ -1,6 +1,7 @@
 import React from 'react';
 import { Drawer } from 'vaul';
 import { useLanguage } from '../../hooks/useLanguage';
+import { useChatHistory } from '../../hooks/useChatHistory';
 
 interface ChatActionsMenuProps {
   isOpen: boolean;
@@ -24,6 +25,7 @@ export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
   isTemporary = false
 }) => {
   const { t } = useLanguage();
+  const { isChatHistoryEnabled } = useChatHistory();
 
   return (
     <Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
@@ -32,7 +34,7 @@ export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
         <Drawer.Content className="bg-[var(--md-sys-color-surface)] flex flex-col rounded-t-[28px] h-auto mt-24 fixed bottom-0 left-0 right-0 z-[70] outline-none border-none max-w-lg mx-auto">
           <div className="mx-auto w-12 h-1.5 flex-shrink-0 rounded-full bg-[var(--md-sys-color-outline)] my-4" />
           <div className="p-4 bg-[var(--md-sys-color-surface)] pb-8">
-            {!isTemporary && (
+            {!isTemporary && isChatHistoryEnabled && (
               <>
                 <button
                   onClick={onPin}
@@ -57,7 +59,7 @@ export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
               <span className="material-symbols-outlined">download</span>
               <span>{t('export.title')}</span>
             </button>
-            {!isTemporary && (
+            {!isTemporary && isChatHistoryEnabled && (
               <button
                 onClick={onDelete}
                 className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-error)] border-none bg-transparent"

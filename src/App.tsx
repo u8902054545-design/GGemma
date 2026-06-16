@@ -45,7 +45,7 @@ export default function App() {
     messages, setMessages, input, setInput, selectedModel, setSelectedModel,
     isTyping, isLoading, messagesEndRef, handleSend, handleFeedback, chatId, setChatId,
     chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
-    isSnackbarOpen, setIsSnackbarOpen, models
+    isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage
   } = useChat(() => refreshChats(true), isTemporary);
 
   const { isChatHistoryEnabled } = useChatHistory();
@@ -75,6 +75,12 @@ export default function App() {
   };
 
   const handleCustomSend = async (text?: string, isSearch?: boolean, file?: File, codes?: any[]) => {
+    if (!isChatHistoryEnabled && chats.some(c => c.id === chatId)) {
+      setSnackbarMessage(t('errors.historyDisabled.send'));
+      setIsSnackbarOpen(true);
+      return;
+    }
+
     let finalInput = text || input;
     if (codes && codes.length > 0) {
       const codesMarkdown = codes.map(c => `File: ${c.filename}\n\`\`\`\n${c.code}\n\`\`\``).join('\n\n');
@@ -108,6 +114,11 @@ export default function App() {
               error={false}
               currentChatId={chatId}
               onChatSelect={(id) => {
+                if (!isChatHistoryEnabled) {
+                  setSnackbarMessage(t('errors.historyDisabled.chat'));
+                  setIsSnackbarOpen(true);
+                  return;
+                }
                 if (isTemporary) clearTempMessages();
                 setIsTemporary(false);
                 handleChatSelection(id, chats, setChatTitle, loadChatMessages, () => closeState(setIsSidebarOpen));

@@ -121,6 +121,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
     handleFeedback,
     models: MODELS,
     snackbarMessage,
+    setSnackbarMessage,
     isSnackbarOpen,
     setIsSnackbarOpen,
     stopRequest,
