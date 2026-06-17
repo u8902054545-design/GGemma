@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
@@ -30,7 +30,6 @@ export default function App() {
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
   const { chats, loading: chatsLoading, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
   const [isTemporary, setIsTemporary] = useState(false);
@@ -43,7 +42,7 @@ export default function App() {
 
   const {
     messages, setMessages, input, setInput, selectedModel, setSelectedModel,
-    isTyping, isLoading, messagesEndRef, handleSend, handleFeedback, chatId, setChatId,
+    isTyping, isLoading, messagesEndRef, scrollContainerRef, handleSend, handleFeedback, chatId, setChatId,
     chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
     isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage
   } = useChat(() => refreshChats(true), isTemporary);

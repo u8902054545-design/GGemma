@@ -66,9 +66,11 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: mdDuration.short4, ease: mdEasing.decelerate }}
+      id={`msg-${messageId}`}
+      layout
+      initial={{ opacity: 0, y: 20, scale: 0.97 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: mdDuration.medium1, ease: mdEasing.decelerate }}
       className={`flex flex-col mb-8 ${isAI ? 'items-start w-full' : 'items-end'}`}
     >
       {isAI && (

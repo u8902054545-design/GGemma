@@ -20,7 +20,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false);
 
   const { createSignal, stopRequest: internalStopRequest } = useStopRequest();
-  const { messagesEndRef, scrollToBottom } = useChatScroll();
+  const { messagesEndRef, scrollContainerRef, scrollToBottom, scrollToMessageTop } = useChatScroll();
 
   const { handleFeedback } = useChatFeedback(setMessages);
 
@@ -51,6 +51,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
     setIsTyping,
     createSignal,
     scrollToBottom,
+    scrollToMessageTop,
     setSnackbarMessage,
     setIsSnackbarOpen,
     onNewChatCreated,
@@ -110,6 +111,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
     isTyping,
     isLoading,
     messagesEndRef,
+    scrollContainerRef,
     scrollToBottom,
     handleSend,
     handleKeyDown,

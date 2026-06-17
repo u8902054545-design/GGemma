@@ -21,6 +21,7 @@ export const useChatSender = (
   setIsTyping: (val: boolean) => void,
   createSignal: () => AbortSignal,
   scrollToBottom: () => void,
+  scrollToMessageTop: (messageId: string) => void,
   setSnackbarMessage: (msg: string) => void,
   setIsSnackbarOpen: (open: boolean) => void,
   onNewChatCreated?: () => void,
@@ -81,7 +82,10 @@ export const useChatSender = (
 
     setInput('');
     setIsTyping(true);
-    scrollToBottom();
+
+    requestAnimationFrame(() => {
+      scrollToMessageTop(newUserMsg.id);
+    });
 
     const aiMsgId = crypto.randomUUID();
     const newAiMsg: Message = { id: aiMsgId, role: 'ai', content: '', voice: currentVoice };
@@ -153,7 +157,7 @@ export const useChatSender = (
     } finally {
       setIsTyping(false);
     }
-  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, messages, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen, setChatTitle, isTemporary]);
+  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, scrollToMessageTop, messages, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen, setChatTitle, isTemporary]);
 
   return { handleSend };
 };
