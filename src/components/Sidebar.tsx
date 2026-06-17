@@ -35,11 +35,14 @@ interface SidebarProps {
   deleteChatFromDB: (id: string) => Promise<void>;
   setChatTitle: (title: string) => void;
   togglePin: (id: string, pinned: boolean) => Promise<void>;
+  setSnackbarMessage: (msg: string) => void;
+  setIsSnackbarOpen: (open: boolean) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   isOpen, onClose, chats, loading, error, currentChatId,
-  onChatSelect, onNewChat, deleteChatFromDB, setChatTitle, togglePin
+  onChatSelect, onNewChat, deleteChatFromDB, setChatTitle, togglePin,
+  setSnackbarMessage, setIsSnackbarOpen
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
@@ -137,7 +140,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}
       >
         <div className="p-4 flex flex-col gap-4 mt-2">
-          <SidebarSearch onClick={() => setIsSearchOpen(true)} />
+          <SidebarSearch onClick={() => {
+            if (!isChatHistoryEnabled) {
+              setSnackbarMessage(t('errors.historyDisabled.search'));
+              setIsSnackbarOpen(true);
+              return;
+            }
+            setIsSearchOpen(true);
+          }} />
 
           <NewChatButton onClick={() => { onNewChat(); onClose(); }} />
         </div>

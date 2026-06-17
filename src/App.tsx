@@ -131,6 +131,8 @@ export default function App() {
               deleteChatFromDB={deleteChat}
               setChatTitle={setChatTitle}
               togglePin={togglePin}
+              setSnackbarMessage={setSnackbarMessage}
+              setIsSnackbarOpen={setIsSnackbarOpen}
             />
 
             <div className="h-full w-full flex flex-col bg-[var(--md-sys-color-background)] relative shadow-2xl">

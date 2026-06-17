@@ -87,6 +87,7 @@ export const en = {
   'sidebar.enableHistory': 'Enable',
   'errors.historyDisabled.chat': 'Cannot open chat while history is disabled',
   'errors.historyDisabled.send': 'Cannot send messages in past chats while history is disabled',
+  'errors.historyDisabled.search': 'Cannot search chats while history is disabled',
   'temp.export.confirm.title': 'Export from Temporary Chat',
   'temp.export.confirm.desc': 'This export is from a temporary chat. Please be careful if there is any confidential information, as the data will be saved locally on your device.',
   'temp.export.confirm.accept': 'I accept',
