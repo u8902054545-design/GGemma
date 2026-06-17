@@ -93,4 +93,5 @@ export const en = {
   'temp.export.confirm.accept': 'I accept',
   'message.generation_details.title': 'Generation Details',
   'message.generation_details.description': 'The response uses a model "{model}"',
+  'code.warning': 'Use the generated code with caution',
 };

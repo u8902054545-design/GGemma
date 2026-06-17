@@ -7,6 +7,7 @@ import json from 'react-syntax-highlighter/dist/esm/languages/prism/json';
 import python from 'react-syntax-highlighter/dist/esm/languages/prism/python';
 import { atomDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { DownloadDialog } from './DownloadDialog';
+import { useLanguage } from '../../hooks/useLanguage';
 
 SyntaxHighlighter.registerLanguage('javascript', js);
 SyntaxHighlighter.registerLanguage('typescript', ts);
@@ -23,6 +24,7 @@ type CodeBlockProps = {
 
 const CodeBlockComponent: React.FC<CodeBlockProps> = ({ language, value, isCopied, onCopy }) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { t } = useLanguage();
 
   const handleDownload = (filename: string, extension: string) => {
     const blob = new Blob([value], { type: 'text/plain' });
@@ -73,6 +75,15 @@ const CodeBlockComponent: React.FC<CodeBlockProps> = ({ language, value, isCopie
             </span>
           </button>
         </div>
+      </div>
+
+      <div className="flex items-center gap-2 px-4 py-2 bg-[var(--md-sys-color-tertiary-container)] text-[var(--md-sys-color-on-tertiary-container)]">
+        <span className="material-symbols-outlined text-[18px]">
+          warning
+        </span>
+        <span className="text-[12px] font-medium">
+          {t('code.warning')}
+        </span>
       </div>
       
       <div className="relative w-full overflow-hidden bg-[var(--md-sys-color-surface)]">

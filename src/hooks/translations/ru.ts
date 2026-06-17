@@ -93,4 +93,5 @@ export const ru = {
   'temp.export.confirm.accept': 'Принимаю',
   'message.generation_details.title': 'Детали генерации',
   'message.generation_details.description': 'В ответе используется модель "{model}"',
+  'code.warning': 'Используйте сгенерированный код с осторожностью',
 };
