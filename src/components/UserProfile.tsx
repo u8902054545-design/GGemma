@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { profileVariants } from '../motion/profileTransitions';
 import { APP_VERSION } from '../versionApp';
 import { SettingsApp } from './Settings/settingsApp';
+import { PersonalizationPage } from './Personalization/personalizationPage';
 import { useLanguage } from '../hooks/useLanguage';
 
 import '@material/web/progress/circular-progress.js';
@@ -12,6 +13,7 @@ import '@material/web/progress/circular-progress.js';
 const ProfileDrawerContent = memo(({ isOpen, onClose, user, signOut, t }: any) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isPersonalizationOpen, setIsPersonalizationOpen] = useState(false);
 
   if (!user) return null;
 
@@ -104,9 +106,18 @@ const ProfileDrawerContent = memo(({ isOpen, onClose, user, signOut, t }: any) =
 
             <div className="w-full max-w-[400px] mt-4 bg-[var(--md-sys-color-surface)] border border-[var(--md-sys-color-outline-variant)]/10 rounded-[28px] p-4 flex flex-col items-center shadow-2xl">
               <button
-                onClick={() => setIsSettingsOpen(true)}
+                onClick={() => setIsPersonalizationOpen(true)}
                 disabled={isLoggingOut}
                 className="ripple-container w-full h-12 flex items-center justify-center gap-3 bg-[var(--md-sys-color-surface)] hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/20 rounded-full font-medium transition-all disabled:opacity-50"
+              >
+                <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)]">person_edit</span>
+                <span>{t('personalization.title')}</span>
+              </button>
+
+              <button
+                onClick={() => setIsSettingsOpen(true)}
+                disabled={isLoggingOut}
+                className="ripple-container w-full h-12 flex items-center justify-center gap-3 mt-2 bg-[var(--md-sys-color-surface)] hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/20 rounded-full font-medium transition-all disabled:opacity-50"
               >
                 <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)]">settings</span>
                 <span>{t('profile.settings')}</span>
@@ -119,6 +130,9 @@ const ProfileDrawerContent = memo(({ isOpen, onClose, user, signOut, t }: any) =
           </main>
 
           <AnimatePresence>
+            {isPersonalizationOpen && (
+              <PersonalizationPage isOpen={isPersonalizationOpen} onClose={() => setIsPersonalizationOpen(false)} />
+            )}
             {isSettingsOpen && (
               <SettingsApp isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
             )}

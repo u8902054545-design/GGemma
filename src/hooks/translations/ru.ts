@@ -94,4 +94,9 @@ export const ru = {
   'message.generation_details.title': 'Детали генерации',
   'message.generation_details.description': 'В ответе используется модель "{model}"',
   'code.warning': 'Используйте сгенерированный код с осторожностью',
+  'personalization.title': 'Персонализация',
+  'personalization.description': 'Введите свои инструкции или предпочтения ниже. Этот текст будет использоваться для персонализации вашего взаимодействия с ассистентом.',
+  'personalization.field_label': 'Ваши инструкции',
+  'personalization.save': 'Сохранить',
+  'personalization.saved': 'Сохранено',
 };

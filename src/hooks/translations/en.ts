@@ -94,4 +94,9 @@ export const en = {
   'message.generation_details.title': 'Generation Details',
   'message.generation_details.description': 'The response uses a model "{model}"',
   'code.warning': 'Use the generated code with caution',
+  'personalization.title': 'Personalization',
+  'personalization.description': 'Enter your custom instructions or preferences below. This text will be used to personalize your experience with the assistant.',
+  'personalization.field_label': 'Your instructions',
+  'personalization.save': 'Save',
+  'personalization.saved': 'Saved',
 };
