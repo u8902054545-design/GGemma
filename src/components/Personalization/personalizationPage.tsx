@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
 import { pageVariants } from '../../motion/transitions';
 import { useLanguage } from '../../hooks/useLanguage';
 import { supabase, SUPABASE_ENDPOINT } from '../../config';
-import '@material/web/textfield/outlined-text-field.js';
+import Snackbar from '../Snackbar';
 import '@material/web/button/filled-button.js';
 
 interface PersonalizationPageProps {
@@ -14,7 +14,8 @@ interface PersonalizationPageProps {
 export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
   const [text, setText] = useState('');
-  const [saved, setSaved] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const loadPersonalization = async () => {
@@ -34,6 +35,13 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ isOpen
     loadPersonalization();
   }, []);
 
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto';
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [text]);
+
   const handleSave = async () => {
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -46,8 +54,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ isOpen
         },
         body: JSON.stringify({ settings: { personalization_text: text } })
       });
-      setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      setSnackbarOpen(true);
     } catch (err) {
       console.error('Failed to save personalization:', err);
     }
@@ -83,19 +90,27 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ isOpen
         </p>
 
         <div className="w-full mb-6">
-          <md-outlined-text-field
-            label={t('personalization.field_label')}
+          <textarea
+            ref={textareaRef}
             value={text}
-            onInput={(e: any) => setText(e.target.value)}
-            className="w-full"
-            rows={5}
+            onChange={(e) => setText(e.target.value)}
+            placeholder={t('personalization.field_label')}
+            className="w-full min-h-[120px] max-h-[400px] px-4 py-3 rounded-xl border border-[var(--md-sys-color-outline)] bg-transparent text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] text-[16px] leading-relaxed resize-none outline-none focus:border-[var(--md-sys-color-primary)] transition-colors"
+            rows={1}
           />
         </div>
 
         <md-filled-button onClick={handleSave} className="w-full">
-          {saved ? t('personalization.saved') : t('personalization.save')}
+          {t('personalization.save')}
         </md-filled-button>
       </main>
+
+      <Snackbar
+        message={t('personalization.saved')}
+        isOpen={snackbarOpen}
+        onClose={() => setSnackbarOpen(false)}
+        duration={2000}
+      />
     </motion.div>
   );
 };
