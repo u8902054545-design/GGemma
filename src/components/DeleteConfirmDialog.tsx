@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { motion, AnimatePresence } from 'motion/react';
 import { mdEasing } from '../motion/transitions';
@@ -7,11 +7,22 @@ import { useLanguage } from '../hooks/useLanguage';
 interface DeleteConfirmDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
 }
 
 export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({ isOpen, onClose, onConfirm }) => {
   const { t } = useLanguage();
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleConfirm = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsLoading(true);
+    try {
+      await onConfirm();
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <AlertDialog.Root open={isOpen} onOpenChange={onClose}>
@@ -45,19 +56,22 @@ export const DeleteConfirmDialog: React.FC<DeleteConfirmDialogProps> = ({ isOpen
                   <button 
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2 text-[var(--md-sys-color-primary)] font-medium hover:bg-[var(--md-sys-color-on-surface-variant)]/5 rounded-full transition-colors"
+                    disabled={isLoading}
+                    className="px-4 py-2 text-[var(--md-sys-color-primary)] font-medium hover:bg-[var(--md-sys-color-on-surface-variant)]/5 rounded-full transition-colors disabled:opacity-50"
                   >
                     {t('dialog.cancel')}
                   </button>
                   <button 
                     type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onConfirm();
-                    }} 
-                    className="px-4 py-2 text-[var(--md-sys-color-error)] font-medium hover:bg-[var(--md-sys-color-error)]/10 rounded-full transition-colors active:bg-[var(--md-sys-color-error)]/20"
+                    onClick={handleConfirm}
+                    disabled={isLoading}
+                    className="px-4 py-2 text-[var(--md-sys-color-error)] font-medium hover:bg-[var(--md-sys-color-error)]/10 rounded-full transition-colors active:bg-[var(--md-sys-color-error)]/20 disabled:opacity-50 flex items-center gap-2 min-w-[80px] justify-center"
                   >
-                    {t('dialog.delete.confirm')}
+                    {isLoading ? (
+                      <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                    ) : (
+                      t('dialog.delete.confirm')
+                    )}
                   </button>
                 </div>
               </motion.div>

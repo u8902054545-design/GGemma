@@ -12,6 +12,7 @@ interface ChatActionsMenuProps {
   onDelete: () => void;
   onExport: () => void;
   isTemporary?: boolean;
+  isPinning?: boolean;
 }
 
 export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
@@ -22,7 +23,8 @@ export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
   onRename,
   onDelete,
   onExport,
-  isTemporary = false
+  isTemporary = false,
+  isPinning = false
 }) => {
   const { t } = useLanguage();
   const { isChatHistoryEnabled } = useChatHistory();
@@ -38,9 +40,14 @@ export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
               <>
                 <button
                   onClick={onPin}
-                  className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-on-surface)] border-none bg-transparent"
+                  disabled={isPinning}
+                  className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-on-surface)] border-none bg-transparent disabled:opacity-50"
                 >
-                  <span className="material-symbols-outlined">{isPinned ? 'keep_off' : 'keep'}</span>
+                  {isPinning ? (
+                    <span className="material-symbols-outlined animate-spin text-[24px]">progress_activity</span>
+                  ) : (
+                    <span className="material-symbols-outlined">{isPinned ? 'keep_off' : 'keep'}</span>
+                  )}
                   <span>{isPinned ? t('menu.unpin') : t('menu.pin')}</span>
                 </button>
                 <button
