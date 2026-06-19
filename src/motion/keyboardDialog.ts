@@ -1,7 +1,7 @@
 import { type CSSProperties } from 'react';
 
 export const keyboardDialogTransition: CSSProperties = {
-  transition: 'top 0.3s cubic-bezier(0.2, 0, 0, 1), translate 0.3s cubic-bezier(0.2, 0, 0, 1)',
+  transition: 'top 0.4s cubic-bezier(0.2, 0, 0, 1), transform 0.4s cubic-bezier(0.2, 0, 0, 1)',
 };
 
 export function getKeyboardDialogStyle(
@@ -14,10 +14,10 @@ export function getKeyboardDialogStyle(
 
   const viewportHeight = window.innerHeight;
   const available = viewportHeight - keyboardHeight;
-  const targetY = Math.max(20, (available - dialogHeight) / 2);
+  const targetY = Math.max(16, available - dialogHeight - 24);
 
   return {
     top: `${targetY}px`,
-    translate: '-50% 0',
+    transform: 'translate(-50%, 0)',
   };
 }

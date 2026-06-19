@@ -98,18 +98,21 @@ export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, cur
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.2, ease: mdEasing.standard }}
+                transition={{ duration: 0.15, ease: 'linear' }}
                 className="fixed inset-0 bg-black/60 z-[300]"
               />
             </Dialog.Overlay>
             <Dialog.Content asChild onOpenAutoFocus={(e) => e.preventDefault()}>
               <motion.div
                 ref={dialogRef}
-                initial={{ opacity: 0, scale: 0.92 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.92 }}
-                transition={{ duration: 0.2, ease: mdEasing.standard }}
-                className="fixed left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[400px] bg-[var(--md-sys-color-surface-container-high)] rounded-[28px] p-6 z-[310] outline-none shadow-xl border border-[var(--md-sys-color-outline-variant)]/10"
+                initial={{ opacity: 0, scale: 0.9, x: '-50%', y: '-50%' }}
+                animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
+                exit={{ opacity: 0, scale: 1, x: '-50%', y: '-50%' }}
+                transition={{ 
+                  duration: 0.4, 
+                  ease: [0.2, 0, 0, 1]
+                }}
+                className="fixed left-1/2 top-1/2 w-[90vw] max-w-[400px] bg-[var(--md-sys-color-surface-container-high)] rounded-[28px] p-6 z-[310] outline-none shadow-xl border border-[var(--md-sys-color-outline-variant)]/10"
                 style={{
                   ...getKeyboardDialogStyle(keyboardHeight, dialogHeight),
                   ...keyboardDialogTransition,
