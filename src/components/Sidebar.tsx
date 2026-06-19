@@ -57,6 +57,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { user } = useAuth();
   const { isChatHistoryEnabled } = useChatHistory();
 
+  const showSnackbar = (message: string) => {
+    setSnackbarMessage(message);
+    setIsSnackbarOpen(true);
+  };
+
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0];
   const userAvatar = user?.user_metadata?.avatar_url;
 
@@ -76,10 +81,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleRenameConfirm = async (newTitle: string) => {
     if (selectedChat) {
-      await renameChat(selectedChat.id, newTitle, (title) => {
-        setChatTitle(title);
-        selectedChat.title = title;
-      });
+      try {
+        await renameChat(selectedChat.id, newTitle, (title) => {
+          setChatTitle(title);
+          selectedChat.title = title;
+        });
+        showSnackbar(t('snackbar.chatRenamed'));
+      } catch (error) {
+        console.error("Failed to rename chat:", error);
+        showSnackbar(error instanceof Error ? error.message : t('snackbar.chatRenameError'));
+      }
     }
   };
 
@@ -89,8 +100,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         await deleteChatFromDB(selectedChat.id);
         if (currentChatId === selectedChat.id) onNewChat();
         setIsDeleteOpen(false);
+        showSnackbar(t('snackbar.chatDeleted'));
       } catch (error) {
         console.error("Failed to delete chat:", error);
+        showSnackbar(error instanceof Error ? error.message : t('snackbar.chatDeleteError'));
       }
     }
   };
@@ -100,8 +113,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       try {
         await togglePinChat(selectedChat.id, !selectedChat.is_pinned, togglePin);
         setIsMenuOpen(false);
+        showSnackbar(!selectedChat.is_pinned ? t('snackbar.chatPinned') : t('snackbar.chatUnpinned'));
       } catch (error) {
         console.error("Failed to pin/unpin chat:", error);
+        showSnackbar(error instanceof Error ? error.message : t('snackbar.chatPinError'));
       }
     }
   };

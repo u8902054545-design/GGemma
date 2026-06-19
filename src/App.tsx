@@ -150,6 +150,8 @@ export default function App() {
                 isSidebarOpen={isSidebarOpen}
                 deleteChatFromDB={deleteChat}
                 togglePin={togglePin}
+                setSnackbarMessage={setSnackbarMessage}
+                setIsSnackbarOpen={setIsSnackbarOpen}
                 isTemporary={isTemporary}
                 onTemporaryChatClick={handleTemporaryToggle}
                 onNewChat={() => {

@@ -9,6 +9,15 @@ export interface Chat {
   is_pinned: boolean;
 }
 
+const getApiErrorMessage = async (response: Response, fallback: string) => {
+  try {
+    const data = await response.json();
+    return data?.error || fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 export const useUserChats = (userId: string | undefined) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +41,7 @@ export const useUserChats = (userId: string | undefined) => {
         }
       });
 
-      if (!response.ok) throw new Error('Failed to fetch chats');
+      if (!response.ok) throw new Error(await getApiErrorMessage(response, 'Failed to fetch chats'));
       
       const data = await response.json();
       setChats(data || []);
@@ -57,7 +66,7 @@ export const useUserChats = (userId: string | undefined) => {
         body: JSON.stringify({ chat_id: chatId }),
       });
 
-      if (!response.ok) throw new Error('Failed to delete chat');
+      if (!response.ok) throw new Error(await getApiErrorMessage(response, 'Failed to delete chat'));
       setChats(prev => prev.filter(chat => chat.id !== chatId));
     } catch (err) {
       console.error('Error deleting chat:', err);
@@ -82,7 +91,7 @@ export const useUserChats = (userId: string | undefined) => {
         }),
       });
 
-      if (!response.ok) throw new Error('Failed to toggle pin');
+      if (!response.ok) throw new Error(await getApiErrorMessage(response, 'Failed to toggle pin'));
       
       setChats(prev => {
         const updated = prev.map(chat => 

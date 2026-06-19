@@ -1,5 +1,14 @@
 import { supabase, SUPABASE_ENDPOINT } from '../config';
 
+const getApiErrorMessage = async (response: Response, fallback: string) => {
+  try {
+    const data = await response.json();
+    return data?.error || fallback;
+  } catch {
+    return fallback;
+  }
+};
+
 export const handleNewChat = (
   setMessages: (m: any[]) => void, 
   setChatId: (id: string) => void, 
@@ -31,11 +40,12 @@ export const renameChat = async (
       }),
     });
 
-    if (!response.ok) throw new Error('Failed to rename chat');
+    if (!response.ok) throw new Error(await getApiErrorMessage(response, 'Failed to rename chat'));
     
     setChatTitle(newTitle);
   } catch (error) {
     console.error('Error renaming chat:', error);
+    throw error;
   }
 };
 
@@ -81,7 +91,7 @@ export const fetchChatMessages = async (chatId: string) => {
       }
     });
 
-    if (!response.ok) throw new Error('Failed to fetch messages');
+    if (!response.ok) throw new Error(await getApiErrorMessage(response, 'Failed to fetch messages'));
 
     const data = await response.json();
     return data.map((m: any) => ({

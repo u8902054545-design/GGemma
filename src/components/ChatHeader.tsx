@@ -26,6 +26,8 @@ interface ChatHeaderProps {
   isSidebarOpen: boolean;
   deleteChatFromDB: (id: string) => Promise<void>;
   togglePin: (id: string, pinned: boolean) => Promise<void>;
+  setSnackbarMessage: (msg: string) => void;
+  setIsSnackbarOpen: (open: boolean) => void;
   isTemporary?: boolean;
   onTemporaryChatClick?: () => void;
   onNewChat?: () => void;
@@ -35,7 +37,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   messages, chatTitle, chatId, isPinned, selectedModel, isModelSelectorOpen, onModelSelectorToggle,
   setMessages, setChatId, setChatTitle,
   onMenuClick, isSidebarOpen, deleteChatFromDB, togglePin, isTemporary = false,
-  onTemporaryChatClick, onNewChat
+  setSnackbarMessage, setIsSnackbarOpen, onTemporaryChatClick, onNewChat
 }) => {
   const isChatStarted = messages.length > 0;
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -45,6 +47,11 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const { t } = useLanguage();
   const { isChatHistoryEnabled } = useChatHistory();
 
+  const showSnackbar = (message: string) => {
+    setSnackbarMessage(message);
+    setIsSnackbarOpen(true);
+  };
+
   const onNewChatClick = () => {
     if (onNewChat) {
       onNewChat();
@@ -53,15 +60,25 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     }
   };
 
-  const handleRenameConfirm = (newTitle: string) => renameChat(chatId, newTitle, setChatTitle);
+  const handleRenameConfirm = async (newTitle: string) => {
+    try {
+      await renameChat(chatId, newTitle, setChatTitle);
+      showSnackbar(t('snackbar.chatRenamed'));
+    } catch (error) {
+      console.error("Failed to rename chat:", error);
+      showSnackbar(error instanceof Error ? error.message : t('snackbar.chatRenameError'));
+    }
+  };
 
   const handleDeleteConfirm = async () => {
     try {
       await deleteChatFromDB(chatId);
       onNewChatClick();
       setIsDeleteOpen(false);
+      showSnackbar(t('snackbar.chatDeleted'));
     } catch (error) {
       console.error("Failed to delete chat:", error);
+      showSnackbar(error instanceof Error ? error.message : t('snackbar.chatDeleteError'));
     }
   };
 
@@ -69,8 +86,10 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
     try {
       await togglePinChat(chatId, !isPinned, togglePin);
       setIsMenuOpen(false);
+      showSnackbar(!isPinned ? t('snackbar.chatPinned') : t('snackbar.chatUnpinned'));
     } catch (error) {
       console.error("Failed to toggle pin in header:", error);
+      showSnackbar(error instanceof Error ? error.message : t('snackbar.chatPinError'));
     }
   };
 
