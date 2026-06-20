@@ -7,7 +7,7 @@ export const useChatLoader = (
   setIsLoading: (loading: boolean) => void,
   setSnackbarMessage: (msg: string) => void,
   setIsSnackbarOpen: (open: boolean) => void,
-  scrollToBottom: () => void
+  scrollToMessageTop: (messageId: string) => void
 ) => {
   const loadChatMessages = async (id: string) => {
     try {
@@ -42,7 +42,11 @@ export const useChatLoader = (
       }));
 
       setMessages(formattedMessages);
-      setTimeout(scrollToBottom, 100);
+      
+      const lastUserMessage = [...formattedMessages].reverse().find(m => m.role === 'user');
+      if (lastUserMessage) {
+        setTimeout(() => scrollToMessageTop(lastUserMessage.id), 100);
+      }
     } catch (err: any) {
       setMessages([]);
       setSnackbarMessage('Error loading messages');

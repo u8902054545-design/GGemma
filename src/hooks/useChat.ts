@@ -30,7 +30,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
     setIsLoading,
     setSnackbarMessage,
     setIsSnackbarOpen,
-    scrollToBottom
+    scrollToMessageTop
   );
 
   const refreshCurrentChatTitle = useCallback((allChats: any[]) => {
