@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { supabase, SUPABASE_ENDPOINT } from '../config';
 import { useLanguage } from '../hooks/useLanguage';
 import { useChatHistory } from '../hooks/useChatHistory';
+import { useAuth } from '../hooks/useAuth';
+import { useUserChats } from '../hooks/useUserChats';
 
 interface SearchResult {
   chat_id: string;
@@ -23,6 +25,8 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
   const [loading, setLoading] = useState(false);
   const { t } = useLanguage();
   const { isChatHistoryEnabled } = useChatHistory();
+  const { user } = useAuth();
+  const { chats } = useUserChats(user?.id);
 
   useEffect(() => {
     if (!query.trim() || !isChatHistoryEnabled) {
@@ -71,15 +75,6 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
           className="fixed inset-0 bg-[var(--md-sys-color-surface)] z-[200] flex flex-col"
         >
           <div className="p-4 flex items-center gap-3 border-b border-[var(--md-sys-color-outline-variant)]/10">
-            <button
-              onClick={() => {
-                setQuery('');
-                onClose();
-              }}
-              className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full text-[var(--md-sys-color-on-surface)] transition-colors"
-            >
-              <span className="material-symbols-outlined">arrow_back</span>
-            </button>
             <input
               autoFocus
               type="text"
@@ -88,21 +83,28 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
               placeholder={t('chat.search.placeholder')}
               className="flex-1 bg-transparent border-none outline-none text-[var(--md-sys-color-on-surface)] text-base placeholder:text-[var(--md-sys-color-on-surface-variant)]"
             />
-            {query && (
-              <button onClick={() => setQuery('')} className="text-[var(--md-sys-color-on-surface-variant)]">
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            )}
+            <md-icon-button
+              onClick={() => {
+                setQuery('');
+                onClose();
+              }}
+            >
+              <md-icon>close</md-icon>
+            </md-icon-button>
           </div>
 
           <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <div className="px-6 py-2 text-sm font-medium text-[var(--md-sys-color-on-surface-variant)]">
+               {query.trim() ? t('chat.search.results') : t('chat.search.recent')}
+            </div>
+
             {loading && (
               <div className="flex justify-center p-8">
                 <div className="w-5 h-5 border-2 border-[#c2e7ff] border-t-transparent rounded-full animate-spin"></div>
               </div>
             )}
 
-            {!loading && results.length > 0 && (
+            {!loading && query.trim() && results.length > 0 && (
               <div className="p-2 flex flex-col gap-1">
                 {results.map((res, i) => (
                   <button
@@ -122,6 +124,26 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
                         {res.content}
                       </div>
                     )}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {!loading && !query.trim() && (
+              <div className="p-2 flex flex-col gap-1">
+                {chats.map((chat) => (
+                  <button
+                    key={chat.id}
+                    onClick={() => {
+                      onSelectChat(chat.id);
+                      setQuery('');
+                      onClose();
+                    }}
+                    className="w-full px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 rounded-2xl text-left transition-all active:scale-[0.98]"
+                  >
+                    <div className="text-sm font-medium text-[var(--md-sys-color-on-surface)] truncate">
+                      {chat.title}
+                    </div>
                   </button>
                 ))}
               </div>

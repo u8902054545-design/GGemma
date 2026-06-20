@@ -16,6 +16,8 @@ export const ru = {
   'chat.input.placeholder': 'Введите сообщение...',
   'chat.input.placeholder.gemma': 'Спросите Gemma',
   'chat.search.button': 'Поиск',
+  'chat.search.recent': 'Недавние чаты',
+  'chat.search.results': 'Результаты поиска',
   'chat.add.photo': 'Фото',
   'chat.add.camera': 'Открыть камеру',
   'chat.add.search': 'Поиск в интернете',

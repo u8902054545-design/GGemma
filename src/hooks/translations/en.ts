@@ -16,6 +16,8 @@ export const en = {
   'chat.input.placeholder': 'Type a message...',
   'chat.input.placeholder.gemma': 'Ask Gemma',
   'chat.search.button': 'Search',
+  'chat.search.recent': 'Recent chats',
+  'chat.search.results': 'Search results',
   'chat.add.photo': 'Photo',
   'chat.add.camera': 'Open the camera',
   'chat.add.search': 'Internet search',
