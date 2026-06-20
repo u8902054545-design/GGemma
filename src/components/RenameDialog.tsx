@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../hooks/useLanguage';
-import { getKeyboardDialogStyle, keyboardDialogTransition } from '../motion/keyboardDialog';
 import { mdEasing } from '../motion/transitions';
 
 interface RenameDialogProps {
@@ -88,6 +87,11 @@ export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, cur
     }
   };
 
+  const isKeyboardOpen = keyboardHeight > 0;
+  const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : 0;
+  const available = viewportHeight - keyboardHeight;
+  const targetY = isKeyboardOpen ? Math.max(16, available - dialogHeight - 24) : 0;
+
   return (
     <Dialog.Root open={isOpen} onOpenChange={onClose}>
       <AnimatePresence>
@@ -105,18 +109,14 @@ export const RenameDialog: React.FC<RenameDialogProps> = ({ isOpen, onClose, cur
             <Dialog.Content asChild onOpenAutoFocus={(e) => e.preventDefault()}>
               <motion.div
                 ref={dialogRef}
-                initial={{ opacity: 0, scale: 0.9, x: '-50%', y: '-50%' }}
-                animate={{ opacity: 1, scale: 1, x: '-50%', y: '-50%' }}
-                exit={{ opacity: 0, scale: 1, x: '-50%', y: '-50%' }}
+                initial={{ opacity: 0, scale: 0.9, x: '-50%', y: isKeyboardOpen ? 0 : '-50%', top: isKeyboardOpen ? `${targetY}px` : '50%' }}
+                animate={{ opacity: 1, scale: 1, x: '-50%', y: isKeyboardOpen ? 0 : '-50%', top: isKeyboardOpen ? `${targetY}px` : '50%' }}
+                exit={{ opacity: 0, scale: 1, x: '-50%', y: isKeyboardOpen ? 0 : '-50%', top: isKeyboardOpen ? `${targetY}px` : '50%' }}
                 transition={{ 
                   duration: 0.4, 
                   ease: [0.2, 0, 0, 1]
                 }}
-                className="fixed left-1/2 top-1/2 w-[90vw] max-w-[400px] bg-[var(--md-sys-color-surface-container-high)] rounded-[28px] p-6 z-[310] outline-none shadow-xl border border-[var(--md-sys-color-outline-variant)]/10"
-                style={{
-                  ...getKeyboardDialogStyle(keyboardHeight, dialogHeight),
-                  ...keyboardDialogTransition,
-                }}
+                className="fixed left-1/2 w-[90vw] max-w-[400px] bg-[var(--md-sys-color-surface-container-high)] rounded-[28px] p-6 z-[310] outline-none shadow-xl border border-[var(--md-sys-color-outline-variant)]/10"
               >
                 <Dialog.Title className="text-[var(--md-sys-color-on-surface)] text-xl mb-6 font-normal">
                   {t('dialog.rename.title')}
