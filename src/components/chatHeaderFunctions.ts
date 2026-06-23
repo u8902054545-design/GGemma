@@ -1,6 +1,9 @@
 import { supabase, SUPABASE_ENDPOINT } from '../config';
 
 const getApiErrorMessage = async (response: Response, fallback: string) => {
+  if (response.status === 403) {
+    return 'Доступ запрещен из вашего региона.';
+  }
   try {
     const data = await response.json();
     return data?.error || fallback;
