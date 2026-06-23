@@ -2,11 +2,14 @@ import React from 'react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { Chat } from '../../hooks/chatTypes';
 import { GemmaSkeleton } from '../GemmaSkeleton';
+import '@material/web/button/filled-button.js';
+import '@material/web/icon/icon.js';
 
 interface ChatListProps {
   chats: Chat[];
   loading?: boolean;
   error?: boolean;
+  onRefresh: () => void;
   currentChatId: string;
   onChatSelect: (id: string) => void;
   onLongPress: (chat: Chat) => void;
@@ -16,6 +19,7 @@ export const ChatList: React.FC<ChatListProps> = ({
   chats,
   loading,
   error,
+  onRefresh,
   currentChatId,
   onChatSelect,
   onLongPress
@@ -32,8 +36,16 @@ export const ChatList: React.FC<ChatListProps> = ({
 
   if (error) {
     return (
-      <div className="px-4 py-8 text-center">
-        <p className="text-sm text-[var(--md-sys-color-error)]">{t('sidebar.load_error')}</p>
+      <div className="px-6 py-6 text-center flex flex-col items-center gap-2">
+        <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">
+          {t('sidebar.load_error')}
+        </p>
+        <button 
+          onClick={onRefresh}
+          className="text-sm font-medium text-[var(--md-sys-color-primary)] hover:bg-[var(--md-sys-color-primary)]/10 px-3 py-1.5 rounded-full transition-colors"
+        >
+          {t('sidebar.retry')}
+        </button>
       </div>
     );
   }
