@@ -53,6 +53,7 @@ export const en = {
   'common.confirm': 'Confirm',
   'sidebar.no_chats': 'No chats yet',
   'sidebar.load_error': 'Failed to load chats',
+  'sidebar.retry': 'Repeat',
   'sidebar.untitled': 'Untitled Chat',
   'start.greeting': 'Hello',
   'start.subtitle': 'How can I help you today?',
@@ -90,6 +91,7 @@ export const en = {
   'errors.historyDisabled.chat': 'Cannot open chat while history is disabled',
   'errors.historyDisabled.send': 'Cannot send messages in past chats while history is disabled',
   'errors.historyDisabled.search': 'Cannot search chats while history is disabled',
+  'errors.snackbar_failed_connect': 'Failed to connect to the server. Please try again later.',
   'snackbar.chatDeleted': 'Chat deleted',
   'snackbar.chatRenamed': 'Chat renamed',
   'snackbar.chatPinned': 'Chat pinned',
@@ -108,4 +110,5 @@ export const en = {
   'personalization.field_label': 'Your instructions',
   'personalization.save': 'Save',
   'personalization.saved': 'Saved',
+  'model.limit.exceeded': 'Limit for model {model} is exhausted. Switched to {fallback}.',
 };

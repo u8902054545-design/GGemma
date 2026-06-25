@@ -53,6 +53,7 @@ export const ru = {
   'common.confirm': 'Подтвердить',
   'sidebar.no_chats': 'Чатов пока нет',
   'sidebar.load_error': 'Не удалось загрузить чаты',
+  'sidebar.retry': 'Повторить',
   'sidebar.untitled': 'Чат без названия',
   'start.greeting': 'Привет',
   'start.subtitle': 'Чем я могу вам помочь сегодня?',
@@ -90,6 +91,7 @@ export const ru = {
   'errors.historyDisabled.chat': 'Невозможно открыть чат при выключенной истории',
   'errors.historyDisabled.send': 'Отправка сообщений в старых чатах невозможна при выключенной истории',
   'errors.historyDisabled.search': 'Поиск чатов невозможен при выключенной истории',
+  'errors.snackbar_failed_connect': 'Не удалось подключиться к серверу. Повторите попытку позже.',
   'snackbar.chatDeleted': 'Чат удалён',
   'snackbar.chatRenamed': 'Название чата изменено',
   'snackbar.chatPinned': 'Чат закреплён',
@@ -108,4 +110,5 @@ export const ru = {
   'personalization.field_label': 'Ваши инструкции',
   'personalization.save': 'Сохранить',
   'personalization.saved': 'Сохранено',
+  'model.limit.exceeded': 'Лимит модели {model} исчерпан. Переключено на {fallback}.',
 };

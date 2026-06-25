@@ -29,6 +29,7 @@ interface SidebarProps {
   chats: Chat[];
   loading?: boolean;
   error?: boolean;
+  onRefresh: () => void;
   currentChatId: string;
   onChatSelect: (id: string) => void;
   onNewChat: () => void;
@@ -40,7 +41,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  isOpen, onClose, chats, loading, error, currentChatId,
+  isOpen, onClose, chats, loading, error, onRefresh, currentChatId,
   onChatSelect, onNewChat, deleteChatFromDB, setChatTitle, togglePin,
   setSnackbarMessage, setIsSnackbarOpen
 }) => {
@@ -56,6 +57,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { t } = useLanguage();
   const { user } = useAuth();
   const { isChatHistoryEnabled } = useChatHistory();
+
+  React.useEffect(() => {
+    if (error) {
+      setSnackbarMessage(t('errors.snackbar_failed_connect'));
+      setIsSnackbarOpen(true);
+    }
+  }, [error]);
 
   const showSnackbar = (message: string) => {
     setSnackbarMessage(message);
@@ -191,6 +199,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               chats={chats}
               loading={loading}
               error={error}
+              onRefresh={onRefresh}
               currentChatId={currentChatId}
               onChatSelect={(id) => { onChatSelect(id); onClose(); }}
               onLongPress={handleLongPress}

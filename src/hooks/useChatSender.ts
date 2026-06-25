@@ -26,7 +26,8 @@ export const useChatSender = (
   setIsSnackbarOpen: (open: boolean) => void,
   onNewChatCreated?: () => void,
   setChatTitle?: (title: string) => void,
-  isTemporary: boolean = false
+  isTemporary: boolean = false,
+  refreshLimits?: () => void
 ) => {
   const { isChatHistoryEnabled } = useChatHistory();
 
@@ -156,8 +157,11 @@ export const useChatSender = (
       }
     } finally {
       setIsTyping(false);
+      if (refreshLimits) {
+        refreshLimits();
+      }
     }
-  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, scrollToMessageTop, messages, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen, setChatTitle, isTemporary]);
+  }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, scrollToMessageTop, messages, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen, setChatTitle, isTemporary, refreshLimits]);
 
   return { handleSend };
 };

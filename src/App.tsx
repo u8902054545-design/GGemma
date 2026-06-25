@@ -28,7 +28,7 @@ export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
-  const { chats, loading: chatsLoading, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
+  const { chats, loading: chatsLoading, error, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
@@ -44,7 +44,7 @@ export default function App() {
     messages, setMessages, input, setInput, selectedModel, setSelectedModel,
     isTyping, isLoading, messagesEndRef, scrollContainerRef, handleSend, handleFeedback, chatId, setChatId,
     chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
-    isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage
+    isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage, exhaustedModels
   } = useChat(() => refreshChats(true), isTemporary);
 
   const { isChatHistoryEnabled } = useChatHistory();
@@ -110,7 +110,8 @@ export default function App() {
               onClose={() => closeState(setIsSidebarOpen)}
               chats={chats}
               loading={chatsLoading}
-              error={false}
+              error={error}
+              onRefresh={() => refreshChats(false)}
               currentChatId={chatId}
               onChatSelect={(id) => {
                 if (!isChatHistoryEnabled) {
@@ -200,7 +201,7 @@ export default function App() {
             </div>
           </motion.div>
 
-          <GemmaBottomSheet isOpen={isModelSelectorOpen} onOpenChange={setIsModelSelectorOpen} selectedModel={selectedModel} onModelSelect={setSelectedModel} models={models} />
+          <GemmaBottomSheet isOpen={isModelSelectorOpen} onOpenChange={setIsModelSelectorOpen} selectedModel={selectedModel} onModelSelect={setSelectedModel} models={models} exhaustedModels={exhaustedModels} />
 
           <AppModals 
             isVoiceSelectionOpen={isVoiceSelectionOpen}

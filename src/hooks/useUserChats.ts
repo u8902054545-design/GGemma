@@ -21,6 +21,7 @@ const getApiErrorMessage = async (response: Response, fallback: string) => {
 export const useUserChats = (userId: string | undefined) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   const fetchChats = useCallback(async (isSilent = false) => {
     if (!userId) {
@@ -29,7 +30,10 @@ export const useUserChats = (userId: string | undefined) => {
       return;
     }
     try {
-      if (!isSilent) setLoading(true);
+      if (!isSilent) {
+        setLoading(true);
+        setError(false);
+      }
       const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) throw new Error('Unauthorized');
 
@@ -47,6 +51,7 @@ export const useUserChats = (userId: string | undefined) => {
       setChats(data || []);
     } catch (err) {
       console.error('Error fetching chats:', err);
+      setError(true);
     } finally {
       if (!isSilent) setLoading(false);
     }
@@ -116,7 +121,8 @@ export const useUserChats = (userId: string | undefined) => {
 
   return { 
     chats, 
-    loading, 
+    loading,
+    error,
     refreshChats: fetchChats, 
     deleteChat: deleteChatLocally,
     togglePin: togglePinLocally

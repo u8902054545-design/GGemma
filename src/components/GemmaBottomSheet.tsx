@@ -12,6 +12,7 @@ interface GemmaBottomSheetProps {
   selectedModel: SelectedModel;
   onModelSelect: (model: SelectedModel) => void;
   models: SelectedModel[];
+  exhaustedModels?: string[];
 }
 
 export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
@@ -19,7 +20,8 @@ export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
   onOpenChange,
   selectedModel,
   onModelSelect,
-  models
+  models,
+  exhaustedModels = []
 }) => {
   const { t, language } = useLanguage();
 
@@ -60,27 +62,33 @@ export const GemmaBottomSheet: React.FC<GemmaBottomSheetProps> = ({
               
               <md-divider style={{ margin: '8px 16px', opacity: 0.1 }} />
 
-              {models.map((model) => (
-                <md-list-item
-                  key={model.id}
-                  type="button"
-                  onClick={() => {
-                    onModelSelect(model);
-                    onOpenChange(false);
-                  }}
-                  style={{
-                    '--md-list-item-label-text-color': selectedModel.id === model.id ? 'var(--md-sys-color-primary)' : 'var(--md-sys-color-on-surface)'
-                  }}
-                >
-                  <div slot="headline">{model.name}</div>
-                  <div slot="supporting-text">{modelDescriptions[model.id]?.[language] || ''}</div>
-                  {selectedModel.id === model.id && (
-                    <span slot="end" className="material-symbols-outlined text-[var(--md-sys-color-primary)]">
-                      check
-                    </span>
-                  )}
-                </md-list-item>
-              ))}
+              {models.map((model) => {
+                const isExhausted = exhaustedModels.includes(model.id);
+                return (
+                  <md-list-item
+                    key={model.id}
+                    type="button"
+                    disabled={isExhausted}
+                    onClick={isExhausted ? undefined : () => {
+                      onModelSelect(model);
+                      onOpenChange(false);
+                    }}
+                    style={{
+                      '--md-list-item-label-text-color': selectedModel.id === model.id ? 'var(--md-sys-color-primary)' : 'var(--md-sys-color-on-surface)',
+                      opacity: isExhausted ? 0.38 : 1,
+                      pointerEvents: isExhausted ? 'none' : 'auto'
+                    }}
+                  >
+                    <div slot="headline">{model.name}</div>
+                    <div slot="supporting-text">{modelDescriptions[model.id]?.[language] || ''}</div>
+                    {selectedModel.id === model.id && (
+                      <span slot="end" className="material-symbols-outlined text-[var(--md-sys-color-primary)]">
+                        check
+                      </span>
+                    )}
+                  </md-list-item>
+                );
+              })}
             </md-list>
           </div>
         </Drawer.Content>
