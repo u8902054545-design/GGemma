@@ -27,6 +27,8 @@ export type Message = {
   modelName?: string;
   feedback?: 'like' | 'dislike' | null;
   voice?: string;
+  searchUsed?: boolean;
+  isSearching?: boolean;
 };
 
 export const MODELS: SelectedModel[] = [

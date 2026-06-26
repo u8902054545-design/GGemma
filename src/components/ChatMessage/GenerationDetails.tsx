@@ -7,12 +7,14 @@ interface GenerationDetailsProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   modelName?: string;
+  searchUsed?: boolean;
 }
 
 export const GenerationDetails: React.FC<GenerationDetailsProps> = ({
   isOpen,
   onOpenChange,
-  modelName
+  modelName,
+  searchUsed
 }) => {
   const { t } = useLanguage();
 
@@ -40,6 +42,28 @@ export const GenerationDetails: React.FC<GenerationDetailsProps> = ({
               </p>
             </div>
           </div>
+
+          {searchUsed && (
+            <>
+              <div className="mx-6 border-t border-[var(--md-sys-color-outline-variant)] opacity-60" />
+              <div className="px-6 py-4 flex flex-col gap-2">
+                <h3 className="text-[var(--md-sys-color-on-surface-variant)] text-xs font-semibold uppercase tracking-wider">
+                  {t('message.generation_details.tools_used')}
+                </h3>
+                <div className="flex items-center gap-3 py-2.5 px-4 rounded-xl bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)]/60">
+                  <div className="w-8 h-8 rounded-lg bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] flex items-center justify-center flex-shrink-0">
+                    <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">search</span>
+                  </div>
+                  <div className="flex-1">
+                    <span className="text-[var(--md-sys-color-on-surface)] text-sm font-medium">
+                      {t('message.generation_details.web_search')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
           <div className="pb-8" />
         </Drawer.Content>
       </Drawer.Portal>

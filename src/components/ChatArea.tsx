@@ -74,6 +74,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
                 onVideoClick={onVideoClick}
                 isTemporary={isTemporary}
+                searchUsed={msg.searchUsed}
+                isSearching={msg.isSearching}
               />
             ))}
             <div ref={messagesEndRef} className="h-1" />

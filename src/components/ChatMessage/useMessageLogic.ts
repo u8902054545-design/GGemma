@@ -14,6 +14,7 @@ export const useMessageLogic = (
   const [localFeedback, setLocalFeedback] = useState<'like' | 'dislike' | null>(initialFeedback || null);
 
   const { thought, mainContent } = useMemo(() => {
+    // 1. Check if content has standard *thought*
     const thoughtMatch = content.match(/^\*([\s\S]*?)\*/);
     if (thoughtMatch) {
       const extractedThought = thoughtMatch[1].trim();
@@ -23,6 +24,33 @@ export const useMessageLogic = (
         mainContent: extractedContent
       };
     }
+
+    // 2. Check if content starts with "thought" or "thinking" or "<thought>" block
+    const hasThoughtHeader = content.match(/^(?:thought|thinking|thought:|<thought>)\s*\n/i);
+    if (hasThoughtHeader) {
+      const headerLength = hasThoughtHeader[0].length;
+      const rest = content.slice(headerLength);
+      
+      // Look for the end of the thought block (either </thought>, double newline, or [SEARCH_REQUIRED:)
+      const endOfThoughtMatch = rest.match(/([\s\S]*?)(?:\n\n|\n\s*\n|<\/thought>|\[SEARCH_REQUIRED:)/i);
+      if (endOfThoughtMatch) {
+        const thoughtContent = endOfThoughtMatch[1].trim();
+        const main = rest.slice(endOfThoughtMatch[1].length).trim();
+        // If main starts with </thought> or similar, strip it
+        const cleanMain = main.replace(/^(?:<\/thought>|\n\n|\n\s*\n)/i, "").trim();
+        return {
+          thought: thoughtContent,
+          mainContent: cleanMain
+        };
+      }
+      
+      // If no end of thought is found yet (still streaming), treat everything as thought
+      return {
+        thought: rest.trim(),
+        mainContent: ""
+      };
+    }
+
     return { thought: null, mainContent: content.trim() };
   }, [content]);
 

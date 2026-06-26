@@ -13,6 +13,7 @@ import { MessageMedia } from './MessageMedia';
 import { StoppedIndicator } from './StoppedIndicator';
 import { ExpandButton } from './ExpandButton';
 import { ImportedCodes } from './ImportedCodes';
+import { SearchProgress } from './SearchProgress';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
@@ -22,6 +23,7 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   imageUrl?: string;
   videoUrl?: string;
   codes?: ImportedCode[];
+  isSearching?: boolean;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
@@ -38,7 +40,9 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   isLast,
   onImageClick,
   onVideoClick,
-  isTemporary = false
+  isTemporary = false,
+  searchUsed,
+  isSearching
 }) => {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
@@ -80,6 +84,12 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           onToggleThought={() => setIsThoughtExpanded(!isThoughtExpanded)}
         />
       )}
+
+      <AnimatePresence mode="wait">
+        {isAI && isSearching && (
+          <SearchProgress />
+        )}
+      </AnimatePresence>
 
       <div className={`w-full flex flex-col ${isAI ? 'items-start' : 'items-end'}`}>
         <AnimatePresence>
@@ -160,6 +170,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               isOpen={isDetailsOpen}
               onOpenChange={setIsDetailsOpen}
               modelName={modelName}
+              searchUsed={searchUsed}
             />
           </>
         )}

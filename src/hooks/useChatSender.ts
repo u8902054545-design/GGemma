@@ -122,6 +122,7 @@ export const useChatSender = (
       }
 
       const modelNameFromServer = response.headers.get('x-model-name') || selectedModel.name;
+      const searchUsedFromServer = response.headers.get('x-search-used') === 'true';
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";
@@ -134,11 +135,48 @@ export const useChatSender = (
 
         accumulatedContent += decoder.decode(value, { stream: true });
 
+        let displayContent = accumulatedContent;
+        let searchUsed = searchUsedFromServer;
+        let isSearching = false;
+
+        if (displayContent.includes("[SEARCH_IN_PROGRESS]")) {
+          const index = displayContent.indexOf("[SEARCH_IN_PROGRESS]");
+          const before = displayContent.substring(0, index);
+          const after = displayContent.substring(index + 20);
+          displayContent = before + after;
+          if (after.trim().length === 0) {
+            isSearching = true;
+          }
+        }
+
+        if (displayContent.includes("[SEARCH_REQUIRED:")) {
+          const index = displayContent.indexOf("[SEARCH_REQUIRED:");
+          const before = displayContent.substring(0, index);
+          const after = displayContent.substring(index);
+          const closingIdx = after.indexOf("]");
+          if (closingIdx !== -1) {
+            displayContent = before + after.substring(closingIdx + 1);
+          } else {
+            displayContent = before;
+          }
+        }
+
+        if (displayContent.endsWith("[SEARCH_USED]")) {
+          displayContent = displayContent.slice(0, -13);
+          searchUsed = true;
+        }
+
         setMessages(prev => {
           const newMessages = [...prev];
           const lastIdx = newMessages.length - 1;
           if (lastIdx >= 0 && newMessages[lastIdx].id === aiMsgId) {
-            newMessages[lastIdx] = { ...newMessages[lastIdx], content: accumulatedContent, modelName: modelNameFromServer };
+            newMessages[lastIdx] = { 
+              ...newMessages[lastIdx], 
+              content: displayContent, 
+              modelName: modelNameFromServer,
+              searchUsed: searchUsed,
+              isSearching: isSearching
+            };
             if (isTemporary) saveTempMessages(newMessages);
           }
           return newMessages;
