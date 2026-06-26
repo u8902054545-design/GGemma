@@ -126,6 +126,7 @@ export const useChatSender = (
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";
+      let searchTriggeredFlag = false;
 
       if (!reader) throw new Error('ReadableStream not supported');
 
@@ -135,16 +136,26 @@ export const useChatSender = (
 
         accumulatedContent += decoder.decode(value, { stream: true });
 
+        if (accumulatedContent.includes("[SEARCH_IN_PROGRESS]")) {
+          searchTriggeredFlag = true;
+        }
+
         let displayContent = accumulatedContent;
         let searchUsed = searchUsedFromServer;
         let isSearching = false;
 
-        if (displayContent.includes("[SEARCH_IN_PROGRESS]")) {
+        if (searchTriggeredFlag) {
           const index = displayContent.indexOf("[SEARCH_IN_PROGRESS]");
-          const before = displayContent.substring(0, index);
-          const after = displayContent.substring(index + 20);
-          displayContent = before + after;
-          if (after.trim().length === 0) {
+          if (index !== -1) {
+            displayContent = displayContent.substring(index + 20);
+          }
+          
+          const cleanText = displayContent
+            .replace(/\[SEARCH_SOURCES:[^\]]*\]/g, "")
+            .replace(/\[SEARCH_USED\]/g, "")
+            .trim();
+            
+          if (cleanText.length === 0) {
             isSearching = true;
           }
         }
