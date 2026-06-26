@@ -30,6 +30,7 @@ export type Message = {
   searchUsed?: boolean;
   isSearching?: boolean;
   searchSources?: { title: string; url: string }[];
+  searchEnabledBy?: 'user' | 'model';
 };
 
 export const MODELS: SelectedModel[] = [

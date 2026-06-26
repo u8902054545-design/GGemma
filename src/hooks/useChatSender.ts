@@ -208,7 +208,8 @@ export const useChatSender = (
               modelName: modelNameFromServer,
               searchUsed: searchUsed,
               isSearching: isSearching,
-              searchSources: searchSourcesList || existingSources
+              searchSources: searchSourcesList || existingSources,
+              searchEnabledBy: searchUsed ? (isSearchActive ? 'user' : 'model') : undefined
             };
             if (isTemporary) saveTempMessages(newMessages);
           }

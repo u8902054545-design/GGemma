@@ -40,7 +40,8 @@ export const useChatLoader = (
         videoUrl: m.video_url,
         codes: m.codes,
         searchUsed: m.search_used,
-        searchSources: m.search_sources
+        searchSources: m.search_sources,
+        searchEnabledBy: m.search_enabled_by
       }));
 
       setMessages(formattedMessages);

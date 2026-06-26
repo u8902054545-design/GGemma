@@ -23,6 +23,7 @@ import { useSettingsSync } from './hooks/useSettingsSync';
 import { ScrollToBottomButton } from './components/ScrollToBottomButton';
 import { AppModals } from './components/AppModals';
 import { useChatHistory } from './hooks/useChatHistory';
+import { WebSearchConfirmationBottomSheet, useWebSearchConfirmation } from './components/WebSearchConfirmation';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -73,6 +74,35 @@ export default function App() {
     setIsCodeImportOpen(false);
   };
 
+  const executeSend = useCallback(async (text?: string, isSearch?: boolean, file?: File, codes?: any[]) => {
+    let finalInput = text || input;
+    const targetCodes = codes !== undefined ? codes : importedCodes;
+    if (targetCodes && targetCodes.length > 0) {
+      const codesMarkdown = targetCodes.map(c => `File: ${c.filename}\n\`\`\`\n${c.code}\n\`\`\``).join('\n\n');
+      finalInput = finalInput ? `${finalInput}\n\n${codesMarkdown}` : codesMarkdown;
+    }
+    await handleSend(finalInput, isSearch, file);
+    setImportedCodes([]);
+    if (isSearch) {
+      resetSearch();
+    }
+  }, [input, handleSend, resetSearch, importedCodes]);
+
+  const {
+    isOpen: isSearchConfirmOpen,
+    setIsOpen: setIsSearchConfirmOpen,
+    checkAndSend,
+    handleConfirm: handleSearchConfirm,
+    handleDecline: handleSearchDecline
+  } = useWebSearchConfirmation(
+    messages,
+    isSearchActive,
+    () => {
+      if (!isSearchActive) toggleSearch();
+    },
+    executeSend
+  );
+
   const handleCustomSend = async (text?: string, isSearch?: boolean, file?: File, codes?: any[]) => {
     if (!isChatHistoryEnabled && chats.some(c => c.id === chatId)) {
       setSnackbarMessage(t('errors.historyDisabled.send'));
@@ -80,13 +110,7 @@ export default function App() {
       return;
     }
 
-    let finalInput = text || input;
-    if (codes && codes.length > 0) {
-      const codesMarkdown = codes.map(c => `File: ${c.filename}\n\`\`\`\n${c.code}\n\`\`\``).join('\n\n');
-      finalInput = finalInput ? `${finalInput}\n\n${codesMarkdown}` : codesMarkdown;
-    }
-    await handleSend(finalInput, isSearch, file);
-    setImportedCodes([]);
+    await checkAndSend(text, isSearch, file, codes);
   };
 
   if (authLoading) return <div className="h-screen w-full bg-[var(--md-sys-color-background)]" />;
@@ -202,6 +226,13 @@ export default function App() {
           </motion.div>
 
           <GemmaBottomSheet isOpen={isModelSelectorOpen} onOpenChange={setIsModelSelectorOpen} selectedModel={selectedModel} onModelSelect={setSelectedModel} models={models} exhaustedModels={exhaustedModels} />
+
+          <WebSearchConfirmationBottomSheet
+            isOpen={isSearchConfirmOpen}
+            onOpenChange={setIsSearchConfirmOpen}
+            onConfirm={handleSearchConfirm}
+            onDecline={handleSearchDecline}
+          />
 
           <AppModals 
             isVoiceSelectionOpen={isVoiceSelectionOpen}
