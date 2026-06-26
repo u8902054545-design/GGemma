@@ -95,20 +95,13 @@ export const SearchSources: React.FC<SearchSourcesProps> = ({ sources }) => {
       </div>
       
       {hasMore && (
-        <div className="flex justify-start mt-1">
-          <md-text-button
+        <div className="w-full mt-2">
+          <button
             onClick={() => setIsExpanded(!isExpanded)}
-            style={{
-              '--md-text-button-label-text-color': 'var(--md-sys-color-primary)',
-              '--md-text-button-label-text-size': '12px',
-              'height': '32px'
-            }}
+            className="w-full h-9 flex items-center justify-center bg-[var(--md-sys-color-primary-container)] hover:bg-[var(--md-sys-color-primary-container)]/85 text-[var(--md-sys-color-on-primary-container)] rounded-full text-[12px] font-semibold transition-all active:scale-[0.98] cursor-pointer outline-none border-none"
           >
-            <span slot="icon" className="material-symbols-outlined">
-              {isExpanded ? 'expand_less' : 'expand_more'}
-            </span>
             {isExpanded ? t('chat.search.show_less') : t('chat.search.all_sources')}
-          </md-text-button>
+          </button>
         </div>
       )}
     </div>
