@@ -39,7 +39,8 @@ export const useChatLoader = (
         imageUrl: m.image_url,
         videoUrl: m.video_url,
         codes: m.codes,
-        searchUsed: m.search_used
+        searchUsed: m.search_used,
+        searchSources: m.search_sources
       }));
 
       setMessages(formattedMessages);

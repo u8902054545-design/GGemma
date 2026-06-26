@@ -76,6 +76,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 isTemporary={isTemporary}
                 searchUsed={msg.searchUsed}
                 isSearching={msg.isSearching}
+                searchSources={msg.searchSources}
               />
             ))}
             <div ref={messagesEndRef} className="h-1" />

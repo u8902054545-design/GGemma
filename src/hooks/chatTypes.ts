@@ -29,6 +29,7 @@ export type Message = {
   voice?: string;
   searchUsed?: boolean;
   isSearching?: boolean;
+  searchSources?: { title: string; url: string }[];
 };
 
 export const MODELS: SelectedModel[] = [

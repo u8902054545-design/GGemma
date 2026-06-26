@@ -14,6 +14,7 @@ import { StoppedIndicator } from './StoppedIndicator';
 import { ExpandButton } from './ExpandButton';
 import { ImportedCodes } from './ImportedCodes';
 import { SearchProgress } from './SearchProgress';
+import { SearchSources } from './SearchSources';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
@@ -42,7 +43,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   onVideoClick,
   isTemporary = false,
   searchUsed,
-  isSearching
+  isSearching,
+  searchSources
 }) => {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
@@ -143,6 +145,10 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
             <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[var(--md-sys-color-background)] to-transparent pointer-events-none" />
           )}
         </div>
+
+        {isAI && (
+          <SearchSources sources={searchSources} />
+        )}
 
         {canShowExpand && (
           <ExpandButton 

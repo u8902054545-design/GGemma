@@ -161,6 +161,25 @@ export const useChatSender = (
           }
         }
 
+        let searchSourcesList = undefined;
+        if (displayContent.includes("[SEARCH_SOURCES:")) {
+          const index = displayContent.indexOf("[SEARCH_SOURCES:");
+          const before = displayContent.substring(0, index);
+          const after = displayContent.substring(index);
+          const closingIdx = after.indexOf("]");
+          if (closingIdx !== -1) {
+            const jsonStr = after.substring(16, closingIdx);
+            try {
+              searchSourcesList = JSON.parse(jsonStr);
+            } catch (e) {
+              console.error("Failed to parse search sources", e);
+            }
+            displayContent = before + after.substring(closingIdx + 1);
+          } else {
+            displayContent = before;
+          }
+        }
+
         if (displayContent.endsWith("[SEARCH_USED]")) {
           displayContent = displayContent.slice(0, -13);
           searchUsed = true;
@@ -170,12 +189,14 @@ export const useChatSender = (
           const newMessages = [...prev];
           const lastIdx = newMessages.length - 1;
           if (lastIdx >= 0 && newMessages[lastIdx].id === aiMsgId) {
+            const existingSources = newMessages[lastIdx].searchSources;
             newMessages[lastIdx] = { 
               ...newMessages[lastIdx], 
               content: displayContent, 
               modelName: modelNameFromServer,
               searchUsed: searchUsed,
-              isSearching: isSearching
+              isSearching: isSearching,
+              searchSources: searchSourcesList || existingSources
             };
             if (isTemporary) saveTempMessages(newMessages);
           }
