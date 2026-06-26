@@ -168,9 +168,10 @@ export const useChatSender = (
           const after = displayContent.substring(index);
           const closingIdx = after.indexOf("]");
           if (closingIdx !== -1) {
-            const jsonStr = after.substring(16, closingIdx);
+            const base64Str = after.substring(16, closingIdx);
             try {
-              searchSourcesList = JSON.parse(jsonStr);
+              const decodedStr = decodeURIComponent(atob(base64Str));
+              searchSourcesList = JSON.parse(decodedStr);
             } catch (e) {
               console.error("Failed to parse search sources", e);
             }
