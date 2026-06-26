@@ -20,7 +20,7 @@ export const en = {
   'chat.search.results': 'Search results',
   'chat.add.photo': 'Photo',
   'chat.add.camera': 'Open the camera',
-  'chat.add.search': 'Internet search',
+  'chat.add.search': 'Web search',
   'chat.add.video': 'Video',
   'chat.add.code': 'Import code',
   'chat.import.code': 'Import Code',
