@@ -1,4 +1,8 @@
 export const voiceDescriptions: Record<string, { en: string; ru: string }> = {
+  'Chrome Web Speech': {
+    en: 'Free, unlimited version (Web Speech API).',
+    ru: 'Бесплатная, безлимитная версия (Web Speech API).'
+  },
   Zephyr: {
     en: 'Warm and friendly tone, perfect for conversational tasks.',
     ru: 'Тёплый и дружелюбный тон, идеально подходит для общения.'

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
 import { pageVariants } from '../../motion/transitions';
 import { useVoicePlayer } from '../../hooks/useVoicePlayer';
@@ -6,6 +6,8 @@ import { SUPABASE_ENDPOINT, supabase } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { voiceDescriptions } from './voiceDescriptions';
+
+const previewAudioCache: Record<string, ArrayBuffer> = {};
 
 interface VoiceSelectionProps {
   isOpen: boolean;
@@ -19,7 +21,11 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
     return localStorage.getItem('selected_voice') || 'Zephyr';
   });
   const [playingVoice, setPlayingVoice] = useState<string | null>(null);
+  const [loadingVoice, setLoadingVoice] = useState<string | null>(null);
   const { playPcmBuffer, stop: stopPcm, isPlaying } = useVoicePlayer();
+
+  const playingVoiceRef = useRef<string | null>(null);
+  playingVoiceRef.current = playingVoice;
 
   const PREVIEW_TEXT = t('settings.voice.preview');
 
@@ -71,22 +77,69 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
   };
 
   useEffect(() => {
-    if (!isPlaying) {
+    if (!isPlaying && playingVoice !== 'Chrome Web Speech' && !loadingVoice) {
       setPlayingVoice(null);
     }
-  }, [isPlaying]);
+  }, [isPlaying, playingVoice, loadingVoice]);
 
   const handlePlayPause = useCallback(async (e: React.MouseEvent, voiceName: string) => {
     e.stopPropagation();
     
     if (playingVoice === voiceName) {
-      stopPcm();
+      if (voiceName === 'Chrome Web Speech') {
+        window.speechSynthesis.cancel();
+      } else {
+        stopPcm();
+      }
       setPlayingVoice(null);
+      setLoadingVoice(null);
       return;
     }
 
-    stopPcm();
+    if (playingVoice === 'Chrome Web Speech') {
+      window.speechSynthesis.cancel();
+    } else {
+      stopPcm();
+    }
+    
     setPlayingVoice(voiceName);
+
+    if (voiceName === 'Chrome Web Speech') {
+      try {
+        const utterance = new SpeechSynthesisUtterance(PREVIEW_TEXT);
+        const voicesList = window.speechSynthesis.getVoices();
+        const russianVoice = voicesList.find(v => v.lang.includes('ru-RU'));
+        if (russianVoice) utterance.voice = russianVoice;
+
+        utterance.onstart = () => {
+          setPlayingVoice('Chrome Web Speech');
+        };
+        utterance.onend = () => {
+          setPlayingVoice(null);
+        };
+        utterance.onerror = () => {
+          setPlayingVoice(null);
+        };
+        window.speechSynthesis.speak(utterance);
+      } catch (error) {
+        console.error('Chrome Web Speech preview error:', error);
+        setPlayingVoice(null);
+      }
+      return;
+    }
+
+    const cacheKey = `${voiceName}_${language}`;
+    if (previewAudioCache[cacheKey]) {
+      try {
+        await playPcmBuffer(previewAudioCache[cacheKey]);
+      } catch (error) {
+        console.error('Preview error from cache:', error);
+        setPlayingVoice(null);
+      }
+      return;
+    }
+
+    setLoadingVoice(voiceName);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -109,22 +162,30 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
       if (!response.ok) throw new Error('Preview failed');
 
       const audioData = await response.arrayBuffer();
+      
+      if (playingVoiceRef.current !== voiceName) {
+        return;
+      }
+
+      previewAudioCache[cacheKey] = audioData;
+      setLoadingVoice(null);
       await playPcmBuffer(audioData);
 
     } catch (error) {
       console.error('Preview error:', error);
+      setLoadingVoice(null);
       setPlayingVoice(null);
     }
-  }, [playingVoice, stopPcm, playPcmBuffer]);
+  }, [playingVoice, stopPcm, playPcmBuffer, PREVIEW_TEXT, language]);
 
   if (!isOpen) return null;
 
   const voices = [
-    'Zephyr', 'Puck', 'Charon', 'Kore', 'Fenrir', 'Leda', 'Orus', 'Aoede', 
-    'Callirrhoe', 'Autonoe', 'Enceladus', 'Iapetus', 'Umbriel', 'Algieba', 
-    'Despina', 'Erinome', 'Algenib', 'Rasalgethi', 'Laomedeia', 'Achernar', 
-    'Alnilam', 'Schedar', 'Gacrux', 'Pulcherrima', 'Achird', 'Zubenelgenubi', 
-    'Vindemiatrix', 'Sadachbia', 'Sadaltager', 'Sulafat'
+    'Chrome Web Speech', 'Zephyr', 'Puck', 'Charon', 'Kore', 'Fenrir', 'Leda', 
+    'Orus', 'Aoede', 'Callirrhoe', 'Autonoe', 'Enceladus', 'Iapetus', 'Umbriel', 
+    'Algieba', 'Despina', 'Erinome', 'Algenib', 'Rasalgethi', 'Laomedeia', 
+    'Achernar', 'Alnilam', 'Schedar', 'Gacrux', 'Pulcherrima', 'Achird', 
+    'Zubenelgenubi', 'Vindemiatrix', 'Sadachbia', 'Sadaltager', 'Sulafat'
   ];
 
   return (
@@ -138,7 +199,7 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
     >
       <header className="w-full p-4 flex items-center justify-start">
         <button
-          onClick={() => { stopPcm(); onClose(); }}
+          onClick={() => { stopPcm(); window.speechSynthesis.cancel(); onClose(); }}
           className="p-3 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors text-[var(--md-sys-color-on-surface-variant)] active:scale-90"
         >
           <span className="material-symbols-outlined text-[24px]">arrow_back</span>
@@ -181,11 +242,25 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
 
                 <div
                   onClick={(e) => handlePlayPause(e, voice)}
-                  className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors active:scale-90"
+                  className="relative p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors active:scale-90 flex items-center justify-center"
+                  style={{ width: '38px', height: '38px' }}
                 >
-                  <span className={`material-symbols-outlined text-[22px] ${isPlayingThis ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'}`}>
-                    {isPlayingThis ? 'pause' : 'play_arrow'}
-                  </span>
+                  {loadingVoice === voice ? (
+                    <>
+                      <span className="absolute inset-0 flex items-center justify-center">
+                        <span className="material-symbols-outlined animate-spin text-[24px] text-[var(--md-sys-color-primary)]">
+                          progress_activity
+                        </span>
+                      </span>
+                      <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-primary)]/50 z-10">
+                        pause
+                      </span>
+                    </>
+                  ) : (
+                    <span className={`material-symbols-outlined text-[22px] ${isPlayingThis ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'}`}>
+                      {isPlayingThis ? 'pause' : 'play_arrow'}
+                    </span>
+                  )}
                 </div>
               </button>
             );

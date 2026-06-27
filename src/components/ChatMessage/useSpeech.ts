@@ -11,6 +11,7 @@ export const setAudioBufferCache = (key: string, buffer: ArrayBuffer) => {
 export const useSpeech = (text: string, modelName?: string) => {
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isPlayingWebSpeech, setIsPlayingWebSpeech] = useState(false);
   const { playPcmBuffer, stop: stopPcm, isPlaying: isPcmPlaying } = useVoicePlayer();
 
   const stop = useCallback(() => {
@@ -18,6 +19,7 @@ export const useSpeech = (text: string, modelName?: string) => {
     stopPcm();
     setIsSpeaking(false);
     setIsLoading(false);
+    setIsPlayingWebSpeech(false);
   }, [stopPcm]);
 
   const speak = useCallback(async () => {
@@ -29,6 +31,29 @@ export const useSpeech = (text: string, modelName?: string) => {
     }
 
     const trimmedText = text.trim();
+    const selectedVoice = localStorage.getItem('selected_voice') || 'Zephyr';
+
+    if (selectedVoice === 'Chrome Web Speech') {
+      window.speechSynthesis.cancel();
+      setIsPlayingWebSpeech(true);
+      
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voices = window.speechSynthesis.getVoices();
+      const russianVoice = voices.find(voice => voice.lang.includes('ru-RU'));
+      if (russianVoice) utterance.voice = russianVoice;
+
+      utterance.onstart = () => setIsSpeaking(true);
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        setIsPlayingWebSpeech(false);
+      };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        setIsPlayingWebSpeech(false);
+      };
+      window.speechSynthesis.speak(utterance);
+      return;
+    }
 
     if (audioBufferCache[trimmedText]) {
       setIsSpeaking(true);
@@ -39,7 +64,6 @@ export const useSpeech = (text: string, modelName?: string) => {
     setIsLoading(true);
 
     try {
-      const selectedVoice = localStorage.getItem('selected_voice') || 'Zephyr';
       const { data: { session } } = await supabase.auth.getSession();
       const accessToken = session?.access_token;
 
@@ -68,6 +92,7 @@ export const useSpeech = (text: string, modelName?: string) => {
     } catch (error) {
       console.error('TTS Error, falling back to Web Speech API', error);
       setIsLoading(false);
+      setIsPlayingWebSpeech(true);
 
       const utterance = new SpeechSynthesisUtterance(text);
       const voices = window.speechSynthesis.getVoices();
@@ -75,15 +100,23 @@ export const useSpeech = (text: string, modelName?: string) => {
       if (russianVoice) utterance.voice = russianVoice;
 
       utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        setIsPlayingWebSpeech(false);
+      };
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        setIsPlayingWebSpeech(false);
+      };
       window.speechSynthesis.speak(utterance);
     }
   }, [text, modelName, isSpeaking, isPcmPlaying, isLoading, stop, playPcmBuffer]);
 
   useEffect(() => {
-    setIsSpeaking(isPcmPlaying);
-  }, [isPcmPlaying]);
+    if (!isPlayingWebSpeech) {
+      setIsSpeaking(isPcmPlaying);
+    }
+  }, [isPcmPlaying, isPlayingWebSpeech]);
 
   useEffect(() => {
     return () => {
