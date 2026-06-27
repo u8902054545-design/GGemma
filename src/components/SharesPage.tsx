@@ -58,6 +58,7 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
     try {
       await navigator.clipboard.writeText(url);
       setCopiedId(share.id);
+      showSnackbar(t('dialog.share.copied') || 'Link copied!');
       setTimeout(() => {
         if (mountedRef.current) setCopiedId(null);
       }, 2000);
