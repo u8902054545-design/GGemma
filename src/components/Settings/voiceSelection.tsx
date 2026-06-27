@@ -5,6 +5,7 @@ import { useVoicePlayer } from '../../hooks/useVoicePlayer';
 import { SUPABASE_ENDPOINT, supabase } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
+import { voiceDescriptions } from './voiceDescriptions';
 
 interface VoiceSelectionProps {
   isOpen: boolean;
@@ -13,7 +14,7 @@ interface VoiceSelectionProps {
 
 export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose }) => {
   const { user } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const [selectedVoice, setSelectedVoice] = useState<string>(() => {
     return localStorage.getItem('selected_voice') || 'Zephyr';
   });
@@ -160,17 +161,22 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
                 onClick={() => updateVoice(voice)}
                 className="ripple-container w-full py-4 px-3 flex items-center justify-between border-b border-[var(--md-sys-color-outline-variant)]/10 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 rounded-xl transition-all text-left active:scale-[0.99]"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-6 h-6 flex items-center justify-center">
+                <div className="flex items-center gap-3 flex-1 min-w-0 pr-4">
+                  <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
                     {isSelected && (
                       <span className="material-symbols-outlined text-[24px] text-[var(--md-sys-color-primary)]">
                         check
                       </span>
                     )}
                   </div>
-                  <span className={`text-[16px] font-medium transition-colors ${isSelected ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface)]'}`}>
-                    {voice}
-                  </span>
+                  <div className="flex flex-col min-w-0">
+                    <span className={`text-[16px] font-medium transition-colors ${isSelected ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface)]'}`}>
+                      {voice}
+                    </span>
+                    <span className="text-[12px] text-[var(--md-sys-color-on-surface-variant)] mt-1 whitespace-normal break-words">
+                      {voiceDescriptions[voice]?.[language] || ''}
+                    </span>
+                  </div>
                 </div>
 
                 <div
