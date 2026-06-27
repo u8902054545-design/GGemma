@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase, SUPABASE_ENDPOINT } from '../config';
 import { useStopRequest } from './useStopRequest';
-import { Message, MODELS } from './chatTypes';
+import { Message, MODELS, SelectedModel } from './chatTypes';
 import { useChatScroll } from './useChatScroll';
 import { useChatFeedback } from './useChatFeedback';
 import { useChatLoader } from './useChatLoader';
@@ -11,7 +11,31 @@ import { useLanguage } from './useLanguage';
 export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = false) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [selectedModel, setSelectedModel] = useState(MODELS[0]);
+  const [selectedModel, setSelectedModelState] = useState(MODELS[0]);
+
+  const setSelectedModel = useCallback(async (model: SelectedModel) => {
+    setSelectedModelState(model);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await fetch(SUPABASE_ENDPOINT, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            settings: {
+              selected_model_id: model.id,
+              selected_model_name: model.name
+            }
+          }),
+        });
+      }
+    } catch (err) {
+      console.error('Failed to sync model settings:', err);
+    }
+  }, []);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
