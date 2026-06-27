@@ -75,7 +75,7 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
         id: crypto.randomUUID(),
         chat_id: newChatId,
         user_id: user.id,
-        role: m.role === 'ai' ? 'assistant' : 'user', // database column role is 'assistant' or 'user'
+        role: m.role === 'ai' ? 'model' : 'user', // database column role is 'model' or 'user'
         content: m.content,
         image_url: m.image_url || m.imageUrl || null,
         video_url: m.video_url || m.videoUrl || null,
