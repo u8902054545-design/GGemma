@@ -11,6 +11,7 @@ interface ChatActionsMenuProps {
   onRename: () => void;
   onDelete: () => void;
   onExport: () => void;
+  onShare: () => void;
   isTemporary?: boolean;
   isPinning?: boolean;
 }
@@ -23,6 +24,7 @@ export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
   onRename,
   onDelete,
   onExport,
+  onShare,
   isTemporary = false,
   isPinning = false
 }) => {
@@ -38,6 +40,13 @@ export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
           <div className="p-4 bg-[var(--md-sys-color-surface)] pb-8">
             {!isTemporary && isChatHistoryEnabled && (
               <>
+                <button
+                  onClick={onShare}
+                  className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-on-surface)] border-none bg-transparent"
+                >
+                  <span className="material-symbols-outlined">share</span>
+                  <span>{t('menu.share')}</span>
+                </button>
                 <button
                   onClick={onPin}
                   disabled={isPinning}

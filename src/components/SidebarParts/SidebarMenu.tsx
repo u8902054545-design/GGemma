@@ -11,6 +11,7 @@ interface SidebarMenuProps {
   onRename: () => void;
   onDelete: () => void;
   onExport: () => void;
+  onShare: () => void;
   isPinning?: boolean;
 }
 
@@ -22,6 +23,7 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
   onRename,
   onDelete,
   onExport,
+  onShare,
   isPinning = false
 }) => {
   const { t } = useLanguage();
@@ -36,6 +38,13 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
             <div className="text-[var(--md-sys-color-on-surface)] text-sm font-medium px-6 mb-2 opacity-50 truncate">
               {selectedChat?.title}
             </div>
+            <button
+              onClick={onShare}
+              className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-on-surface)] border-none bg-transparent"
+            >
+              <span className="material-symbols-outlined">share</span>
+              <span>{t('menu.share')}</span>
+            </button>
             <button
               onClick={onPin}
               disabled={isPinning}

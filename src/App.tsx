@@ -24,6 +24,7 @@ import { ScrollToBottomButton } from './components/ScrollToBottomButton';
 import { AppModals } from './components/AppModals';
 import { useChatHistory } from './hooks/useChatHistory';
 import { WebSearchConfirmationBottomSheet, useWebSearchConfirmation } from './components/WebSearchConfirmation';
+import { SharedChatView } from './components/SharedChatView';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();
@@ -59,6 +60,21 @@ export default function App() {
   }, [isChatHistoryEnabled, isTemporary, setMessages, setChatId, setChatTitle, resetSearch]);
 
   useSettingsSync({ user, selectedModelId: selectedModel.id, language, theme, setSelectedModel, setLanguage, setTheme });
+
+  React.useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlChatId = params.get('chat_id');
+    if (urlChatId && user && chats.length > 0) {
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+
+      const foundChat = chats.find(c => c.id === urlChatId);
+      if (foundChat) {
+        setChatTitle(foundChat.title);
+      }
+      loadChatMessages(urlChatId);
+    }
+  }, [user, chats, isChatHistoryEnabled, loadChatMessages, setChatTitle]);
 
   const handleScroll = useCallback(() => handleScrollLogic(scrollContainerRef, setShowScrollButton), []);
 
@@ -112,6 +128,21 @@ export default function App() {
 
     await checkAndSend(text, isSearch, file, codes);
   };
+
+  const pathname = window.location.pathname;
+  const isSharedRoute = pathname.startsWith('/shared/') || pathname.startsWith('/share/');
+  const shareId = isSharedRoute ? pathname.split('/').pop() : null;
+
+  if (isSharedRoute && shareId) {
+    return (
+      <SharedChatView 
+        shareId={shareId} 
+        onImportSuccess={(newChatId) => {
+          window.location.href = `/?chat_id=${newChatId}`;
+        }} 
+      />
+    );
+  }
 
   if (authLoading) return <div className="h-screen w-full bg-[var(--md-sys-color-background)]" />;
 

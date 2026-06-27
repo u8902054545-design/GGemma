@@ -4,6 +4,7 @@ import { mdEasing } from '../motion/transitions';
 import { handleNewChat, renameChat, togglePinChat } from './chatHeaderFunctions';
 import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { ShareChatDialog } from './ShareChatDialog';
 import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { ChatActionsMenu } from './ChatHeaderParts/ChatActionsMenu';
 import { useLanguage } from '../hooks/useLanguage';
@@ -44,6 +45,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const { t } = useLanguage();
   const { isChatHistoryEnabled } = useChatHistory();
 
@@ -178,7 +180,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       </div>
 
       <ExportMenu isOpen={isDownloadOpen} onOpenChange={setIsDownloadOpen} messages={messages} isTemporary={isTemporary} />
-      <ChatActionsMenu
+       <ChatActionsMenu
         isOpen={isMenuOpen}
         onOpenChange={setIsMenuOpen}
         isPinned={isPinned}
@@ -186,10 +188,12 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         onRename={() => { setIsMenuOpen(false); setTimeout(() => setIsRenameOpen(true), 300); }}
         onExport={() => setIsDownloadOpen(true)}
         onDelete={() => { setIsMenuOpen(false); setTimeout(() => setIsDeleteOpen(true), 300); }}
+        onShare={() => { setIsMenuOpen(false); setTimeout(() => setIsShareOpen(true), 300); }}
         isTemporary={isTemporary}
       />
       <RenameDialog isOpen={isRenameOpen} onClose={() => setIsRenameOpen(false)} currentTitle={chatTitle} onConfirm={handleRenameConfirm} />
       <DeleteConfirmDialog isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDeleteConfirm} />
+      <ShareChatDialog isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} chatId={chatId} chatTitle={chatTitle} showSnackbar={showSnackbar} />
       </div>
     </header>
   );

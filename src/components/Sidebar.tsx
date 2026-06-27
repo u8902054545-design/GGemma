@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SearchOverlay } from './SearchOverlay';
 import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
+import { ShareChatDialog } from './ShareChatDialog';
 import { renameChat, togglePinChat, fetchChatMessages } from './chatHeaderFunctions';
 import { ChatList } from './SidebarParts/ChatList';
 import { SidebarMenu } from './SidebarParts/SidebarMenu';
@@ -52,6 +53,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const [isChatHistorySelectionOpen, setIsChatHistorySelectionOpen] = useState(false);
   const [exportMessages, setExportMessages] = useState<any[]>([]);
   const { t } = useLanguage();
@@ -234,6 +236,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onRename={() => { setIsMenuOpen(false); setTimeout(() => setIsRenameOpen(true), 300); }}
         onExport={handleExport}
         onDelete={() => { setIsMenuOpen(false); setTimeout(() => setIsDeleteOpen(true), 300); }}
+        onShare={() => { setIsMenuOpen(false); setTimeout(() => setIsShareOpen(true), 300); }}
       />
 
       <ExportMenu
@@ -253,6 +256,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         isOpen={isDeleteOpen}
         onClose={() => setIsDeleteOpen(false)}
         onConfirm={handleDeleteConfirm}
+      />
+
+      <ShareChatDialog
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        chatId={selectedChat?.id}
+        chatTitle={selectedChat?.title}
+        showSnackbar={showSnackbar}
       />
 
       <ProfileDrawer 
