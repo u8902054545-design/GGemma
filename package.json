@@ -1,7 +1,7 @@
 {
   "name": "gemma-open-access",
   "private": true,
-  "version": "1.7.0-persona-sync",
+  "version": "1.8.0-personalization-beta",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",

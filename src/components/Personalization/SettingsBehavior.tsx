@@ -5,6 +5,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { supabase, SUPABASE_ENDPOINT } from '../../config';
 import Snackbar from '../Snackbar';
 import { CommStyleBottomSheet, COMMUNICATION_STYLES } from './CommStyleBottomSheet';
+import { AssistRoleBottomSheet, ASSISTANT_ROLES } from './AssistRoleBottomSheet';
 import '@material/web/button/filled-button.js';
 
 interface SettingsBehaviorProps {
@@ -17,17 +18,9 @@ export const SettingsBehavior: React.FC<SettingsBehaviorProps> = ({ isOpen, onCl
   const [commStyle, setCommStyle] = useState('');
   const [assistConfig, setAssistConfig] = useState('');
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
+  const [isRoleBottomSheetOpen, setIsRoleBottomSheetOpen] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const assistConfigRef = useRef<HTMLTextAreaElement>(null);
-
-  useEffect(() => {
-    if (assistConfigRef.current) {
-      assistConfigRef.current.style.height = 'auto';
-      assistConfigRef.current.style.height = `${assistConfigRef.current.scrollHeight}px`;
-    }
-  }, [assistConfig]);
 
   useEffect(() => {
     const loadBehaviorSettings = async () => {
@@ -80,11 +73,19 @@ export const SettingsBehavior: React.FC<SettingsBehaviorProps> = ({ isOpen, onCl
     s => s.id === commStyle.toLowerCase()
   );
 
-  const quickConfigs = [
-    { label: language === 'ru' ? 'Программист' : 'Developer', value: language === 'ru' ? 'Веди себя как опытный разработчик. Пиши чистый, оптимизированный код с комментариями.' : 'Act as an experienced developer. Write clean, optimized code with comments.' },
-    { label: language === 'ru' ? 'Писатель' : 'Writer', value: language === 'ru' ? 'Веди себя как творческий писатель. Помогай генерировать яркие образы и метафоры.' : 'Act as a creative writer. Help generate vivid imagery and metaphors.' },
-    { label: language === 'ru' ? 'Репетитор' : 'Tutor', value: language === 'ru' ? 'Веди себя как терпеливый учитель. Объясняй сложные концепции простыми словами.' : 'Act as a patient teacher. Explain complex concepts in simple terms.' }
-  ];
+  const selectedRoleItem = ASSISTANT_ROLES.find(
+    r => r.id === assistConfig.toLowerCase()
+  );
+
+  const customRoleItem = assistConfig ? {
+    id: assistConfig,
+    titleRu: 'Персональная роль',
+    titleEn: 'Custom Role',
+    descRu: assistConfig,
+    descEn: assistConfig
+  } : undefined;
+
+  const currentRole = selectedRoleItem || customRoleItem;
 
   if (!isOpen) return null;
 
@@ -125,12 +126,7 @@ export const SettingsBehavior: React.FC<SettingsBehaviorProps> = ({ isOpen, onCl
               onClick={() => setIsBottomSheetOpen(true)}
               className="w-full py-4 px-4 flex items-center justify-between bg-[var(--md-sys-color-surface-container-low)] hover:bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)]/20 rounded-2xl transition-all text-left active:scale-[0.99]"
             >
-              <div className="flex items-center gap-4">
-                {selectedStyleItem?.icon && (
-                  <span className="material-symbols-outlined text-[24px] text-[var(--md-sys-color-primary)]">
-                    {selectedStyleItem.icon}
-                  </span>
-                )}
+              <div className="flex-1 min-w-0 pr-2">
                 <div className="flex flex-col gap-0.5">
                   <span className="text-[16px] font-semibold text-[var(--md-sys-color-on-surface)]">
                     {selectedStyleItem 
@@ -144,13 +140,13 @@ export const SettingsBehavior: React.FC<SettingsBehaviorProps> = ({ isOpen, onCl
                   </span>
                 </div>
               </div>
-              <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)]">
+              <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)] flex-shrink-0">
                 arrow_drop_down
               </span>
             </button>
           </div>
 
-          {/* Assistant Configuration */}
+          {/* Assistant Configuration (Role Selector) */}
           <div className="w-full mb-8">
             <label className="block text-[16px] font-medium text-[var(--md-sys-color-on-surface)] mb-1">
               {t('personalization.behavior.assist_config.title')}
@@ -158,26 +154,29 @@ export const SettingsBehavior: React.FC<SettingsBehaviorProps> = ({ isOpen, onCl
             <p className="text-[13px] text-[var(--md-sys-color-on-surface-variant)] mb-3 leading-relaxed">
               {t('personalization.behavior.assist_config.desc')}
             </p>
-            <textarea
-              ref={assistConfigRef}
-              value={assistConfig}
-              onChange={(e) => setAssistConfig(e.target.value)}
-              placeholder={t('personalization.behavior.assist_config.placeholder')}
-              className="w-full min-h-[100px] max-h-[300px] px-4 py-3 rounded-xl border border-[var(--md-sys-color-outline)] bg-transparent text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] text-[16px] leading-relaxed resize-none outline-none focus:border-[var(--md-sys-color-primary)] transition-colors"
-              rows={1}
-            />
-            {/* Quick choices */}
-            <div className="flex flex-wrap gap-2 mt-2">
-              {quickConfigs.map((config) => (
-                <button
-                  key={config.label}
-                  onClick={() => setAssistConfig(config.value)}
-                  className="text-[12px] font-medium px-3 py-1.5 rounded-full border border-[var(--md-sys-color-outline-variant)]/10 hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] transition-all active:scale-95"
-                >
-                  {config.label}
-                </button>
-              ))}
-            </div>
+            
+            <button
+              onClick={() => setIsRoleBottomSheetOpen(true)}
+              className="w-full py-4 px-4 flex items-center justify-between bg-[var(--md-sys-color-surface-container-low)] hover:bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)]/20 rounded-2xl transition-all text-left active:scale-[0.99]"
+            >
+              <div className="flex-1 min-w-0 pr-2">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[16px] font-semibold text-[var(--md-sys-color-on-surface)]">
+                    {currentRole 
+                      ? (language === 'ru' ? currentRole.titleRu : currentRole.titleEn)
+                      : (language === 'ru' ? 'Не используется' : 'Not used')}
+                  </span>
+                  <span className="text-[12px] text-[var(--md-sys-color-on-surface-variant)] line-clamp-1">
+                    {currentRole 
+                      ? (language === 'ru' ? currentRole.descRu : currentRole.descEn)
+                      : (language === 'ru' ? 'Роль ассистента' : 'Assistant role')}
+                  </span>
+                </div>
+              </div>
+              <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)] flex-shrink-0">
+                arrow_drop_down
+              </span>
+            </button>
           </div>
 
           <md-filled-button onClick={handleSave} disabled={isLoading} className="w-full">
@@ -198,6 +197,13 @@ export const SettingsBehavior: React.FC<SettingsBehaviorProps> = ({ isOpen, onCl
         onOpenChange={setIsBottomSheetOpen}
         selectedStyle={commStyle}
         onStyleSelect={setCommStyle}
+      />
+
+      <AssistRoleBottomSheet
+        isOpen={isRoleBottomSheetOpen}
+        onOpenChange={setIsRoleBottomSheetOpen}
+        selectedRole={assistConfig}
+        onRoleSelect={setAssistConfig}
       />
     </>
   );

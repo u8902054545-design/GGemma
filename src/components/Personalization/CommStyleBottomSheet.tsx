@@ -19,56 +19,56 @@ export const COMMUNICATION_STYLES: StyleItem[] = [
     id: '',
     titleRu: 'Не используется',
     titleEn: 'Not used',
-    descRu: 'Ассистент будет общаться в стандартной манере без применения дополнительных правил стиля.',
-    descEn: 'Disables style customization. The assistant will communicate in its default tone.',
+    descRu: 'Буду общаться в стандартной манере без применения дополнительных правил стиля.',
+    descEn: 'I will communicate in my default tone without any additional style rules.',
     icon: ''
   },
   {
     id: 'analytical',
     titleRu: 'Аналитический',
     titleEn: 'Analytical',
-    descRu: 'Детальный и логичный. Предоставляет подробную информацию, опирается на факты и логику, помогает глубоко разобраться в вопросе.',
-    descEn: 'Detailed and logical. Provides detailed information, relies on facts and logic, helps to deeply understand the issue.',
+    descRu: 'Отвечаю детально и логично. Предоставляю подробную информацию, опираюсь на факты и логику, помогаю глубоко разобраться в вопросе.',
+    descEn: 'I respond in a detailed and logical manner. I provide detailed information, rely on facts and logic, and help you deeply understand the issue.',
     icon: 'analytics'
   },
   {
     id: 'concise',
     titleRu: 'Лаконичный',
     titleEn: 'Concise',
-    descRu: 'Краткий и точный. Формулирует ответы максимально конкретно и по существу, экономя время пользователя и не отвлекая на лишние детали.',
-    descEn: 'Brief and precise. Formulates answers as specifically and to the point as possible, saving user\'s time and not distracting with unnecessary details.',
+    descRu: 'Отвечаю кратко и точно. Формулирую ответы максимально конкретно и по существу, экономя ваше время и не отвлекая на лишние детали.',
+    descEn: 'I respond briefly and precisely. I formulate answers as specifically and to the point as possible, saving your time and avoiding unnecessary details.',
     icon: 'short_text'
   },
   {
     id: 'friendly',
     titleRu: 'Доброжелательный',
     titleEn: 'Friendly',
-    descRu: 'Открытый и располагающий. Общается в тёплой, поддерживающей манере, создавая комфортную атмосферу для диалога.',
-    descEn: 'Open and welcoming. Communicates in a warm, supportive manner, creating a comfortable atmosphere for dialogue.',
+    descRu: 'Общаюсь открыто и доброжелательно. Пишу в тёплой, поддерживающей манере, создавая комфортную атмосферу для диалога.',
+    descEn: 'I communicate openly and warmly. I write in a supportive manner, creating a comfortable atmosphere for our dialogue.',
     icon: 'sentiment_satisfied'
   },
   {
     id: 'creative',
     titleRu: 'Творческий',
     titleEn: 'Creative',
-    descRu: 'Вдохновляющий и нестандартный. Помогает находить оригинальные идеи, предлагает необычные подходы к решению задач и развивает воображение.',
-    descEn: 'Inspiring and unconventional. Helps to find original ideas, suggests unusual approaches to problem solving, and develops imagination.',
+    descRu: 'Мыслю нестандартно и творчески. Помогаю находить оригинальные идеи, предлагаю необычные подходы к задачам и развиваю воображение.',
+    descEn: 'I think creatively and unconventionally. I help find original ideas, suggest unusual approaches to tasks, and spark your imagination.',
     icon: 'psychology'
   },
   {
     id: 'realistic',
     titleRu: 'Реалистичный',
     titleEn: 'Realistic',
-    descRu: 'Объективный и критический. Помогает трезво оценить ситуацию, указывает на возможные риски и слабые места, избегая излишнего оптимизма.',
-    descEn: 'Objective and critical. Helps to soberly assess the situation, points to possible risks and weaknesses, avoiding excessive optimism.',
+    descRu: 'Смотрю на вещи объективно и критически. Помогаю трезво оценить ситуацию, указываю на возможные риски и слабые места, избегая излишнего оптимизма.',
+    descEn: 'I look at things objectively and critically. I help soberly assess the situation, point out potential risks and weaknesses, and avoid excessive optimism.',
     icon: 'balance'
   },
   {
     id: 'guiding',
     titleRu: 'Направляющий',
     titleEn: 'Guiding',
-    descRu: 'Поучительный и мотивирующий. Помогает пользователю самостоятельно прийти к верному решению с помощью наводящих вопросов и полезных советов.',
-    descEn: 'Instructive and motivating. Helps the user to independently come to the right decision with the help of leading questions and useful tips.',
+    descRu: 'Направляю и мотивирую. Помогаю вам самостоятельно прийти к решению с помощью наводящих вопросов и полезных советов.',
+    descEn: 'I guide and motivate you. I help you independently arrive at the correct solution using leading questions and helpful tips.',
     icon: 'explore'
   }
 ];
@@ -86,7 +86,7 @@ export const CommStyleBottomSheet: React.FC<CommStyleBottomSheetProps> = ({
   selectedStyle,
   onStyleSelect
 }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <Drawer.Root open={isOpen} onOpenChange={onOpenChange}>
@@ -122,25 +122,15 @@ export const CommStyleBottomSheet: React.FC<CommStyleBottomSheetProps> = ({
                       }}
                     >
                       <div slot="headline" className="flex items-center gap-2">
-                        <span className="font-semibold text-[15px]">{style.titleRu}</span>
-                        <span className="text-[12px] opacity-40">/ {style.titleEn}</span>
+                        <span className="font-semibold text-[15px]">
+                          {language === 'ru' ? style.titleRu : style.titleEn}
+                        </span>
                       </div>
                       <div slot="supporting-text" className="flex flex-col gap-1 mt-1 pr-4">
-                        <span className="text-[12.5px] leading-tight text-[var(--md-sys-color-on-surface-variant)]">{style.descRu}</span>
-                        <span className="text-[11px] leading-tight text-[var(--md-sys-color-on-surface-variant)]/60 italic">{style.descEn}</span>
+                        <span className={`text-[12.5px] leading-tight ${isSelected ? 'text-[var(--md-sys-color-primary)]/80' : 'text-[var(--md-sys-color-on-surface-variant)]'}`}>
+                          {language === 'ru' ? style.descRu : style.descEn}
+                        </span>
                       </div>
-                      {style.icon ? (
-                        <span slot="start" className={`material-symbols-outlined text-[20px] ${isSelected ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'}`}>
-                          {style.icon}
-                        </span>
-                      ) : (
-                        <div slot="start" className="w-[20px] h-[20px] flex-shrink-0" />
-                      )}
-                      {isSelected && (
-                        <span slot="end" className="material-symbols-outlined text-[var(--md-sys-color-primary)]">
-                          check
-                        </span>
-                      )}
                     </md-list-item>
                   </React.Fragment>
                 );
