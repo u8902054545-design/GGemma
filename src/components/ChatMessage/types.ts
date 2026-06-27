@@ -9,4 +9,5 @@ export type ChatMessageProps = {
   searchUsed?: boolean;
   isSearching?: boolean;
   searchSources?: { title: string; url: string }[];
+  hideActions?: boolean;
 };

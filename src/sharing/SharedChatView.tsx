@@ -3,8 +3,8 @@ import { getSharedChat, SharedChat } from './shareUtils';
 import { ChatMessage } from '../components/ChatMessage';
 import { supabase } from '../config';
 import { useLanguage } from '../hooks/useLanguage';
-import { useTheme } from '../hooks/useTheme';
 import { useAuth } from '../hooks/useAuth';
+import { GemmaIcon } from '../components/IconsApp/GemmaIcon';
 
 interface SharedChatViewProps {
   shareId: string;
@@ -17,7 +17,6 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
   const [error, setError] = useState<string | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const { t } = useLanguage();
-  const { theme, setTheme } = useTheme();
   const { user } = useAuth();
   
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -97,10 +96,6 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
     }
   };
 
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-  };
-
   if (loading) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-[var(--md-sys-color-background)]">
@@ -131,43 +126,27 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
         <div className="flex items-center gap-3 min-w-0">
           <button
             onClick={() => { window.location.href = '/'; }}
-            className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors flex items-center justify-center bg-transparent"
-            title={t('shared.go_home') || 'Go Home'}
+            className="flex items-center gap-2 px-3 py-1.5 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors bg-transparent border-none cursor-pointer text-left focus:outline-none"
+            title={t('shared.go_home') || 'Go to Gemma'}
           >
-            <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface)]">home</span>
-          </button>
-          <div className="min-w-0">
-            <h1 className="text-md font-semibold truncate leading-tight max-w-[200px] sm:max-w-[400px]">
-              {sharedChat.title}
-            </h1>
-            <span className="text-[10px] text-[var(--md-sys-color-on-surface-variant)] opacity-70">
-              {t('shared.public_snapshot') || 'Public snapshot'}
+            <GemmaIcon className="w-6 h-6" />
+            <span className="text-md font-semibold text-[var(--md-sys-color-on-surface)] leading-none select-none">
+              Gemma
             </span>
-          </div>
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Theme Toggle */}
-          <button
-            onClick={toggleTheme}
-            className="p-2 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors flex items-center justify-center bg-transparent"
-            title={theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-          >
-            <span className="material-symbols-outlined text-[var(--md-sys-color-on-surface)]">
-              {theme === 'dark' ? 'light_mode' : 'dark_mode'}
-            </span>
-          </button>
-
           {/* Import Button */}
           <button
             onClick={handleImport}
             disabled={isImporting}
-            className="px-4 py-2 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full text-xs font-semibold hover:shadow-md transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5"
+            className="px-5 py-2.5 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full text-sm font-semibold hover:shadow-md transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
           >
             {isImporting ? (
-              <span className="material-symbols-outlined animate-spin text-[16px]">progress_activity</span>
+              <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
             ) : (
-              <span className="material-symbols-outlined text-[16px]">{user ? 'content_copy' : 'login'}</span>
+              <span className="material-symbols-outlined text-[18px]">{user ? 'content_copy' : 'login'}</span>
             )}
             {user 
               ? (t('shared.import') || 'Copy to my chats') 
@@ -183,6 +162,24 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
         className="flex-1 overflow-y-auto w-full mx-auto flex flex-col p-4 md:p-6 pb-20 max-w-[1200px]"
       >
         <div className="flex-1 flex flex-col">
+          {/* Chat Title and Public Link */}
+          <div className="mb-8 border-b border-[var(--md-sys-color-outline-variant)]/10 pb-6">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[var(--md-sys-color-on-background)] mb-3">
+              {sharedChat.title}
+            </h1>
+            <div className="flex items-center gap-2 text-sm text-[var(--md-sys-color-primary)] font-medium">
+              <span className="material-symbols-outlined text-[18px]">link</span>
+              <a 
+                href={window.location.href} 
+                className="hover:underline break-all transition-all duration-150"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {window.location.href}
+              </a>
+            </div>
+          </div>
+
           {sharedChat.messages.map((msg, index) => (
             <ChatMessage
               key={index}
@@ -208,6 +205,7 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
               searchUsed={false}
               isSearching={false}
               searchSources={undefined}
+              hideActions={true}
             />
           ))}
         </div>

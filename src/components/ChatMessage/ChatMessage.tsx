@@ -44,7 +44,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   isTemporary = false,
   searchUsed,
   isSearching,
-  searchSources
+  searchSources,
+  hideActions = false
 }) => {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
@@ -171,6 +172,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               isSpeaking={isSpeaking}
               isSpeechLoading={isLoading}
               onShowDetails={() => setIsDetailsOpen(true)}
+              hideActions={hideActions}
             />
             <GenerationDetails
               isOpen={isDetailsOpen}

@@ -15,6 +15,7 @@ interface MessageActionsProps {
   isSpeaking: boolean;
   isSpeechLoading?: boolean;
   onShowDetails: () => void;
+  hideActions?: boolean;
 }
 
 export const MessageActions: React.FC<MessageActionsProps> = ({
@@ -28,7 +29,8 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   onSpeech,
   isSpeaking,
   isSpeechLoading,
-  onShowDetails
+  onShowDetails,
+  hideActions = false
 }) => {
   const { t } = useLanguage();
 
@@ -39,7 +41,8 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
       transition={{ duration: mdDuration.medium4, ease: mdEasing.standard }}
       className="mt-4 flex flex-col gap-3 w-full select-none"
     >
-      <div className="flex items-center gap-1 w-full">
+      {!hideActions && (
+        <div className="flex items-center gap-1 w-full">
         {!isTemporary && (
           <>
             <button
@@ -102,6 +105,7 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
           </span>
         </button>
       </div>
+      )}
 
       {isLast && (
         <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-70 leading-tight">
