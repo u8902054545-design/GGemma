@@ -4,6 +4,7 @@ import { pageVariants } from '../motion/transitions';
 import { useLanguage } from '../hooks/useLanguage';
 import { getAllUserShares, deleteShareById, deleteAllUserShares, SharedChat } from '../Functions/shareUtils';
 import Snackbar from './Snackbar';
+import { DeleteAllSharesDialog } from './DeleteAllSharesDialog';
 
 interface SharesPageProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
   const [shares, setShares] = useState<SharedChat[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isDeleteAllOpen, setIsDeleteAllOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const mountedRef = useRef(true);
@@ -56,7 +58,6 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
     try {
       await navigator.clipboard.writeText(url);
       setCopiedId(share.id);
-      showSnackbar(t('dialog.share.copied') || 'Link copied!');
       setTimeout(() => {
         if (mountedRef.current) setCopiedId(null);
       }, 2000);
@@ -78,10 +79,7 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
     }
   };
 
-  const handleDeleteAll = async () => {
-    if (!window.confirm(t('shared.delete_all_confirm') || 'Are you sure you want to delete all your shared links? This cannot be undone.')) {
-      return;
-    }
+  const handleDeleteAllConfirm = async () => {
     try {
       await deleteAllUserShares();
       if (mountedRef.current) {
@@ -134,7 +132,7 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
             </p>
           </div>
         ) : (
-          <div className="w-full flex flex-col gap-4">
+          <div className="w-full flex flex-col gap-4 mt-2">
             <AnimatePresence mode="popLayout">
               {shares.map((share) => (
                 <motion.div
@@ -144,7 +142,7 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   transition={{ duration: 0.2 }}
-                  className="w-full p-5 bg-[var(--md-sys-color-surface-container)] hover:bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)]/10 rounded-[24px] shadow-sm flex flex-col gap-3 transition-colors"
+                  className="w-full p-5 bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)] border border-[var(--md-sys-color-outline-variant)]/30 rounded-[24px] shadow-sm flex flex-col gap-3 transition-colors mb-2"
                 >
                   <div className="flex justify-between items-start gap-2">
                     <div className="min-w-0">
@@ -164,24 +162,24 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
                   <div className="flex justify-end items-center gap-2 mt-1">
                     <button
                       onClick={() => handleCopy(share)}
-                      className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-medium transition-all ${
+                      className={`p-2 rounded-full transition-all flex items-center justify-center border-none ${
                         copiedId === share.id 
                           ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]' 
-                          : 'hover:bg-[var(--md-sys-color-on-surface-variant)]/10 text-[var(--md-sys-color-on-surface-variant)]'
+                          : 'hover:bg-[var(--md-sys-color-on-surface-variant)]/10 text-[var(--md-sys-color-on-surface-variant)] bg-transparent'
                       }`}
+                      title={t('dialog.share.copy')}
                     >
-                      <span className="material-symbols-outlined text-[16px]">
+                      <span className="material-symbols-outlined text-[20px]">
                         {copiedId === share.id ? 'check' : 'content_copy'}
                       </span>
-                      {copiedId === share.id ? t('dialog.share.copied') : t('dialog.share.copy')}
                     </button>
 
                     <button
                       onClick={() => handleDelete(share.id)}
-                      className="flex items-center gap-1.5 px-4 py-2 hover:bg-[var(--md-sys-color-error)]/10 text-[var(--md-sys-color-error)] rounded-full text-xs font-medium transition-colors"
+                      className="p-2 hover:bg-[var(--md-sys-color-error)]/10 text-[var(--md-sys-color-error)] rounded-full transition-colors flex items-center justify-center bg-transparent border-none"
+                      title={t('dialog.delete.confirm') || 'Delete'}
                     >
-                      <span className="material-symbols-outlined text-[16px]">delete</span>
-                      {t('dialog.delete.confirm') || 'Delete'}
+                      <span className="material-symbols-outlined text-[20px]">delete</span>
                     </button>
                   </div>
                 </motion.div>
@@ -194,14 +192,20 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
       {/* Delete All Sticky Footer */}
       <div className="w-full p-6 shrink-0 border-t border-[var(--md-sys-color-outline-variant)]/10 bg-[var(--md-sys-color-background)] flex justify-center">
         <button
-          onClick={handleDeleteAll}
+          onClick={() => setIsDeleteAllOpen(true)}
           disabled={isLoading || shares.length === 0}
-          className="w-full max-w-[400px] h-12 flex items-center justify-center gap-3 bg-[var(--md-sys-color-error-container)] hover:bg-[var(--md-sys-color-error-container)]/80 text-[var(--md-sys-color-on-error-container)] border border-[var(--md-sys-color-error)]/10 rounded-full font-medium transition-all active:scale-[0.98] disabled:opacity-30 disabled:scale-100 shadow-sm"
+          className="w-full max-w-[400px] h-12 flex items-center justify-center gap-3 bg-[#1a73e8] hover:bg-[#1557b0] text-white border-none rounded-full font-medium transition-all active:scale-[0.98] disabled:opacity-30 disabled:scale-100 shadow-md cursor-pointer"
         >
-          <span className="material-symbols-outlined text-[20px]">delete_forever</span>
+          <span className="material-symbols-outlined text-[20px]">delete</span>
           <span>{t('shared.delete_all') || 'Remove all links'}</span>
         </button>
       </div>
+
+      <DeleteAllSharesDialog
+        isOpen={isDeleteAllOpen}
+        onClose={() => setIsDeleteAllOpen(false)}
+        onConfirm={handleDeleteAllConfirm}
+      />
 
       <Snackbar
         message={snackbarMessage}

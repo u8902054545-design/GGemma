@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../hooks/useLanguage';
-import { createChatShare, SharedChat } from '../Functions/shareUtils';
+import { createChatShare, getChatShareCount, SharedChat } from '../Functions/shareUtils';
 import { fetchChatMessages } from './chatHeaderFunctions';
 
 interface ShareChatDialogProps {
@@ -21,6 +21,8 @@ export const ShareChatDialog: React.FC<ShareChatDialogProps> = ({
   showSnackbar
 }) => {
   const [isOperating, setIsOperating] = useState(false);
+  const [isLoadingCount, setIsLoadingCount] = useState(false);
+  const [existingCount, setExistingCount] = useState<number | null>(null);
   const [sharedInfo, setSharedInfo] = useState<SharedChat | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const mountedRef = useRef(true);
@@ -31,11 +33,32 @@ export const ShareChatDialog: React.FC<ShareChatDialogProps> = ({
     if (isOpen) {
       setSharedInfo(null);
       setIsCopied(false);
+      setExistingCount(null);
+      if (chatId) {
+        loadShareCount();
+      }
     }
     return () => {
       mountedRef.current = false;
     };
-  }, [isOpen]);
+  }, [isOpen, chatId]);
+
+  const loadShareCount = async () => {
+    if (!chatId) return;
+    setIsLoadingCount(true);
+    try {
+      const count = await getChatShareCount(chatId);
+      if (mountedRef.current) {
+        setExistingCount(count);
+      }
+    } catch (err) {
+      console.error('Failed to load share count', err);
+    } finally {
+      if (mountedRef.current) {
+        setIsLoadingCount(false);
+      }
+    }
+  };
 
   const handleCreateShare = async () => {
     if (!chatId) return;
@@ -52,6 +75,7 @@ export const ShareChatDialog: React.FC<ShareChatDialogProps> = ({
       
       if (mountedRef.current) {
         setSharedInfo(result);
+        setExistingCount(prev => (prev !== null ? prev + 1 : 1));
         if (showSnackbar) {
           showSnackbar(t('snackbar.chatShared') || 'Chat link ready!');
         }
@@ -122,7 +146,11 @@ export const ShareChatDialog: React.FC<ShareChatDialogProps> = ({
                     {t('dialog.share.desc')}
                   </p>
 
-                  {sharedInfo ? (
+                  {isLoadingCount ? (
+                    <div className="w-full flex justify-center py-4">
+                      <span className="material-symbols-outlined animate-spin text-[24px] text-[var(--md-sys-color-primary)]">progress_activity</span>
+                    </div>
+                  ) : sharedInfo ? (
                     <div className="space-y-4 mt-2">
                       <div className="flex items-center gap-2 bg-[var(--md-sys-color-surface-container)] rounded-xl p-3 border border-[var(--md-sys-color-outline-variant)]/10">
                         <input
@@ -151,7 +179,16 @@ export const ShareChatDialog: React.FC<ShareChatDialogProps> = ({
                     </div>
                   ) : (
                     <div className="text-sm text-[var(--md-sys-color-on-surface-variant)] italic opacity-75 mt-2">
-                      {t('dialog.share.status.not_shared')}
+                      {existingCount !== null && existingCount > 0 ? (
+                        <div className="flex items-center gap-2 text-[var(--md-sys-color-primary)] font-medium">
+                          <span className="material-symbols-outlined text-[18px]">info</span>
+                          <span>
+                            {(t('dialog.share.status.shared_count') || 'Links generated for this chat: {count}').replace('{count}', existingCount.toString())}
+                          </span>
+                        </div>
+                      ) : (
+                        t('dialog.share.status.not_shared')
+                      )}
                     </div>
                   )}
 

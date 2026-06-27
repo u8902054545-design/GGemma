@@ -119,3 +119,20 @@ export const deleteAllUserShares = async (): Promise<void> => {
     throw error;
   }
 };
+
+/**
+ * Gets the count of public links created for a specific chat.
+ */
+export const getChatShareCount = async (chatId: string): Promise<number> => {
+  const { count, error } = await supabase
+    .from('shared_chats')
+    .select('*', { count: 'exact', head: true })
+    .eq('chat_id', chatId);
+
+  if (error) {
+    console.error('Error getting chat share count:', error);
+    throw error;
+  }
+  return count || 0;
+};
+
