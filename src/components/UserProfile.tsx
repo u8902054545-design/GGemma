@@ -6,7 +6,7 @@ import { profileVariants } from '../motion/profileTransitions';
 import { APP_VERSION } from '../versionApp';
 import { SettingsApp } from './Settings/settingsApp';
 import { PersonalizationPage } from './Personalization/personalizationPage';
-import { SharesPage } from './SharesPage';
+import { SharesPage } from '../sharing/SharesPage';
 import { useLanguage } from '../hooks/useLanguage';
 
 import '@material/web/progress/circular-progress.js';

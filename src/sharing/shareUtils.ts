@@ -135,4 +135,3 @@ export const getChatShareCount = async (chatId: string): Promise<number> => {
   }
   return count || 0;
 };
-

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { getSharedChat, SharedChat } from '../Functions/shareUtils';
-import { ChatMessage } from './ChatMessage';
+import { getSharedChat, SharedChat } from './shareUtils';
+import { ChatMessage } from '../components/ChatMessage';
 import { supabase } from '../config';
 import { useLanguage } from '../hooks/useLanguage';
 import { useTheme } from '../hooks/useTheme';

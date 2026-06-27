@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import * as Dialog from '@radix-ui/react-dialog';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../hooks/useLanguage';
-import { createChatShare, getChatShareCount, SharedChat } from '../Functions/shareUtils';
-import { fetchChatMessages } from './chatHeaderFunctions';
+import { createChatShare, getChatShareCount, SharedChat } from './shareUtils';
+import { fetchChatMessages } from '../components/chatHeaderFunctions';
 
 interface ShareChatDialogProps {
   isOpen: boolean;

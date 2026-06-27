@@ -24,7 +24,7 @@ import { ScrollToBottomButton } from './components/ScrollToBottomButton';
 import { AppModals } from './components/AppModals';
 import { useChatHistory } from './hooks/useChatHistory';
 import { WebSearchConfirmationBottomSheet, useWebSearchConfirmation } from './components/WebSearchConfirmation';
-import { SharedChatView } from './components/SharedChatView';
+import { SharedChatView } from './sharing/SharedChatView';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle } = useAuth();

@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { pageVariants } from '../motion/transitions';
 import { useLanguage } from '../hooks/useLanguage';
-import { getAllUserShares, deleteShareById, deleteAllUserShares, SharedChat } from '../Functions/shareUtils';
-import Snackbar from './Snackbar';
+import { getAllUserShares, deleteShareById, deleteAllUserShares, SharedChat } from './shareUtils';
+import Snackbar from '../components/Snackbar';
 import { DeleteAllSharesDialog } from './DeleteAllSharesDialog';
 
 interface SharesPageProps {

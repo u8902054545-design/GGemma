@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SearchOverlay } from './SearchOverlay';
 import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
-import { ShareChatDialog } from './ShareChatDialog';
+import { ShareChatDialog } from '../sharing/ShareChatDialog';
 import { renameChat, togglePinChat, fetchChatMessages } from './chatHeaderFunctions';
 import { ChatList } from './SidebarParts/ChatList';
 import { SidebarMenu } from './SidebarParts/SidebarMenu';

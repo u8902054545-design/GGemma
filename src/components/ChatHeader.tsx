@@ -4,7 +4,7 @@ import { mdEasing } from '../motion/transitions';
 import { handleNewChat, renameChat, togglePinChat } from './chatHeaderFunctions';
 import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
-import { ShareChatDialog } from './ShareChatDialog';
+import { ShareChatDialog } from '../sharing/ShareChatDialog';
 import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { ChatActionsMenu } from './ChatHeaderParts/ChatActionsMenu';
 import { useLanguage } from '../hooks/useLanguage';
