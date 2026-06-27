@@ -28,26 +28,30 @@ export const getSharedChat = async (shareId: string): Promise<SharedChat | null>
 };
 
 /**
- * Checks if a chat is currently shared and returns the share record if it exists.
+ * Fetches all shared links created by the current authenticated user.
  */
-export const getChatShareStatus = async (chatId: string): Promise<SharedChat | null> => {
+export const getAllUserShares = async (): Promise<SharedChat[]> => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) throw new Error('Unauthorized');
+
   const { data, error } = await supabase
     .from('shared_chats')
     .select('*')
-    .eq('chat_id', chatId)
-    .maybeSingle();
+    .eq('user_id', session.user.id)
+    .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error checking chat share status:', error);
+    console.error('Error fetching user shares:', error);
     throw error;
   }
-  return data as SharedChat | null;
+  return (data as SharedChat[]) || [];
 };
 
 /**
- * Creates a public share link (snapshot) of a chat or updates an existing one.
+ * Creates a public share link (snapshot) of a chat.
+ * Generates a new link every time it is called.
  */
-export const createOrUpdateChatShare = async (
+export const createChatShare = async (
   chatId: string,
   chatTitle: string,
   messages: any[]
@@ -66,34 +70,52 @@ export const createOrUpdateChatShare = async (
 
   const { data, error } = await supabase
     .from('shared_chats')
-    .upsert({
+    .insert({
       chat_id: chatId,
       user_id: session.user.id,
       title: chatTitle || 'Shared Chat',
       messages: formattedMessages,
       created_at: new Date().toISOString()
-    }, { onConflict: 'chat_id' })
+    })
     .select('*')
     .single();
 
   if (error) {
-    console.error('Error creating/updating chat share:', error);
+    console.error('Error creating chat share:', error);
     throw error;
   }
   return data as SharedChat;
 };
 
 /**
- * Disables sharing for a chat by deleting its shared_chats entry.
+ * Deletes a specific share link by its ID.
  */
-export const deleteChatShare = async (chatId: string): Promise<void> => {
+export const deleteShareById = async (shareId: string): Promise<void> => {
   const { error } = await supabase
     .from('shared_chats')
     .delete()
-    .eq('chat_id', chatId);
+    .eq('id', shareId);
 
   if (error) {
-    console.error('Error deleting chat share:', error);
+    console.error('Error deleting share by id:', error);
+    throw error;
+  }
+};
+
+/**
+ * Deletes all share links created by the current authenticated user.
+ */
+export const deleteAllUserShares = async (): Promise<void> => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.user?.id) throw new Error('Unauthorized');
+
+  const { error } = await supabase
+    .from('shared_chats')
+    .delete()
+    .eq('user_id', session.user.id);
+
+  if (error) {
+    console.error('Error deleting all user shares:', error);
     throw error;
   }
 };

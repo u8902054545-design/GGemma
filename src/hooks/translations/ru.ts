@@ -150,5 +150,12 @@ export const ru = {
   'shared.public_snapshot': 'Снимок чата',
   'shared.import': 'Скопировать в мои чаты',
   'shared.try_gemma': 'Попробовать Gemma',
+  'shared.profile_title': 'Общедоступные ссылки',
+  'shared.profile_desc': 'Управляйте публичными ссылками на ваши чаты. Любой, у кого есть ссылка, может просмотреть снимок переписки.',
+  'shared.no_links': 'Вы ещё не делились ссылками на чаты.',
+  'shared.delete_all': 'Удалить все ссылки',
+  'shared.delete_all_confirm': 'Вы уверены, что хотите удалить все общедоступные ссылки? Это действие необратимо.',
+  'shared.all_deleted': 'Все ссылки удалены',
+  'dialog.share.create_another': 'Создать другую ссылку',
 };
 

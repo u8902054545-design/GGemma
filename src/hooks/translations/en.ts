@@ -150,5 +150,12 @@ export const en = {
   'shared.public_snapshot': 'Public snapshot',
   'shared.import': 'Copy to my chats',
   'shared.try_gemma': 'Try Gemma',
+  'shared.profile_title': 'Public links',
+  'shared.profile_desc': 'Manage public links to your chats. Anyone with the link can view the snapshot.',
+  'shared.no_links': 'You have not shared any chats yet.',
+  'shared.delete_all': 'Remove all links',
+  'shared.delete_all_confirm': 'Are you sure you want to delete all your shared links? This cannot be undone.',
+  'shared.all_deleted': 'All links removed',
+  'dialog.share.create_another': 'Create another link',
 };
 
