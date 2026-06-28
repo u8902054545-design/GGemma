@@ -69,16 +69,69 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
 
       if (chatError) throw chatError;
 
-      // 2. Insert messages
-      const messagesToInsert = sharedChat.messages.map((m: any, idx: number) => ({
-        id: crypto.randomUUID(),
-        chat_id: newChatId,
-        user_id: user.id,
-        role: m.role === 'ai' ? 'model' : 'user', // database column role is 'model' or 'user'
-        content: m.content,
-        image_url: m.image_url || m.imageUrl || null,
-        video_url: m.video_url || m.videoUrl || null,
-        created_at: new Date(Date.now() - (sharedChat.messages.length - idx) * 1000).toISOString()
+      // 2. Process and copy media files to the new user's storage
+      const messagesToInsert = await Promise.all(sharedChat.messages.map(async (m: any, idx: number) => {
+        let copiedImageUrl = m.image_url || m.imageUrl || null;
+        let copiedVideoUrl = m.video_url || m.videoUrl || null;
+
+        // Copy Image
+        if (copiedImageUrl) {
+          try {
+            const response = await fetch(copiedImageUrl);
+            if (response.ok) {
+              const blob = await response.blob();
+              const ext = copiedImageUrl.split('.').pop()?.split('?')[0] || 'png';
+              const fileName = `${user.id}/${crypto.randomUUID()}.${ext}`;
+              
+              const { error: uploadError } = await supabase.storage
+                .from('chat-images')
+                .upload(fileName, blob, { contentType: blob.type || 'image/png' });
+              
+              if (!uploadError) {
+                copiedImageUrl = supabase.storage.from('chat-images').getPublicUrl(fileName).data.publicUrl;
+              } else {
+                console.error('Failed to upload copied image:', uploadError);
+              }
+            }
+          } catch (err) {
+            console.error('Error copying image:', err);
+          }
+        }
+
+        // Copy Video
+        if (copiedVideoUrl) {
+          try {
+            const response = await fetch(copiedVideoUrl);
+            if (response.ok) {
+              const blob = await response.blob();
+              const ext = copiedVideoUrl.split('.').pop()?.split('?')[0] || 'mp4';
+              const fileName = `${user.id}/${crypto.randomUUID()}.${ext}`;
+              
+              const { error: uploadError } = await supabase.storage
+                .from('chat-videos')
+                .upload(fileName, blob, { contentType: blob.type || 'video/mp4' });
+              
+              if (!uploadError) {
+                copiedVideoUrl = supabase.storage.from('chat-videos').getPublicUrl(fileName).data.publicUrl;
+              } else {
+                console.error('Failed to upload copied video:', uploadError);
+              }
+            }
+          } catch (err) {
+            console.error('Error copying video:', err);
+          }
+        }
+
+        return {
+          id: crypto.randomUUID(),
+          chat_id: newChatId,
+          user_id: user.id,
+          role: m.role === 'ai' ? 'model' : 'user', // database column role is 'model' or 'user'
+          content: m.content,
+          image_url: copiedImageUrl,
+          video_url: copiedVideoUrl,
+          created_at: new Date(Date.now() - (sharedChat.messages.length - idx) * 1000).toISOString()
+        };
       }));
 
       const { error: msgError } = await supabase

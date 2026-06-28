@@ -17,6 +17,9 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useAuth();
   const [language, setLanguageState] = useState<Language>(() => {
+    const isSharedRoute = window.location.pathname.startsWith('/shared/') || window.location.pathname.startsWith('/share/');
+    if (isSharedRoute) return 'en';
+
     const saved = localStorage.getItem('app_language');
     if (saved === 'ru' || saved === 'en') return saved;
     const systemLang = navigator.language.split('-')[0];

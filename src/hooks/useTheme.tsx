@@ -15,6 +15,9 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<Theme>(() => {
+    const isSharedRoute = window.location.pathname.startsWith('/shared/') || window.location.pathname.startsWith('/share/');
+    if (isSharedRoute) return 'dark';
+
     const saved = localStorage.getItem('app_theme');
     return (saved as Theme) || 'system';
   });
