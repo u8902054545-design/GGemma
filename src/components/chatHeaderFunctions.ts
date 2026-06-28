@@ -99,7 +99,11 @@ export const fetchChatMessages = async (chatId: string) => {
     const data = await response.json();
     return data.map((m: any) => ({
       role: (m.role === 'assistant' || m.role === 'ai' || m.role === 'model') ? 'ai' : 'user',
-      content: m.content
+      content: m.content,
+      image_url: m.image_url || m.imageUrl || null,
+      video_url: m.video_url || m.videoUrl || null,
+      codes: m.codes || null,
+      created_at: m.created_at || null
     }));
   } catch (error) {
     console.error('Error fetching messages for export:', error);
