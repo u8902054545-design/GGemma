@@ -10,6 +10,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ImportedCodesList } from './ImportedCodesList';
 import { HiddenInputs } from './HiddenInputs';
 import { VoiceInput } from './VoiceInput';
+import { GemmaLive } from './GemmaLive';
+import { playLiveOpenSound, playLiveCloseSound } from './sounds';
+
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
   input, setInput, handleSend, stopRequest,
@@ -21,6 +24,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   onImageClick,
   importedCodes = [],
   onRemoveCode,
+  messages,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -41,6 +45,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   } = useImageUpload();
 
   const [isVoiceInputActive, setIsVoiceInputActive] = useState(false);
+  const [isLiveActive, setIsLiveActive] = useState(false);
+
 
   useEffect(() => {
     if (isImageDisabled && selectedFile) {
@@ -95,63 +101,98 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         onRemoveCode={onRemoveCode} 
       />
       
-      <div className="flex items-end gap-3 justify-center">
-        {!isVoiceInputActive && (
-          <AddAction onAddClick={() => setIsBottomSheetOpen(true)} />
-        )}
-
-        <AnimatePresence mode="wait">
-          {!isVoiceInputActive ? (
-            <motion.div
-              key="input-area-wrapper"
-              initial={{ opacity: 0, scale: 0.95, y: 10 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 10 }}
-              transition={{ duration: 0.25, ease: [0.2, 0.0, 0, 1.0] }}
-              className="flex-1 flex min-w-0"
-            >
-              <InputArea 
-                input={input}
-                setInput={setInput}
-                textareaRef={textareaRef}
-                onKeyDown={onKeyDown}
-                previewUrl={previewUrl}
-                selectedFile={selectedFile}
-                clearSelection={clearSelection}
-                onMediaClick={handleMediaClick}
-                isSearchActive={isSearchActive}
-                isSearchDisabled={isSearchDisabled}
-                onSearchClick={onSearchClick}
-                isListening={false}
-                toggleListening={() => setIsVoiceInputActive(true)}
-              />
-            </motion.div>
-          ) : (
-            <VoiceInput 
-              key="voice-input"
-              onCancel={() => setIsVoiceInputActive(false)}
-              onConfirm={(text) => {
-                if (text) {
-                  setInput(input + (input ? " " : "") + text);
-                }
-                setIsVoiceInputActive(false);
-                setTimeout(() => {
-                  textareaRef.current?.focus();
-                }, 100);
-              }}
+      <AnimatePresence mode="wait">
+        {isLiveActive ? (
+          <motion.div
+            key="live-container"
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ duration: 0.25 }}
+            className="flex items-center justify-between min-h-[52px] w-full gap-3"
+          >
+            <GemmaLive 
+              messages={messages}
+              isTyping={isTyping}
+              handleSend={handleSend}
+              onClose={() => {
+                playLiveCloseSound();
+                setIsLiveActive(false);
+              }} 
             />
-          )}
-        </AnimatePresence>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="standard-input-container"
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            transition={{ duration: 0.25 }}
+            className="flex items-end gap-3 justify-center min-h-[52px] w-full"
+          >
+            {!isVoiceInputActive && (
+              <AddAction onAddClick={() => setIsBottomSheetOpen(true)} />
+            )}
 
-        {!isVoiceInputActive && (
-          <SendAction 
-            isTyping={isTyping}
-            stopRequest={stopRequest}
-            handleWrappedSend={handleWrappedSend}
-            isSendDisabled={isSendDisabled}
-          />
+            <AnimatePresence mode="wait">
+              {!isVoiceInputActive ? (
+                <motion.div
+                  key="input-area-wrapper"
+                  initial={{ opacity: 0, scale: 0.95, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 10 }}
+                  transition={{ duration: 0.25, ease: [0.2, 0.0, 0, 1.0] }}
+                  className="flex-1 flex min-w-0"
+                >
+                  <InputArea 
+                    input={input}
+                    setInput={setInput}
+                    textareaRef={textareaRef}
+                    onKeyDown={onKeyDown}
+                    previewUrl={previewUrl}
+                    selectedFile={selectedFile}
+                    clearSelection={clearSelection}
+                    onMediaClick={handleMediaClick}
+                    isSearchActive={isSearchActive}
+                    isSearchDisabled={isSearchDisabled}
+                    onSearchClick={onSearchClick}
+                    isListening={false}
+                    toggleListening={() => setIsVoiceInputActive(true)}
+                  />
+                </motion.div>
+              ) : (
+                <VoiceInput 
+                  key="voice-input"
+                  onCancel={() => setIsVoiceInputActive(false)}
+                  onConfirm={(text) => {
+                    if (text) {
+                      setInput(input + (input ? " " : "") + text);
+                    }
+                    setIsVoiceInputActive(false);
+                    setTimeout(() => {
+                      textareaRef.current?.focus();
+                    }, 100);
+                  }}
+                />
+              )}
+            </AnimatePresence>
+
+            {!isVoiceInputActive && (
+              <SendAction 
+                isTyping={isTyping}
+                stopRequest={stopRequest}
+                handleWrappedSend={handleWrappedSend}
+                isSendDisabled={isSendDisabled}
+                showVoiceChat={!input.trim() && !selectedFile && importedCodes.length === 0}
+                onVoiceChatClick={() => {
+                  playLiveOpenSound();
+                  setIsLiveActive(true);
+                }}
+              />
+            )}
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
 
       <HiddenInputs 
         fileInputRef={fileInputRef}

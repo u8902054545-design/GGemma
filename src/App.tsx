@@ -252,6 +252,7 @@ export default function App() {
                 onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
                 importedCodes={importedCodes}
                 onRemoveCode={(id) => setImportedCodes(prev => prev.filter(c => c.id !== id))}
+                messages={messages}
               />
             </div>
           </motion.div>

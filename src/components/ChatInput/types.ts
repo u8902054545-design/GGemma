@@ -1,4 +1,5 @@
 import React from 'react';
+import { Message } from '../../hooks/chatTypes';
 
 export interface ImportedCode {
   id: string;
@@ -19,5 +20,7 @@ export interface ChatInputProps {
   onImageClick?: (url: string) => void;
   importedCodes?: ImportedCode[];
   onRemoveCode?: (id: string) => void;
+  messages: Message[];
 }
+
 
