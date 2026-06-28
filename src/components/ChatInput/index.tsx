@@ -12,6 +12,7 @@ import { HiddenInputs } from './HiddenInputs';
 import { VoiceInput } from './VoiceInput';
 import { GemmaLive } from './GemmaLive';
 import { playLiveOpenSound, playLiveCloseSound } from './sounds';
+import { initLiveAudioContext } from './liveTTS';
 
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
@@ -185,6 +186,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 isSendDisabled={isSendDisabled}
                 showVoiceChat={!input.trim() && !selectedFile && importedCodes.length === 0}
                 onVoiceChatClick={() => {
+                  initLiveAudioContext();
                   playLiveOpenSound();
                   setIsLiveActive(true);
                 }}

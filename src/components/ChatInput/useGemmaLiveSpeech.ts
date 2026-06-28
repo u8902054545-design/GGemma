@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { playLiveTTS, stopLiveTTS } from './liveTTS';
+import { playLiveTTS, stopLiveTTS, initLiveAudioContext, closeLiveAudioContext } from './liveTTS';
 import { Message } from '../../hooks/chatTypes';
 import { SUPABASE_ENDPOINT, supabase } from '../../config';
 
@@ -34,9 +34,34 @@ export const useGemmaLiveSpeech = ({
   const isUserSpeakingRef = useRef<boolean>(false);
   const silenceStartTimeRef = useRef<number | null>(null);
 
-  // Keep latest state references to avoid callback dependency updates
-  const isTypingRef = useRef(isTyping);
-  isTypingRef.current = isTyping;
+  const startListeningTimeoutRef = useRef<any>(null);
+
+  const clearStartListeningTimeout = useCallback(() => {
+    if (startListeningTimeoutRef.current !== null) {
+      clearTimeout(startListeningTimeoutRef.current);
+      startListeningTimeoutRef.current = null;
+    }
+  }, []);
+
+  const cleanupAudio = useCallback(() => {
+    if (animationFrameRef.current) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
+      audioContextRef.current.close();
+      audioContextRef.current = null;
+    }
+    analyserRef.current = null;
+  }, []);
+
+  // Keep latest refs of all props and state variables to make callbacks stable
+  const handleSendRef = useRef(handleSend);
+  handleSendRef.current = handleSend;
 
   const messagesRef = useRef(messages);
   messagesRef.current = messages;
@@ -49,6 +74,9 @@ export const useGemmaLiveSpeech = ({
 
   const isProcessingRef = useRef(isProcessing);
   isProcessingRef.current = isProcessing;
+
+  const isTypingRef = useRef(isTyping);
+  isTypingRef.current = isTyping;
 
   // Handle uploading audio file to Groq Whisper STT endpoint
   const handleAudioUpload = useCallback(async (audioBlob: Blob) => {
@@ -84,7 +112,7 @@ export const useGemmaLiveSpeech = ({
       const transcribedText = result.text || '';
       if (transcribedText.trim() && isComponentActiveRef.current) {
         console.log('[Gemma Live Debug] STT complete. Sending text to Gemma:', transcribedText);
-        handleSend(transcribedText);
+        handleSendRef.current(transcribedText);
         // Reset processing state since handleSend will trigger isTyping=true
         setIsProcessing(false);
       } else {
@@ -101,7 +129,7 @@ export const useGemmaLiveSpeech = ({
         startListening();
       }
     }
-  }, [handleSend]);
+  }, []); // Empty dependencies because we use handleSendRef!
 
   // Helper to start recording user speech
   const startListening = useCallback(async () => {
@@ -176,9 +204,7 @@ export const useGemmaLiveSpeech = ({
               isUserSpeakingRef.current = false;
               silenceStartTimeRef.current = null;
               
-              if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-                mediaRecorderRef.current.stop();
-              }
+              stopListening();
             }
           }
 
@@ -219,9 +245,10 @@ export const useGemmaLiveSpeech = ({
 
     } catch (err) {
       console.error('[Gemma Live Debug] startListening setup failed:', err);
+      cleanupAudio();
       setIsListening(false);
     }
-  }, [handleAudioUpload]);
+  }, [handleAudioUpload, cleanupAudio]);
 
   // Helper to stop recording
   const stopListening = useCallback(() => {
@@ -234,26 +261,20 @@ export const useGemmaLiveSpeech = ({
     setIsListening(false);
   }, []);
 
-  const cleanupAudio = useCallback(() => {
-    if (animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current);
-      animationFrameRef.current = null;
-    }
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach(track => track.stop());
-      streamRef.current = null;
-    }
-    if (audioContextRef.current && audioContextRef.current.state !== 'closed') {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-    analyserRef.current = null;
-  }, []);
 
-  // Monitor isTyping changes. When typing ends (AI finishes response), speak it.
+
+  // Monitor isTyping changes.
   const prevIsTypingRef = useRef(isTyping);
   useEffect(() => {
     console.log('[Gemma Live Debug] isTyping changed:', prevIsTypingRef.current, '->', isTyping);
+    
+    // When typing starts (AI starts generating response), stop listening immediately
+    if (!prevIsTypingRef.current && isTyping) {
+      console.log('[Gemma Live Debug] AI started typing/generating. Stopping listening.');
+      stopListening();
+    }
+    
+    // When typing ends (AI finishes response), speak it.
     if (prevIsTypingRef.current && !isTyping && isComponentActiveRef.current) {
       // Find the last assistant message
       const lastAiMsg = [...messagesRef.current].reverse().find(msg => msg.role === 'ai');
@@ -276,6 +297,7 @@ export const useGemmaLiveSpeech = ({
             console.log('[Gemma Live Debug] TTS finished playing');
             if (isComponentActiveRef.current) {
               setIsSpeaking(false);
+              isSpeakingRef.current = false; // Manually clear speaking ref block
               if (!isMutedRef.current) {
                 console.log('[Gemma Live Debug] Resuming user speech listening');
                 startListening();
@@ -299,19 +321,23 @@ export const useGemmaLiveSpeech = ({
       const nextMuted = !prev;
       console.log('[Gemma Live Debug] Manual mute toggled to:', nextMuted);
       if (nextMuted) {
+        clearStartListeningTimeout();
         stopListening();
         stopLiveTTS();
         cleanupAudio();
+        closeLiveAudioContext();
         setIsSpeaking(false);
         setIsProcessing(false);
       } else {
-        setTimeout(() => {
+        initLiveAudioContext();
+        clearStartListeningTimeout();
+        startListeningTimeoutRef.current = setTimeout(() => {
           startListening();
         }, 100);
       }
       return nextMuted;
     });
-  }, [startListening, stopListening, cleanupAudio]);
+  }, [startListening, stopListening, cleanupAudio, clearStartListeningTimeout]);
 
   // Handle entering Gemma Live
   const startLiveConversation = useCallback(() => {
@@ -321,32 +347,37 @@ export const useGemmaLiveSpeech = ({
     setIsSpeaking(false);
     setIsProcessing(false);
     
-    setTimeout(() => {
+    clearStartListeningTimeout();
+    startListeningTimeoutRef.current = setTimeout(() => {
       startListening();
     }, 200);
-  }, [startListening]);
+  }, [startListening, clearStartListeningTimeout]);
 
   // Handle exiting Gemma Live
   const stopLiveConversation = useCallback(() => {
     console.log('[Gemma Live Debug] Exiting Gemma Live mode');
     isComponentActiveRef.current = false;
+    clearStartListeningTimeout();
     stopListening();
     stopLiveTTS();
     cleanupAudio();
+    closeLiveAudioContext();
     setIsSpeaking(false);
     setIsProcessing(false);
-  }, [stopListening, cleanupAudio]);
+  }, [stopListening, cleanupAudio, clearStartListeningTimeout]);
 
   // Cleanup on unmount
   useEffect(() => {
     return () => {
       console.log('[Gemma Live Debug] Hook unmounted');
       isComponentActiveRef.current = false;
+      clearStartListeningTimeout();
       stopListening();
       stopLiveTTS();
       cleanupAudio();
+      closeLiveAudioContext();
     };
-  }, [stopListening, cleanupAudio]);
+  }, [stopListening, cleanupAudio, clearStartListeningTimeout]);
 
   return {
     isListening,

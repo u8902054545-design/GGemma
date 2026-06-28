@@ -5,6 +5,33 @@ let activeAudioContext: AudioContext | null = null;
 let activeSourceNode: AudioBufferSourceNode | null = null;
 let isPlayingTts = false;
 
+export const initLiveAudioContext = () => {
+  try {
+    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+    if (!AudioContextClass) return;
+    if (!activeAudioContext || activeAudioContext.state === 'closed') {
+      activeAudioContext = new AudioContextClass({ sampleRate: 24000 });
+    }
+    if (activeAudioContext.state === 'suspended') {
+      activeAudioContext.resume();
+    }
+  } catch (e) {
+    console.error('Failed to initialize activeAudioContext:', e);
+  }
+};
+
+export const closeLiveAudioContext = () => {
+  try {
+    if (activeAudioContext && activeAudioContext.state !== 'closed') {
+      activeAudioContext.close();
+    }
+  } catch (e) {
+    console.error('Failed to close activeAudioContext:', e);
+  } finally {
+    activeAudioContext = null;
+  }
+};
+
 /**
  * Stops any ongoing TTS playback (both local speech synthesis and remote PCM player).
  */
@@ -21,11 +48,6 @@ export const stopLiveTTS = () => {
         activeSourceNode.stop();
       } catch (e) {}
       activeSourceNode = null;
-    }
-
-    if (activeAudioContext && activeAudioContext.state !== 'closed') {
-      activeAudioContext.close();
-      activeAudioContext = null;
     }
 
     isPlayingTts = false;
@@ -125,9 +147,12 @@ export const playLiveTTS = async (
       ttsAudioCache[trimmedText] = audioBufferData;
     }
 
-    // Playback PCM buffer
-    const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-    activeAudioContext = new AudioContextClass({ sampleRate: 24000 });
+    // Ensure AudioContext is active
+    initLiveAudioContext();
+    
+    if (!activeAudioContext) {
+      throw new Error('AudioContext is not available');
+    }
     
     const pcmData = new Int16Array(audioBufferData);
     const float32Data = new Float32Array(pcmData.length);

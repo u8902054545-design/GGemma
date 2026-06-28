@@ -43,6 +43,12 @@ export const playLiveOpenSound = () => {
     
     osc1.stop(now + 0.75);
     osc2.stop(now + 0.75);
+
+    setTimeout(() => {
+      try {
+        ctx.close();
+      } catch (e) {}
+    }, 1000);
   } catch (e) {
     console.error('Failed to play Gemma Live open sound:', e);
   }
@@ -89,6 +95,12 @@ export const playLiveCloseSound = () => {
     
     osc1.stop(now + 0.75);
     osc2.stop(now + 0.75);
+
+    setTimeout(() => {
+      try {
+        ctx.close();
+      } catch (e) {}
+    }, 1000);
   } catch (e) {
     console.error('Failed to play Gemma Live close sound:', e);
   }
