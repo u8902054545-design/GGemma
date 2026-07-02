@@ -253,6 +253,8 @@ export default function App() {
                 importedCodes={importedCodes}
                 onRemoveCode={(id) => setImportedCodes(prev => prev.filter(c => c.id !== id))}
                 messages={messages}
+                setSnackbarMessage={setSnackbarMessage}
+                setIsSnackbarOpen={setIsSnackbarOpen}
               />
             </div>
           </motion.div>

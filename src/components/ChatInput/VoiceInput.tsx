@@ -1,16 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../../hooks/useLanguage';
-import { voiceInputVariants, pulseVariants, barVariants } from '../../motion/voiceTransition';
+import { voiceInputVariants, pulseVariants } from '../../motion/voiceTransition';
 import '@material/web/iconbutton/icon-button.js';
+import '@material/web/iconbutton/filled-icon-button.js';
 import { SUPABASE_ENDPOINT, supabase } from '../../config';
 
 interface VoiceInputProps {
   onCancel: () => void;
-  onConfirm: (transcript: string) => void;
+  onConfirm: (transcript: string, sendImmediately?: boolean) => void;
+  setSnackbarMessage?: (msg: string) => void;
+  setIsSnackbarOpen?: (open: boolean) => void;
 }
 
-export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) => {
+export const VoiceInput: React.FC<VoiceInputProps> = ({ 
+  onCancel, 
+  onConfirm,
+  setSnackbarMessage,
+  setIsSnackbarOpen
+}) => {
   const { language } = useLanguage();
   const [transcript, setTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
@@ -18,11 +26,10 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
   const [isOnline, setIsOnline] = useState(navigator.onLine);
-  const [errorMessage, setErrorMessage] = useState('');
 
   const recognitionRef = useRef<any>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const speakingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const shouldSendOnConfirmRef = useRef(false);
 
   // Online recording refs
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -45,12 +52,25 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
     };
   }, []);
 
-  // Auto-scroll the transcript to the bottom if it grows
+  // Listen for Escape key to cancel
   useEffect(() => {
-    if (containerRef.current) {
-      containerRef.current.scrollTop = containerRef.current.scrollHeight;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleCancel();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
+  const showError = (msg: string) => {
+    if (setSnackbarMessage && setIsSnackbarOpen) {
+      setSnackbarMessage(msg);
+      setIsSnackbarOpen(true);
     }
-  }, [transcript, interimTranscript, isTranscribing, errorMessage]);
+  };
 
   // Clean up function for audio recording
   const cleanupRecording = () => {
@@ -157,7 +177,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
               await uploadAndTranscribe(audioBlob, mimeType);
             } else {
               setIsTranscribing(false);
-              setErrorMessage(language === 'ru' ? 'Запись слишком короткая.' : 'Recording too short.');
+              showError(language === 'ru' ? 'Запись слишком короткая.' : 'Recording too short.');
             }
           };
 
@@ -167,7 +187,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
         } catch (err) {
           console.error("Failed to start MediaRecorder recording:", err);
           if (isComponentMounted) {
-            setErrorMessage(language === 'ru' ? 'Не удалось получить доступ к микрофону.' : 'Could not access microphone.');
+            showError(language === 'ru' ? 'Не удалось получить доступ к микрофону.' : 'Could not access microphone.');
             setIsListening(false);
           }
         }
@@ -189,7 +209,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (!SpeechRecognition) {
         console.warn("Speech recognition not supported in this browser.");
-        setErrorMessage(language === 'ru' ? 'Распознавание речи не поддерживается.' : 'Speech recognition not supported.');
+        showError(language === 'ru' ? 'Распознавание речи не поддерживается.' : 'Speech recognition not supported.');
         return;
       }
 
@@ -201,7 +221,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
 
       recognition.onstart = () => {
         setIsListening(true);
-        setErrorMessage('');
       };
 
       recognition.onspeechstart = () => {
@@ -250,9 +269,9 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
       recognition.onerror = (event: any) => {
         console.error("Speech recognition error:", event.error);
         if (event.error === 'not-allowed') {
-          setErrorMessage(language === 'ru' ? 'Доступ к микрофону заблокирован.' : 'Microphone access denied.');
+          showError(language === 'ru' ? 'Доступ к микрофону заблокирован.' : 'Microphone access denied.');
         } else {
-          setErrorMessage(language === 'ru' ? 'Ошибка распознавания речи.' : 'Speech recognition error.');
+          showError(language === 'ru' ? 'Ошибка распознавания речи.' : 'Speech recognition error.');
         }
       };
 
@@ -290,7 +309,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
 
   const uploadAndTranscribe = async (audioBlob: Blob, mimeType: string) => {
     setIsTranscribing(true);
-    setErrorMessage('');
     try {
       const { data: { session } } = await supabase.auth.getSession();
       const accessToken = session?.access_token;
@@ -321,10 +339,10 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
 
       const result = await response.json();
       const text = result.text || '';
-      onConfirm(text);
+      onConfirm(text, shouldSendOnConfirmRef.current);
     } catch (err: any) {
       console.error("OpenRouter chirp-3 transcription error:", err);
-      setErrorMessage(language === 'ru' ? 'Не удалось расшифровать аудио. Попробуйте еще раз.' : 'Could not transcribe audio. Please try again.');
+      showError(language === 'ru' ? 'Не удалось расшифровать аудио.' : 'Could not transcribe audio.');
       setIsTranscribing(false);
     }
   };
@@ -348,9 +366,12 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
     onCancel();
   };
 
-  const handleConfirm = () => {
+  const handleStopRecording = (sendAfter: boolean) => {
+    if (isTranscribing) return;
+    shouldSendOnConfirmRef.current = sendAfter;
+    setIsListening(false);
+
     if (isOnline) {
-      if (isTranscribing) return;
       if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
         setIsTranscribing(true);
         try {
@@ -359,16 +380,19 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
           setIsTranscribing(false);
         }
       } else {
-        onConfirm('');
+        onConfirm('', sendAfter);
       }
     } else {
+      setIsTranscribing(true);
       const finalText = (transcript + (interimTranscript ? ' ' + interimTranscript : '')).trim();
       if (recognitionRef.current) {
         try {
           recognitionRef.current.stop();
         } catch (e) {}
       }
-      onConfirm(finalText);
+      setTimeout(() => {
+        onConfirm(finalText, sendAfter);
+      }, 600);
     }
   };
 
@@ -378,7 +402,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
       initial="initial"
       animate="animate"
       exit="exit"
-      className="flex-1 flex items-center gap-3 bg-[var(--md-sys-color-surface-container-high)] rounded-[32px] px-3 py-2 min-h-[52px] border border-[var(--md-sys-color-primary)]/10 shadow-lg relative overflow-hidden min-w-0"
+      className="flex-1 flex flex-col justify-between bg-[var(--md-sys-color-surface-container-high)] rounded-[32px] p-4 min-h-[96px] border border-[var(--md-sys-color-primary)]/10 shadow-lg relative overflow-hidden min-w-0 gap-3"
     >
       {/* Visual background ripple/pulse when listening */}
       <AnimatePresence>
@@ -391,96 +415,76 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({ onCancel, onConfirm }) =
         )}
       </AnimatePresence>
 
-      {/* Close button on the left (Material Web Component) */}
-      <div className="flex-shrink-0 z-10">
-        <md-icon-button
-          onClick={handleCancel}
-          disabled={isTranscribing}
-          style={{
-            '--md-icon-button-icon-color': 'var(--md-sys-color-on-surface-variant)',
-            '--md-icon-button-hover-state-layer-color': 'var(--md-sys-color-on-surface-variant)',
-            '--md-icon-button-pressed-state-layer-color': 'var(--md-sys-color-primary)',
-          }}
-        >
-          <span className="material-symbols-outlined">close</span>
-        </md-icon-button>
+      {/* Top area: Linear segment-based waveform audio stream indicator */}
+      <div className="w-full flex-1 flex items-center justify-between min-h-[48px] relative px-1">
+        <AnimatePresence>
+          {isListening && !isTranscribing && (
+            <motion.div
+              initial={{ x: '100%', opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: '-100%', opacity: 0 }}
+              transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+              className="w-full flex justify-between items-center gap-[3px]"
+            >
+              {[...Array(40)].map((_, i) => (
+                <motion.div
+                  key={i}
+                  animate={{
+                    height: isSpeaking 
+                      ? [4, Math.random() * 26 + 6, 4] 
+                      : 4
+                  }}
+                  transition={{
+                    duration: isSpeaking ? (Math.random() * 0.4 + 0.25) : 1.2,
+                    repeat: Infinity,
+                    repeatType: "mirror",
+                    delay: i * 0.015
+                  }}
+                  className="w-[3px] rounded-full bg-[#4285F4]"
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Transcript / Listening state in the center */}
-      <div 
-        ref={containerRef}
-        className="flex-1 flex items-center justify-start gap-3 px-2 max-h-[120px] overflow-y-auto select-none z-10"
-      >
-        {/* Pulsing indicator - Google Assistant style visualizer */}
-        <div className="flex items-center gap-[3.5px] h-5 w-6 shrink-0 justify-center">
-          {isListening && !isTranscribing ? (
-            [0, 1, 2, 3].map((i) => (
-              <motion.div
-                key={i}
-                custom={i}
-                variants={barVariants}
-                animate={isSpeaking ? "animate" : "idle"}
-                initial="idle"
-                className="w-[3px] rounded-full bg-[var(--md-sys-color-primary)]"
-                style={{
-                  height: '100%',
-                  transformOrigin: 'center',
-                }}
-              />
-            ))
-          ) : isTranscribing ? (
-            <div className="w-4 h-4 border-2 border-[var(--md-sys-color-primary)] border-t-transparent rounded-full animate-spin flex-shrink-0 opacity-70" />
-          ) : (
-            <div className="w-2.5 h-2.5 rounded-full bg-[var(--md-sys-color-outline)]" />
+      {/* Bottom Area: Transcribing text (left) and Buttons (right) */}
+      <div className="flex justify-between items-center w-full mt-auto">
+        <div className="flex items-center min-w-0 pr-4">
+          {isTranscribing && (
+            <span className="text-[var(--md-sys-color-primary)] animate-pulse font-medium text-[15px] flex items-center gap-2 select-none">
+              <div className="w-3.5 h-3.5 border-2 border-[var(--md-sys-color-primary)] border-t-transparent rounded-full animate-spin flex-shrink-0" />
+              {language === 'ru' ? 'Расшифровка...' : 'Transcribing...'}
+            </span>
           )}
         </div>
 
-        {/* Text Area / Transcript display */}
-        <div className="flex-1 text-[15px] leading-relaxed overflow-hidden text-ellipsis">
-          {errorMessage ? (
-            <span className="text-[var(--md-sys-color-error)] break-words font-medium text-sm">
-              {errorMessage}
-            </span>
-          ) : isTranscribing ? (
-            <span className="text-[var(--md-sys-color-primary)] animate-pulse font-medium text-sm flex items-center gap-1.5">
-              {language === 'ru' ? 'Распознавание...' : 'Transcribing...'}
-            </span>
-          ) : !isOnline ? (
-            transcript || interimTranscript ? (
-              <p className="text-[var(--md-sys-color-on-surface)] break-words">
-                {transcript}
-                {interimTranscript && (
-                  <span className="text-[var(--md-sys-color-on-surface-variant)]/60 italic ml-1">
-                    {interimTranscript}
-                  </span>
-                )}
-              </p>
-            ) : (
-              <span className="text-[var(--md-sys-color-on-surface-variant)] animate-pulse">
-                {language === 'ru' ? 'Слушаю... (Оффлайн)' : 'Listening... (Offline)'}
-              </span>
-            )
-          ) : (
-            <span className="text-[var(--md-sys-color-on-surface-variant)] animate-pulse">
-              {language === 'ru' ? 'Говорите...' : 'Speak...'}
-            </span>
-          )}
-        </div>
-      </div>
+        <div className="flex items-center gap-2 z-10 flex-shrink-0">
+          <md-icon-button
+            onClick={() => handleStopRecording(false)}
+            disabled={isTranscribing}
+            style={{
+              '--md-icon-button-icon-color': 'var(--md-sys-color-on-surface-variant)',
+              '--md-icon-button-hover-state-layer-color': 'var(--md-sys-color-on-surface-variant)',
+              '--md-icon-button-pressed-state-layer-color': 'var(--md-sys-color-primary)',
+            }}
+          >
+            <span className="material-symbols-outlined text-[26px]">stop_circle</span>
+          </md-icon-button>
 
-      {/* Check button on the right (Material Web Component) - Always enabled */}
-      <div className="flex-shrink-0 z-10">
-        <md-icon-button
-          onClick={handleConfirm}
-          disabled={isTranscribing || (!isOnline && !transcript && !interimTranscript)}
-          style={{
-            '--md-icon-button-icon-color': 'var(--md-sys-color-primary)',
-            '--md-icon-button-hover-state-layer-color': 'var(--md-sys-color-primary)',
-            '--md-icon-button-pressed-state-layer-color': 'var(--md-sys-color-primary)',
-          }}
-        >
-          <span className="material-symbols-outlined">check</span>
-        </md-icon-button>
+          <md-filled-icon-button
+            onClick={() => handleStopRecording(true)}
+            disabled={isTranscribing}
+            style={{
+              '--md-filled-icon-button-container-color': '#1a73e8',
+              '--md-filled-icon-button-icon-color': '#ffffff',
+              '--md-filled-icon-button-disabled-container-color': 'rgba(26, 115, 232, 0.4)',
+              '--md-filled-icon-button-disabled-icon-color': 'rgba(255, 255, 255, 0.6)',
+            }}
+          >
+            <span className="material-symbols-outlined text-[24px]">send</span>
+          </md-filled-icon-button>
+        </div>
       </div>
     </motion.div>
   );

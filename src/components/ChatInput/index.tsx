@@ -26,6 +26,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   importedCodes = [],
   onRemoveCode,
   messages,
+  setSnackbarMessage,
+  setIsSnackbarOpen,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -165,15 +167,25 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 <VoiceInput 
                   key="voice-input"
                   onCancel={() => setIsVoiceInputActive(false)}
-                  onConfirm={(text) => {
+                  onConfirm={(text, sendImmediately) => {
                     if (text) {
-                      setInput(input + (input ? " " : "") + text);
+                      const newText = input + (input ? " " : "") + text;
+                      if (sendImmediately) {
+                        handleSend(newText, isSearchActive, selectedFile || undefined, importedCodes);
+                        clearSelection();
+                      } else {
+                        setInput(newText);
+                      }
                     }
                     setIsVoiceInputActive(false);
-                    setTimeout(() => {
-                      textareaRef.current?.focus();
-                    }, 100);
+                    if (!sendImmediately) {
+                      setTimeout(() => {
+                        textareaRef.current?.focus();
+                      }, 100);
+                    }
                   }}
+                  setSnackbarMessage={setSnackbarMessage}
+                  setIsSnackbarOpen={setIsSnackbarOpen}
                 />
               )}
             </AnimatePresence>

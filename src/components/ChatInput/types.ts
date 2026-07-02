@@ -21,6 +21,8 @@ export interface ChatInputProps {
   importedCodes?: ImportedCode[];
   onRemoveCode?: (id: string) => void;
   messages: Message[];
+  setSnackbarMessage?: (msg: string) => void;
+  setIsSnackbarOpen?: (open: boolean) => void;
 }
 
 

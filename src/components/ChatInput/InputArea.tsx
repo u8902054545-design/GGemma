@@ -79,18 +79,18 @@ export const InputArea: React.FC<InputAreaProps> = ({
         )}
       </AnimatePresence>
 
-      <div className="flex items-end w-full px-2">
+      <div className="relative flex items-end w-full px-2">
         <textarea
           ref={textareaRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           placeholder={t('chat.input.placeholder.gemma')}
-          className="flex-1 bg-transparent border-none outline-none resize-none max-h-60 min-h-[52px] px-4 py-3.5 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] text-[16px] leading-relaxed select-text"
+          className="w-full bg-transparent border-none outline-none resize-none max-h-60 min-h-[52px] pl-4 pr-12 py-3.5 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] text-[16px] leading-relaxed select-text"
           rows={1}
         />
 
-        <div className="flex items-center gap-1 pr-2 pb-2">
+        <div className="absolute right-4 bottom-2 flex items-center gap-1">
           <button
             type="button"
             onClick={toggleListening}
