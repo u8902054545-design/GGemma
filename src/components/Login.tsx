@@ -2,31 +2,45 @@ import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { GemmaIcon } from './IconsApp/GemmaIcon';
 import { GoogleIcon } from './IconsApp/GoogleIcon';
+import { GitHubIcon } from './IconsApp/GitHubIcon';
 import Snackbar from './Snackbar';
-import { pageVariants, mdEasing, mdDuration } from '../motion/transitions';
+import { pageVariants } from '../motion/transitions';
 import { useLanguage } from '../hooks/useLanguage';
 
 import '@material/web/progress/circular-progress.js';
 
 interface LoginProps {
-  onLoginSuccess: () => void;
+  onLoginGoogle: () => Promise<void>;
+  onLoginGitHub: () => Promise<void>;
 }
 
-export default function Login({ onLoginSuccess }: LoginProps) {
-  const [isLoading, setIsLoading] = useState(false);
+export default function Login({ onLoginGoogle, onLoginGitHub }: LoginProps) {
+  const [loadingProvider, setLoadingProvider] = useState<'google' | 'github' | null>(null);
   const [showSnack, setShowSnack] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
   const { t } = useLanguage();
 
-  const handleLogin = async () => {
-    setIsLoading(true);
+  const handleLoginGoogle = async () => {
+    setLoadingProvider('google');
     try {
-      await onLoginSuccess();
+      await onLoginGoogle();
     } catch (error: any) {
       console.error(error);
       setSnackMessage(error.message || t('login.error'));
       setShowSnack(true);
-      setIsLoading(false);
+      setLoadingProvider(null);
+    }
+  };
+
+  const handleLoginGitHub = async () => {
+    setLoadingProvider('github');
+    try {
+      await onLoginGitHub();
+    } catch (error: any) {
+      console.error(error);
+      setSnackMessage(error.message || t('login.error'));
+      setShowSnack(true);
+      setLoadingProvider(null);
     }
   };
 
@@ -61,26 +75,49 @@ export default function Login({ onLoginSuccess }: LoginProps) {
           {t('login.subtitle')}
         </p>
 
-        <button
-          onClick={handleLogin}
-          disabled={isLoading}
-          className="w-full h-[52px] flex items-center justify-center gap-3 bg-[var(--md-sys-color-primary)] hover:opacity-90 text-[var(--md-sys-color-on-primary)] rounded-full px-6 text-[14px] font-medium transition-all active:scale-[0.98] disabled:opacity-70"
-        >
-          {isLoading ? (
-            <md-circular-progress 
-              indeterminate 
-              style={{ 
-                '--md-circular-progress-size': '24px',
-                '--md-circular-progress-active-indicator-color': 'var(--md-sys-color-primary)' 
-              } as any}
-            />
-          ) : (
-            <>
-              <GoogleIcon className="w-5 h-5" />
-              <span>{t('login.button')}</span>
-            </>
-          )}
-        </button>
+        <div className="w-full flex flex-col gap-3">
+          <button
+            onClick={handleLoginGoogle}
+            disabled={loadingProvider !== null}
+            className="w-full h-[52px] flex items-center justify-center gap-3 bg-[var(--md-sys-color-primary)] hover:opacity-90 text-[var(--md-sys-color-on-primary)] rounded-full px-6 text-[14px] font-medium transition-all active:scale-[0.98] disabled:opacity-70"
+          >
+            {loadingProvider === 'google' ? (
+              <md-circular-progress 
+                indeterminate 
+                style={{ 
+                  '--md-circular-progress-size': '24px',
+                  '--md-circular-progress-active-indicator-color': 'var(--md-sys-color-on-primary)' 
+                } as any}
+              />
+            ) : (
+              <>
+                <GoogleIcon className="w-5 h-5" />
+                <span>{t('login.button')}</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={handleLoginGitHub}
+            disabled={loadingProvider !== null}
+            className="w-full h-[52px] flex items-center justify-center gap-3 bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)] border border-[var(--md-sys-color-outline)]/20 text-[var(--md-sys-color-on-surface)] rounded-full px-6 text-[14px] font-medium transition-all active:scale-[0.98] disabled:opacity-70"
+          >
+            {loadingProvider === 'github' ? (
+              <md-circular-progress 
+                indeterminate 
+                style={{ 
+                  '--md-circular-progress-size': '24px',
+                  '--md-circular-progress-active-indicator-color': 'var(--md-sys-color-on-surface)' 
+                } as any}
+              />
+            ) : (
+              <>
+                <GitHubIcon className="w-5 h-5" />
+                <span>{t('login.button_github')}</span>
+              </>
+            )}
+          </button>
+        </div>
 
         <div className="mt-10 pt-6 border-t border-[var(--md-sys-color-outline-variant)]/10 w-full flex justify-center">
           <span className="text-[10px] text-[var(--md-sys-color-on-surface-variant)]/30 uppercase tracking-[2px]">

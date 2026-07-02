@@ -22,6 +22,20 @@ const ProfileDrawerContent = memo(({ isOpen, onClose, user, signOut, t }: any) =
   const userAvatar = user.user_metadata?.avatar_url;
   const userName = user.user_metadata?.full_name || user.email?.split('@')[0];
   const userEmail = user.email;
+  
+  const getActiveProvider = () => {
+    if (user.identities && user.identities.length > 0) {
+      const latest = user.identities.reduce((latestId: any, currentId: any) => {
+        if (!latestId) return currentId;
+        const latestTime = latestId.last_sign_in_at ? new Date(latestId.last_sign_in_at).getTime() : 0;
+        const currentTime = currentId.last_sign_in_at ? new Date(currentId.last_sign_in_at).getTime() : 0;
+        return currentTime > latestTime ? currentId : latestId;
+      }, null);
+      if (latest) return latest.provider;
+    }
+    return user.app_metadata?.provider || 'google';
+  };
+  const isGitHub = getActiveProvider() === 'github';
 
   const handleSignOut = async () => {
     setIsLoggingOut(true);
@@ -136,7 +150,7 @@ const ProfileDrawerContent = memo(({ isOpen, onClose, user, signOut, t }: any) =
             </div>
             
             <p className="mt-8 text-[12px] text-[var(--md-sys-color-on-surface-variant)]/50 font-medium tracking-wide">
-              {t('profile.google_account')}
+              {isGitHub ? t('profile.github_account') : t('profile.google_account')}
             </p>
           </main>
 

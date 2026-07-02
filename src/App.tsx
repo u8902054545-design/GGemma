@@ -27,7 +27,7 @@ import { WebSearchConfirmationBottomSheet, useWebSearchConfirmation } from './co
 import { SharedChatView } from './sharing/SharedChatView';
 
 export default function App() {
-  const { user, loading: authLoading, signInWithGoogle } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle, signInWithGitHub } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
   const { chats, loading: chatsLoading, error, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
@@ -152,7 +152,7 @@ export default function App() {
       <AnimatePresence>
         {!user && (
           <motion.div key="login-screen" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="fixed inset-0 z-[200] bg-[var(--md-sys-color-background)]">
-            <Login onLoginSuccess={signInWithGoogle} />
+            <Login onLoginGoogle={signInWithGoogle} onLoginGitHub={signInWithGitHub} />
           </motion.div>
         )}
       </AnimatePresence>
