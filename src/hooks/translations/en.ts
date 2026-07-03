@@ -165,5 +165,11 @@ export const en = {
   'regenerate.briefly': 'Answer briefly',
   'regenerate.no_personalization': 'Without personalization',
   'regenerate.repeat': 'Repeat answer',
+  'menu.copy': 'Copy',
+  'menu.edit': 'Edit',
+  'editMessage.title': 'Edit message',
+  'editMessage.close': 'Close',
+  'editMessage.apply': 'Apply changes',
+  'editMessage.placeholder': 'Type your message...',
 };
 

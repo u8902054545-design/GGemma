@@ -20,14 +20,19 @@ interface ChatAreaProps {
   setFullscreenImage: (url: string | null) => void;
   onVideoClick?: (url: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
+  onEditClick?: (messageId: string, content: string) => void;
 }
 
 export const ChatArea: React.FC<ChatAreaProps> = ({
   messages, isTyping, isTemporary, user, scrollContainerRef, handleScroll,
   handleSend, handleRegenerate, isSearchActive, handleFeedback, handleImagePreview, setFullscreenImage, 
   onVideoClick,
-  messagesEndRef
+  messagesEndRef,
+  onEditClick
 }) => {
+  const lastUserMsg = [...messages].reverse().find(msg => msg.role === 'user');
+  const lastUserMsgId = lastUserMsg ? lastUserMsg.id : null;
+
   return (
     <main
       ref={scrollContainerRef}
@@ -79,6 +84,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 isSearching={msg.isSearching}
                 searchSources={msg.searchSources}
                 onRegenerate={handleRegenerate}
+                isLastUserMessage={msg.id === lastUserMsgId}
+                onEditClick={onEditClick}
               />
             ))}
             <div ref={messagesEndRef} className="h-1" />

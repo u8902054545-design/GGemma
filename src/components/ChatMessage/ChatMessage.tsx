@@ -15,6 +15,10 @@ import { ExpandButton } from './ExpandButton';
 import { ImportedCodes } from './ImportedCodes';
 import { SearchProgress } from './SearchProgress';
 import { SearchSources } from './SearchSources';
+import { useLanguage } from '../../hooks/useLanguage';
+import '@material/web/menu/menu.js';
+import '@material/web/menu/menu-item.js';
+import '@material/web/icon/icon.js';
 
 interface ExtendedChatMessageProps extends ChatMessageProps {
   isLast?: boolean;
@@ -26,6 +30,8 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   codes?: ImportedCode[];
   isSearching?: boolean;
   onRegenerate?: (mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => void;
+  isLastUserMessage?: boolean;
+  onEditClick?: (messageId: string, content: string) => void;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
@@ -47,7 +53,9 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   isSearching,
   searchSources,
   hideActions = false,
-  onRegenerate
+  onRegenerate,
+  isLastUserMessage = false,
+  onEditClick
 }) => {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
@@ -70,6 +78,68 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
     isSpeaking,
     isLoading
   } = useMessageLogic(cleanContent, messageId, feedback, onFeedback);
+
+  const { t } = useLanguage();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const menuRef = React.useRef<any>(null);
+  const timerRef = React.useRef<any>(null);
+
+  React.useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+    const handleClosed = () => setMenuOpen(false);
+    menu.addEventListener('closed', handleClosed);
+    return () => {
+      menu.removeEventListener('closed', handleClosed);
+    };
+  }, []);
+
+  const handleContextMenu = React.useCallback((e: React.MouseEvent) => {
+    if (isAI) return;
+    e.preventDefault();
+    setMenuOpen(true);
+  }, [isAI]);
+
+  const handlePointerDown = React.useCallback((e: React.PointerEvent) => {
+    if (isAI) return;
+    if (e.button !== 0) return; // Only primary clicks
+    
+    if (timerRef.current) clearTimeout(timerRef.current);
+    timerRef.current = setTimeout(() => {
+      if (navigator.vibrate) {
+        navigator.vibrate(50);
+      }
+      setMenuOpen(true);
+    }, 600);
+  }, [isAI]);
+
+  const handlePointerUp = React.useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const handlePointerMove = React.useCallback(() => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+  }, []);
+
+  const handleCopyAction = React.useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMenuOpen(false);
+    handleCopy(mainContent);
+  }, [handleCopy, mainContent]);
+
+  const handleEditAction = React.useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    setMenuOpen(false);
+    if (onEditClick && messageId) {
+      onEditClick(messageId, mainContent);
+    }
+  }, [onEditClick, messageId, mainContent]);
 
   const canShowExpand = !isAI && shouldShowExpandButton;
 
@@ -112,10 +182,18 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           )}
         </AnimatePresence>
 
-        <div className={`relative transition-all duration-300 ease-in-out ${
+        <div 
+          id={`msg-bubble-${messageId}`}
+          onContextMenu={handleContextMenu}
+          onPointerDown={handlePointerDown}
+          onPointerUp={handlePointerUp}
+          onPointerCancel={handlePointerUp}
+          onPointerLeave={handlePointerUp}
+          onPointerMove={handlePointerMove}
+          className={`relative transition-all duration-300 ease-in-out cursor-pointer ${
             isAI
               ? 'text-[var(--md-sys-color-on-background)] w-full'
-              : 'max-w-[85%] bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] px-5 py-3 rounded-[24px] rounded-tr-[4px] shadow-sm inline-block'
+              : 'max-w-[85%] bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] px-5 py-3 rounded-[24px] rounded-tr-[4px] shadow-sm inline-block active:scale-[0.99] select-none'
           } ${!isContentExpanded && canShowExpand ? 'max-h-[300px] overflow-hidden' : 'max-h-full'}`}
         >
           <MessageMedia 
@@ -125,7 +203,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
             onVideoClick={() => videoUrl && onVideoClick?.(videoUrl)}
           />
 
-          <div className={`text-[16px] leading-relaxed markdown-content select-text`}>
+          <div className={`text-[16px] leading-relaxed markdown-content ${isAI ? 'select-text' : 'select-none'}`}>
             {isAI && isGenerating && !mainContent ? (
               <div className="min-h-[40px] flex items-center">
                 <TypingAnimation />
@@ -148,6 +226,31 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
             <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-[var(--md-sys-color-background)] to-transparent pointer-events-none" />
           )}
         </div>
+
+        {!isAI && (
+          <md-menu
+            ref={menuRef}
+            anchor={`msg-bubble-${messageId}`}
+            open={menuOpen || undefined}
+            style={{
+              '--md-menu-container-color': 'var(--md-sys-color-surface-container-high)',
+              '--md-menu-item-label-text-color': 'var(--md-sys-color-on-surface)',
+              '--md-menu-item-headline-color': 'var(--md-sys-color-on-surface)',
+              'z-index': 9999
+            } as any}
+          >
+            <md-menu-item onClick={handleCopyAction}>
+              <md-icon slot="start">content_copy</md-icon>
+              <div slot="headline">{t('menu.copy')}</div>
+            </md-menu-item>
+            {isLastUserMessage && (
+              <md-menu-item onClick={handleEditAction}>
+                <md-icon slot="start">edit</md-icon>
+                <div slot="headline">{t('menu.edit')}</div>
+              </md-menu-item>
+            )}
+          </md-menu>
+        )}
 
         {isAI && (
           <SearchSources sources={searchSources} />

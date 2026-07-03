@@ -35,10 +35,12 @@ export const useChatSender = (
     overrideInput?: string, 
     isSearchActive: boolean = false, 
     file?: File,
-    codes?: ImportedCode[]
+    codes?: ImportedCode[],
+    isEdit?: boolean,
+    editMessageId?: string
   ) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
-    if ((!textToSend.trim() && !file && (!codes || codes.length === 0)) || isTyping) return;
+    if ((!textToSend.trim() && !file && (!codes || codes.length === 0)) && !isEdit || isTyping) return;
 
     const { data: { session } } = await supabase.auth.getSession();
     const accessToken = session?.access_token;
@@ -49,7 +51,7 @@ export const useChatSender = (
       return;
     }
 
-    const isFirstMessage = messages.length === 0;
+    const isFirstMessage = messages.length === 0 && !isEdit;
     const userText = textToSend.trim();
     const currentVoice = localStorage.getItem('selected_voice') || 'Zephyr';
 
@@ -67,19 +69,37 @@ export const useChatSender = (
       localMediaUrl = processed.localUrl;
     }
 
+    const oldUserMsg = isEdit && editMessageId ? messages.find(m => m.id === editMessageId) : undefined;
+
     const newUserMsg: Message = {
       id: crypto.randomUUID(),
       role: 'user',
       content: userText,
-      imageUrl: file && !file.type.startsWith('video/') ? localMediaUrl : undefined,
-      videoUrl: file && file.type.startsWith('video/') ? localMediaUrl : undefined,
-      base64Image: base64Image || undefined,
-      base64Video: base64Video || undefined,
-      codes: codes,
+      imageUrl: file 
+        ? (file.type.startsWith('video/') ? undefined : localMediaUrl) 
+        : oldUserMsg?.imageUrl,
+      videoUrl: file 
+        ? (file.type.startsWith('video/') ? localMediaUrl : undefined) 
+        : oldUserMsg?.videoUrl,
+      base64Image: file 
+        ? (file.type.startsWith('video/') ? undefined : base64Image) 
+        : oldUserMsg?.base64Image,
+      base64Video: file 
+        ? (file.type.startsWith('video/') ? base64Video : undefined) 
+        : oldUserMsg?.base64Video,
+      codes: codes !== undefined ? codes : oldUserMsg?.codes,
       voice: currentVoice
     };
 
-    const updatedMessages = [...messages, newUserMsg];
+    let baseMessages = [...messages];
+    if (isEdit && editMessageId) {
+      const editIdx = baseMessages.findIndex(m => m.id === editMessageId);
+      if (editIdx !== -1) {
+        baseMessages = baseMessages.slice(0, editIdx);
+      }
+    }
+
+    const updatedMessages = [...baseMessages, newUserMsg];
     setMessages(updatedMessages);
     if (isTemporary) saveTempMessages(updatedMessages);
 
@@ -100,6 +120,7 @@ export const useChatSender = (
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'x-user-message-id': newUserMsg.id,
           'x-ai-message-id': aiMsgId,
           ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
         },
@@ -109,12 +130,14 @@ export const useChatSender = (
           publicModelName: selectedModel.name,
           chat_id: isTemporary ? `temp_${chatId}` : chatId,
           isSearchActive: isSearchActive,
-          image: base64Image || null,
-          video: base64Video || null,
-          codes: codes || null,
+          image: newUserMsg.base64Image || null,
+          video: newUserMsg.base64Video || null,
+          codes: newUserMsg.codes || null,
           isTemporary: isTemporary || !isChatHistoryEnabled,
           history: (isTemporary || !isChatHistoryEnabled) ? updatedMessages : undefined,
-          voice: currentVoice
+          voice: currentVoice,
+          isEdit: !!isEdit,
+          editMessageId: editMessageId || null
         }),
       });
 

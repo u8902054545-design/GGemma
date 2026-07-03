@@ -165,5 +165,11 @@ export const ru = {
   'regenerate.briefly': 'Ответить короче',
   'regenerate.no_personalization': 'Без персонализации',
   'regenerate.repeat': 'Повторить ответ',
+  'menu.copy': 'Копировать',
+  'menu.edit': 'Редактировать',
+  'editMessage.title': 'Редактирование сообщения',
+  'editMessage.close': 'Закрыть',
+  'editMessage.apply': 'Применить изменения',
+  'editMessage.placeholder': 'Введите сообщение...',
 };
 

@@ -25,6 +25,7 @@ import { AppModals } from './components/AppModals';
 import { useChatHistory } from './hooks/useChatHistory';
 import { WebSearchConfirmationBottomSheet, useWebSearchConfirmation } from './components/WebSearchConfirmation';
 import { SharedChatView } from './sharing/SharedChatView';
+import { EditMessagePage } from './components/EditMessagePage';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle, signInWithGitHub } = useAuth();
@@ -50,6 +51,14 @@ export default function App() {
   } = useChat(() => refreshChats(true), isTemporary);
 
   const { isChatHistoryEnabled } = useChatHistory();
+  const [editingMessage, setEditingMessage] = useState<{ id: string; content: string } | null>(null);
+
+  const handleApplyEdit = useCallback(async (newText: string) => {
+    if (!editingMessage) return;
+    const messageId = editingMessage.id;
+    setEditingMessage(null);
+    await handleSend(newText, isSearchActive, undefined, undefined, true, messageId);
+  }, [editingMessage, handleSend, isSearchActive]);
 
   React.useEffect(() => {
     if (!isChatHistoryEnabled && isTemporary) {
@@ -233,6 +242,7 @@ export default function App() {
                   setFullscreenImage={setFullscreenImage}
                   onVideoClick={setPreviewVideoUrl}
                   messagesEndRef={messagesEndRef}
+                  onEditClick={(id, content) => setEditingMessage({ id, content })}
                 />
 
                 <AnimatePresence>
@@ -282,6 +292,13 @@ export default function App() {
             isSnackbarOpen={isSnackbarOpen}
             setIsSnackbarOpen={setIsSnackbarOpen}
             handleImportCode={handleImportCode}
+          />
+
+          <EditMessagePage
+            isOpen={editingMessage !== null}
+            initialText={editingMessage?.content || ''}
+            onClose={() => setEditingMessage(null)}
+            onApply={handleApplyEdit}
           />
         </>
       )}
