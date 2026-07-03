@@ -23,6 +23,8 @@ export type Message = {
   content: string;
   imageUrl?: string;
   videoUrl?: string;
+  base64Image?: string;
+  base64Video?: string;
   codes?: ImportedCode[];
   modelName?: string;
   feedback?: 'like' | 'dislike' | null;

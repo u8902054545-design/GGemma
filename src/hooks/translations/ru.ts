@@ -161,5 +161,9 @@ export const ru = {
   'shared.delete_all_confirm': 'Вы уверены, что хотите удалить все общедоступные ссылки? Это действие необратимо.',
   'shared.all_deleted': 'Все ссылки удалены',
   'dialog.share.create_another': 'Создать другую ссылку',
+  'regenerate.longer': 'Ответить длиннее',
+  'regenerate.briefly': 'Ответить короче',
+  'regenerate.no_personalization': 'Без персонализации',
+  'regenerate.repeat': 'Повторить ответ',
 };
 

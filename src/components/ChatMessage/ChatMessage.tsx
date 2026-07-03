@@ -25,6 +25,7 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   videoUrl?: string;
   codes?: ImportedCode[];
   isSearching?: boolean;
+  onRegenerate?: (mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => void;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
@@ -45,7 +46,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   searchUsed,
   isSearching,
   searchSources,
-  hideActions = false
+  hideActions = false,
+  onRegenerate
 }) => {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
@@ -173,6 +175,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               isSpeechLoading={isLoading}
               onShowDetails={() => setIsDetailsOpen(true)}
               hideActions={hideActions}
+              onRegenerate={onRegenerate}
             />
             <GenerationDetails
               isOpen={isDetailsOpen}

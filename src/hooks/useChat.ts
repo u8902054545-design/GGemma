@@ -108,7 +108,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
     }
   }, [chatId]);
 
-  const { handleSend } = useChatSender(
+  const { handleSend, handleRegenerate } = useChatSender(
     messages,
     setMessages,
     input,
@@ -193,6 +193,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
     scrollContainerRef,
     scrollToBottom,
     handleSend,
+    handleRegenerate,
     handleKeyDown,
     chatId,
     setChatId,

@@ -2,6 +2,10 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { mdEasing, mdDuration } from '../../motion/transitions';
 import { useLanguage } from '../../hooks/useLanguage';
+import '@material/web/iconbutton/icon-button.js';
+import '@material/web/icon/icon.js';
+import '@material/web/menu/menu.js';
+import '@material/web/menu/menu-item.js';
 
 interface MessageActionsProps {
   isTemporary: boolean;
@@ -16,6 +20,7 @@ interface MessageActionsProps {
   isSpeechLoading?: boolean;
   onShowDetails: () => void;
   hideActions?: boolean;
+  onRegenerate?: (mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => void;
 }
 
 export const MessageActions: React.FC<MessageActionsProps> = ({
@@ -30,9 +35,24 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   isSpeaking,
   isSpeechLoading,
   onShowDetails,
-  hideActions = false
+  hideActions = false,
+  onRegenerate
 }) => {
   const { t } = useLanguage();
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const menuRef = React.useRef<any>(null);
+  const anchorId = `regen-btn-${React.useId().replace(/:/g, '')}`;
+
+  React.useEffect(() => {
+    const menu = menuRef.current;
+    if (!menu) return;
+
+    const handleClosed = () => setMenuOpen(false);
+    menu.addEventListener('closed', handleClosed);
+    return () => {
+      menu.removeEventListener('closed', handleClosed);
+    };
+  }, []);
 
   return (
     <motion.div
@@ -65,6 +85,47 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
                 thumb_down
               </span>
             </button>
+          </>
+        )}
+        {isLast && onRegenerate && (
+          <>
+            <md-icon-button
+              id={anchorId}
+              onClick={() => setMenuOpen(prev => !prev)}
+              style={{
+                '--md-icon-button-icon-color': 'var(--md-sys-color-on-surface-variant)',
+                '--md-icon-button-state-layer-color': 'var(--md-sys-color-on-surface-variant)'
+              }}
+            >
+              <md-icon>refresh</md-icon>
+            </md-icon-button>
+            <md-menu
+              ref={menuRef}
+              anchor={anchorId}
+              open={menuOpen || undefined}
+              style={{
+                '--md-menu-container-color': 'var(--md-sys-color-surface-container-high)',
+                '--md-menu-item-label-text-color': 'var(--md-sys-color-on-surface)',
+                '--md-menu-item-headline-color': 'var(--md-sys-color-on-surface)'
+              }}
+            >
+              <md-menu-item onClick={() => { setMenuOpen(false); onRegenerate('longer'); }}>
+                <md-icon slot="start">expand</md-icon>
+                <div slot="headline">{t('regenerate.longer')}</div>
+              </md-menu-item>
+              <md-menu-item onClick={() => { setMenuOpen(false); onRegenerate('briefly'); }}>
+                <md-icon slot="start">compress</md-icon>
+                <div slot="headline">{t('regenerate.briefly')}</div>
+              </md-menu-item>
+              <md-menu-item onClick={() => { setMenuOpen(false); onRegenerate('no_personalization'); }}>
+                <md-icon slot="start">person_cancel</md-icon>
+                <div slot="headline">{t('regenerate.no_personalization')}</div>
+              </md-menu-item>
+              <md-menu-item onClick={() => { setMenuOpen(false); onRegenerate('repeat'); }}>
+                <md-icon slot="start">refresh</md-icon>
+                <div slot="headline">{t('regenerate.repeat')}</div>
+              </md-menu-item>
+            </md-menu>
           </>
         )}
         <button

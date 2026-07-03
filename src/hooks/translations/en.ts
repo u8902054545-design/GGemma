@@ -161,5 +161,9 @@ export const en = {
   'shared.delete_all_confirm': 'Are you sure you want to delete all your shared links? This cannot be undone.',
   'shared.all_deleted': 'All links removed',
   'dialog.share.create_another': 'Create another link',
+  'regenerate.longer': 'Reply longer',
+  'regenerate.briefly': 'Answer briefly',
+  'regenerate.no_personalization': 'Without personalization',
+  'regenerate.repeat': 'Repeat answer',
 };
 

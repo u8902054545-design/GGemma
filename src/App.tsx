@@ -44,7 +44,7 @@ export default function App() {
 
   const {
     messages, setMessages, input, setInput, selectedModel, setSelectedModel,
-    isTyping, isLoading, messagesEndRef, scrollContainerRef, handleSend, handleFeedback, chatId, setChatId,
+    isTyping, isLoading, messagesEndRef, scrollContainerRef, handleSend, handleRegenerate, handleFeedback, chatId, setChatId,
     chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
     isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage, exhaustedModels
   } = useChat(() => refreshChats(true), isTemporary);
@@ -226,6 +226,7 @@ export default function App() {
                   scrollContainerRef={scrollContainerRef}
                   handleScroll={handleScroll}
                   handleSend={handleSend}
+                  handleRegenerate={handleRegenerate}
                   isSearchActive={isSearchActive}
                   handleFeedback={handleFeedback}
                   handleImagePreview={handleImagePreview}

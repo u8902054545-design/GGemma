@@ -13,6 +13,7 @@ interface ChatAreaProps {
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
   handleScroll: () => void;
   handleSend: (text: string, isSearchActive?: boolean) => void;
+  handleRegenerate?: (mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => void;
   isSearchActive: boolean;
   handleFeedback: (id: string, type: 'like' | 'dislike' | null) => void;
   handleImagePreview: (url: string, setFullscreenImage: (url: string | null) => void) => void;
@@ -23,7 +24,7 @@ interface ChatAreaProps {
 
 export const ChatArea: React.FC<ChatAreaProps> = ({
   messages, isTyping, isTemporary, user, scrollContainerRef, handleScroll,
-  handleSend, isSearchActive, handleFeedback, handleImagePreview, setFullscreenImage, 
+  handleSend, handleRegenerate, isSearchActive, handleFeedback, handleImagePreview, setFullscreenImage, 
   onVideoClick,
   messagesEndRef
 }) => {
@@ -77,6 +78,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 searchUsed={msg.searchUsed}
                 isSearching={msg.isSearching}
                 searchSources={msg.searchSources}
+                onRegenerate={handleRegenerate}
               />
             ))}
             <div ref={messagesEndRef} className="h-1" />
