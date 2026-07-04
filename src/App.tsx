@@ -26,9 +26,53 @@ import { useChatHistory } from './hooks/useChatHistory';
 import { WebSearchConfirmationBottomSheet, useWebSearchConfirmation } from './components/WebSearchConfirmation';
 import { SharedChatView } from './sharing/SharedChatView';
 import { EditMessagePage } from './components/EditMessagePage';
+import BlockedScreen from './components/BlockedScreen';
+import { GeoblockDialog } from './components/GeoblockDialog';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle, signInWithGitHub } = useAuth();
+  const [isBlocked, setIsBlocked] = useState<boolean | null>(null);
+  const [showGeoblockDialog, setShowGeoblockDialog] = useState(false);
+
+  React.useEffect(() => {
+    const checkIp = async () => {
+      try {
+        const response = await fetch('https://ipinfo.io/json');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.country === 'RU') {
+            setIsBlocked(true);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('IP block check failed:', err);
+      }
+      setIsBlocked(false);
+    };
+    checkIp();
+
+    const originalFetch = window.fetch;
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      if (response.status === 403) {
+        try {
+          const cloned = response.clone();
+          const data = await cloned.json();
+          if (data && data.error === 'Access denied from this location.') {
+            setShowGeoblockDialog(true);
+          }
+        } catch (e) {
+          // Not JSON or error body doesn't match
+        }
+      }
+      return response;
+    };
+
+    return () => {
+      window.fetch = originalFetch;
+    };
+  }, []);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
   const { chats, loading: chatsLoading, error, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
@@ -163,7 +207,9 @@ export default function App() {
     );
   }
 
-  if (authLoading) return <div className="h-screen w-full bg-[var(--md-sys-color-background)]" />;
+  if (isBlocked === null || authLoading) return <div className="h-screen w-full bg-[var(--md-sys-color-background)]" />;
+
+  if (isBlocked) return <BlockedScreen />;
 
   return (
     <div className="h-screen w-full bg-[var(--md-sys-color-background)] overflow-hidden relative">
@@ -320,6 +366,14 @@ export default function App() {
             initialText={editingMessage?.content || ''}
             onClose={() => setEditingMessage(null)}
             onApply={handleApplyEdit}
+          />
+
+          <GeoblockDialog
+            isOpen={showGeoblockDialog}
+            onConfirm={() => {
+              setShowGeoblockDialog(false);
+              setIsBlocked(true);
+            }}
           />
         </>
       )}

@@ -321,7 +321,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               onShowDetails={() => setIsDetailsOpen(true)}
               hideActions={hideActions}
               onRegenerate={onRegenerate}
-              messageId={messageId}
+              messageId={messageId || ''}
             />
             <GenerationDetails
               isOpen={isDetailsOpen}
