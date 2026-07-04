@@ -50,6 +50,16 @@ export default function App() {
     isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage, exhaustedModels
   } = useChat(() => refreshChats(true), isTemporary);
 
+  const [isRegenModelSelectorOpen, setIsRegenModelSelectorOpen] = useState(false);
+
+  const handleRegenerateWithModelSelection = useCallback((mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => {
+    if (mode === 'repeat') {
+      setIsRegenModelSelectorOpen(true);
+    } else {
+      handleRegenerate(mode);
+    }
+  }, [handleRegenerate]);
+
   const { isChatHistoryEnabled } = useChatHistory();
   const [editingMessage, setEditingMessage] = useState<{ id: string; content: string } | null>(null);
 
@@ -235,7 +245,7 @@ export default function App() {
                   scrollContainerRef={scrollContainerRef}
                   handleScroll={handleScroll}
                   handleSend={handleSend}
-                  handleRegenerate={handleRegenerate}
+                  handleRegenerate={handleRegenerateWithModelSelection}
                   isSearchActive={isSearchActive}
                   handleFeedback={handleFeedback}
                   handleImagePreview={handleImagePreview}
@@ -271,6 +281,17 @@ export default function App() {
           </motion.div>
 
           <GemmaBottomSheet isOpen={isModelSelectorOpen} onOpenChange={setIsModelSelectorOpen} selectedModel={selectedModel} onModelSelect={setSelectedModel} models={models} exhaustedModels={exhaustedModels} />
+          <GemmaBottomSheet 
+            isOpen={isRegenModelSelectorOpen} 
+            onOpenChange={setIsRegenModelSelectorOpen} 
+            selectedModel={selectedModel} 
+            onModelSelect={(model) => {
+              setSelectedModel(model);
+              handleRegenerate('repeat', model);
+            }} 
+            models={models} 
+            exhaustedModels={exhaustedModels} 
+          />
 
           <WebSearchConfirmationBottomSheet
             isOpen={isSearchConfirmOpen}

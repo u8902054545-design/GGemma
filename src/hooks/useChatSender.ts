@@ -260,7 +260,7 @@ export const useChatSender = (
     }
   }, [input, isTyping, selectedModel, chatId, createSignal, scrollToBottom, scrollToMessageTop, messages, onNewChatCreated, setMessages, setInput, setIsTyping, setSnackbarMessage, setIsSnackbarOpen, setChatTitle, isTemporary, refreshLimits]);
 
-  const handleRegenerate = useCallback(async (mode?: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => {
+  const handleRegenerate = useCallback(async (mode?: 'longer' | 'briefly' | 'no_personalization' | 'repeat', targetModel?: SelectedModel) => {
     if (isTyping || messages.length < 2) return;
 
     const lastAiMsg = messages[messages.length - 1];
@@ -277,6 +277,7 @@ export const useChatSender = (
       return;
     }
 
+    const modelToUse = targetModel || selectedModel;
     const currentVoice = localStorage.getItem('selected_voice') || 'Zephyr';
     const regeneratedAiMsgId = crypto.randomUUID();
     const cleanMessages = messages.slice(0, -1);
@@ -302,7 +303,7 @@ export const useChatSender = (
         signal,
         body: JSON.stringify({
           message: userMsg.content,
-          publicModelName: selectedModel.name,
+          publicModelName: modelToUse.name,
           chat_id: isTemporary ? `temp_${chatId}` : chatId,
           isSearchActive: userMsg.searchEnabledBy === 'user',
           image: userMsg.base64Image || null,
@@ -323,7 +324,7 @@ export const useChatSender = (
         throw new Error(errorData.error || `Server error: ${response.status}`);
       }
 
-      const modelNameFromServer = response.headers.get('x-model-name') || selectedModel.name;
+      const modelNameFromServer = response.headers.get('x-model-name') || modelToUse.name;
       const searchUsedFromServer = response.headers.get('x-search-used') === 'true';
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();

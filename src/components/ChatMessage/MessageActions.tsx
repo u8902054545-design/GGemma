@@ -21,6 +21,7 @@ interface MessageActionsProps {
   onShowDetails: () => void;
   hideActions?: boolean;
   onRegenerate?: (mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => void;
+  messageId: string;
 }
 
 export const MessageActions: React.FC<MessageActionsProps> = ({
@@ -36,10 +37,12 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   isSpeechLoading,
   onShowDetails,
   hideActions = false,
-  onRegenerate
+  onRegenerate,
+  messageId
 }) => {
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [menuDirection, setMenuDirection] = React.useState<'down' | 'up'>('down');
   const menuRef = React.useRef<any>(null);
   const anchorId = `regen-btn-${React.useId().replace(/:/g, '')}`;
 
@@ -53,6 +56,43 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
       menu.removeEventListener('closed', handleClosed);
     };
   }, []);
+
+  React.useEffect(() => {
+    if (menuOpen) {
+      const bubble = document.getElementById(`msg-bubble-${messageId}`);
+      if (bubble) {
+        const rect = bubble.getBoundingClientRect();
+        const threshold = window.innerHeight - 250;
+        if (rect.bottom > threshold) {
+          setMenuDirection('up');
+        } else {
+          setMenuDirection('down');
+        }
+      }
+    }
+  }, [menuOpen, messageId]);
+
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    let active = true;
+    const handleDocumentClick = (e: MouseEvent) => {
+      if (!active) return;
+      const menu = menuRef.current;
+      if (menu && !menu.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    const timer = setTimeout(() => {
+      if (active) {
+        document.addEventListener('click', handleDocumentClick);
+      }
+    }, 0);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, [menuOpen]);
 
   return (
     <motion.div
@@ -101,8 +141,12 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
             </md-icon-button>
             <md-menu
               ref={menuRef}
-              anchor={anchorId}
+              anchor={`msg-bubble-${messageId}`}
               open={menuOpen || undefined}
+              anchorCorner={menuDirection === 'up' ? 'start-start' : 'end-start'}
+              menuCorner={menuDirection === 'up' ? 'end-start' : 'start-start'}
+              yOffset={menuDirection === 'up' ? -4 : 4}
+              positioning="fixed"
               style={{
                 '--md-menu-container-color': 'var(--md-sys-color-surface-container-high)',
                 '--md-menu-item-label-text-color': 'var(--md-sys-color-on-surface)',

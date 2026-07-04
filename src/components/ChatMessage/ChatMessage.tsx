@@ -81,6 +81,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
 
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = React.useState(false);
+  const [menuDirection, setMenuDirection] = React.useState<'down' | 'up'>('down');
   const menuRef = React.useRef<any>(null);
   const timerRef = React.useRef<any>(null);
 
@@ -93,6 +94,43 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
       menu.removeEventListener('closed', handleClosed);
     };
   }, []);
+
+  React.useEffect(() => {
+    if (menuOpen) {
+      const bubble = document.getElementById(`msg-bubble-${messageId}`);
+      if (bubble) {
+        const rect = bubble.getBoundingClientRect();
+        const threshold = window.innerHeight - 250;
+        if (rect.bottom > threshold) {
+          setMenuDirection('up');
+        } else {
+          setMenuDirection('down');
+        }
+      }
+    }
+  }, [menuOpen, messageId]);
+
+  React.useEffect(() => {
+    if (!menuOpen) return;
+    let active = true;
+    const handleDocumentClick = (e: MouseEvent) => {
+      if (!active) return;
+      const menu = menuRef.current;
+      if (menu && !menu.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    const timer = setTimeout(() => {
+      if (active) {
+        document.addEventListener('click', handleDocumentClick);
+      }
+    }, 0);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, [menuOpen]);
 
   const handleContextMenu = React.useCallback((e: React.MouseEvent) => {
     if (isAI) return;
@@ -166,7 +204,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
         )}
       </AnimatePresence>
 
-      <div className={`w-full flex flex-col ${isAI ? 'items-start' : 'items-end'}`}>
+      <div className={`relative w-full flex flex-col ${isAI ? 'items-start' : 'items-end'}`}>
         <AnimatePresence>
           {isAI && thought && isThoughtExpanded && (
             <motion.div
@@ -232,6 +270,10 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
             ref={menuRef}
             anchor={`msg-bubble-${messageId}`}
             open={menuOpen || undefined}
+            anchorCorner={menuDirection === 'up' ? 'start-end' : 'end-end'}
+            menuCorner={menuDirection === 'up' ? 'end-end' : 'start-end'}
+            yOffset={menuDirection === 'up' ? -4 : 4}
+            positioning="fixed"
             style={{
               '--md-menu-container-color': 'var(--md-sys-color-surface-container-high)',
               '--md-menu-item-label-text-color': 'var(--md-sys-color-on-surface)',
@@ -279,6 +321,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               onShowDetails={() => setIsDetailsOpen(true)}
               hideActions={hideActions}
               onRegenerate={onRegenerate}
+              messageId={messageId}
             />
             <GenerationDetails
               isOpen={isDetailsOpen}

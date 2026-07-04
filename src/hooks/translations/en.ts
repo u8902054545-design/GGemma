@@ -164,7 +164,7 @@ export const en = {
   'regenerate.longer': 'Reply longer',
   'regenerate.briefly': 'Answer briefly',
   'regenerate.no_personalization': 'Without personalization',
-  'regenerate.repeat': 'Repeat answer',
+  'regenerate.repeat': 'Repeat with another model',
   'menu.copy': 'Copy',
   'menu.edit': 'Edit',
   'editMessage.title': 'Edit message',

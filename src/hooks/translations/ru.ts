@@ -164,7 +164,7 @@ export const ru = {
   'regenerate.longer': 'Ответить длиннее',
   'regenerate.briefly': 'Ответить короче',
   'regenerate.no_personalization': 'Без персонализации',
-  'regenerate.repeat': 'Повторить ответ',
+  'regenerate.repeat': 'Повторить с другой моделью',
   'menu.copy': 'Копировать',
   'menu.edit': 'Редактировать',
   'editMessage.title': 'Редактирование сообщения',
