@@ -6,15 +6,23 @@ import { GitHubIcon } from './IconsApp/GitHubIcon';
 import Snackbar from './Snackbar';
 import { pageVariants } from '../motion/transitions';
 import { useLanguage } from '../hooks/useLanguage';
+import { BlockedAccountDialog } from './BlockedAccountDialog';
 
 import '@material/web/progress/circular-progress.js';
 
 interface LoginProps {
   onLoginGoogle: () => Promise<void>;
   onLoginGitHub: () => Promise<void>;
+  isAccountBlocked?: boolean;
+  onCloseBlocked?: () => void;
 }
 
-export default function Login({ onLoginGoogle, onLoginGitHub }: LoginProps) {
+export default function Login({ 
+  onLoginGoogle, 
+  onLoginGitHub,
+  isAccountBlocked = false,
+  onCloseBlocked = () => {}
+}: LoginProps) {
   const [loadingProvider, setLoadingProvider] = useState<'google' | 'github' | null>(null);
   const [showSnack, setShowSnack] = useState(false);
   const [snackMessage, setSnackMessage] = useState('');
@@ -130,6 +138,11 @@ export default function Login({ onLoginGoogle, onLoginGitHub }: LoginProps) {
         message={snackMessage}
         isOpen={showSnack}
         onClose={() => setShowSnack(false)}
+      />
+
+      <BlockedAccountDialog
+        isOpen={isAccountBlocked}
+        onClose={onCloseBlocked}
       />
     </div>
   );

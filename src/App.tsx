@@ -28,11 +28,13 @@ import { SharedChatView } from './sharing/SharedChatView';
 import { EditMessagePage } from './components/EditMessagePage';
 import BlockedScreen from './components/BlockedScreen';
 import { GeoblockDialog } from './components/GeoblockDialog';
+import { BlockedAccountDialog } from './components/BlockedAccountDialog';
 
 export default function App() {
-  const { user, loading: authLoading, signInWithGoogle, signInWithGitHub } = useAuth();
+  const { user, loading: authLoading, signInWithGoogle, signInWithGitHub, signOut } = useAuth();
   const [isBlocked, setIsBlocked] = useState<boolean | null>(null);
   const [showGeoblockDialog, setShowGeoblockDialog] = useState(false);
+  const [showBlockedDialog, setShowBlockedDialog] = useState(false);
 
   React.useEffect(() => {
     const checkIp = async () => {
@@ -61,6 +63,9 @@ export default function App() {
           const data = await cloned.json();
           if (data && data.error === 'Access denied from this location.') {
             setShowGeoblockDialog(true);
+          } else if (data && data.error === 'ACCOUNT_BLOCKED') {
+            await signOut();
+            setShowBlockedDialog(true);
           }
         } catch (e) {
           // Not JSON or error body doesn't match
@@ -72,7 +77,7 @@ export default function App() {
     return () => {
       window.fetch = originalFetch;
     };
-  }, []);
+  }, [signOut]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
   const { chats, loading: chatsLoading, error, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
@@ -217,7 +222,12 @@ export default function App() {
       <AnimatePresence>
         {!user && (
           <motion.div key="login-screen" variants={pageVariants} initial="initial" animate="animate" exit="exit" className="fixed inset-0 z-[200] bg-[var(--md-sys-color-background)]">
-            <Login onLoginGoogle={signInWithGoogle} onLoginGitHub={signInWithGitHub} />
+            <Login 
+              onLoginGoogle={signInWithGoogle} 
+              onLoginGitHub={signInWithGitHub} 
+              isAccountBlocked={showBlockedDialog}
+              onCloseBlocked={() => setShowBlockedDialog(false)}
+            />
           </motion.div>
         )}
       </AnimatePresence>

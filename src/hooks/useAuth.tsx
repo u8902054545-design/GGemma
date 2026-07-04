@@ -16,12 +16,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const signOut = async () => {
+  const signOut = React.useCallback(async () => {
     setUser(null);
     await supabase.auth.signOut();
-  };
+  }, []);
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = React.useCallback(async () => {
     try {
       await supabase.auth.signInWithOAuth({
         provider: 'google',
@@ -36,9 +36,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error(error);
     }
-  };
+  }, []);
 
-  const signInWithGitHub = async () => {
+  const signInWithGitHub = React.useCallback(async () => {
     try {
       await supabase.auth.signInWithOAuth({
         provider: 'github',
@@ -49,7 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     } catch (error) {
       console.error(error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     const handleAuth = (session: any) => {
