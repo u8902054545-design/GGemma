@@ -119,6 +119,7 @@ export const ru = {
   'message.menu.create_branch': 'Создать ветвь',
   'message.menu.generation_details': 'Детали генерации',
   'chat.thread_from': 'Ветвь из чата — «{name}»',
+  'menu.fork_chat': 'Разветвить чат',
   'message.search_progress': 'Выполняется поиск в интернете...',
   'code.warning': 'Используйте сгенерированный код с осторожностью',
   'personalization.title': 'Персонализация',

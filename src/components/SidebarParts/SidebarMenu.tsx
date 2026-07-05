@@ -13,6 +13,7 @@ interface SidebarMenuProps {
   onExport: () => void;
   onShare: () => void;
   isPinning?: boolean;
+  onForkChat?: () => void;
 }
 
 export const SidebarMenu: React.FC<SidebarMenuProps> = ({
@@ -24,7 +25,8 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
   onDelete,
   onExport,
   onShare,
-  isPinning = false
+  isPinning = false,
+  onForkChat
 }) => {
   const { t } = useLanguage();
 
@@ -38,6 +40,15 @@ export const SidebarMenu: React.FC<SidebarMenuProps> = ({
             <div className="text-[var(--md-sys-color-on-surface)] text-sm font-medium px-6 mb-2 opacity-50 truncate">
               {selectedChat?.title}
             </div>
+            {onForkChat && (
+              <button
+                onClick={onForkChat}
+                className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-on-surface)] border-none bg-transparent"
+              >
+                <span className="material-symbols-outlined">arrow_split</span>
+                <span>{t('menu.fork_chat')}</span>
+              </button>
+            )}
             <button
               onClick={onShare}
               className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-on-surface)] border-none bg-transparent"

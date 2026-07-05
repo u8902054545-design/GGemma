@@ -39,12 +39,13 @@ interface SidebarProps {
   togglePin: (id: string, pinned: boolean) => Promise<void>;
   setSnackbarMessage: (msg: string) => void;
   setIsSnackbarOpen: (open: boolean) => void;
+  onForkChat?: (id: string, title: string) => void;
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
   isOpen, onClose, chats, loading, error, onRefresh, currentChatId,
   onChatSelect, onNewChat, deleteChatFromDB, setChatTitle, togglePin,
-  setSnackbarMessage, setIsSnackbarOpen
+  setSnackbarMessage, setIsSnackbarOpen, onForkChat
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
@@ -237,6 +238,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onExport={handleExport}
         onDelete={() => { setIsMenuOpen(false); setTimeout(() => setIsDeleteOpen(true), 300); }}
         onShare={() => { setIsMenuOpen(false); setTimeout(() => setIsShareOpen(true), 300); }}
+        onForkChat={() => {
+          setIsMenuOpen(false);
+          if (selectedChat) onForkChat?.(selectedChat.id, selectedChat.title);
+        }}
       />
 
       <ExportMenu

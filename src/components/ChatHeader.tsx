@@ -32,13 +32,15 @@ interface ChatHeaderProps {
   isTemporary?: boolean;
   onTemporaryChatClick?: () => void;
   onNewChat?: () => void;
+  onForkChat?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
   messages, chatTitle, chatId, isPinned, selectedModel, isModelSelectorOpen, onModelSelectorToggle,
   setMessages, setChatId, setChatTitle,
   onMenuClick, isSidebarOpen, deleteChatFromDB, togglePin, isTemporary = false,
-  setSnackbarMessage, setIsSnackbarOpen, onTemporaryChatClick, onNewChat
+  setSnackbarMessage, setIsSnackbarOpen, onTemporaryChatClick, onNewChat,
+  onForkChat
 }) => {
   const isChatStarted = messages.length > 0;
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -190,6 +192,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         onDelete={() => { setIsMenuOpen(false); setTimeout(() => setIsDeleteOpen(true), 300); }}
         onShare={() => { setIsMenuOpen(false); setTimeout(() => setIsShareOpen(true), 300); }}
         isTemporary={isTemporary}
+        onForkChat={() => { setIsMenuOpen(false); onForkChat?.(); }}
       />
       <RenameDialog isOpen={isRenameOpen} onClose={() => setIsRenameOpen(false)} currentTitle={chatTitle} onConfirm={handleRenameConfirm} />
       <DeleteConfirmDialog isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDeleteConfirm} />

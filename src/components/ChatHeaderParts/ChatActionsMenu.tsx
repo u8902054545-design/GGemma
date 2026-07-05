@@ -14,6 +14,7 @@ interface ChatActionsMenuProps {
   onShare: () => void;
   isTemporary?: boolean;
   isPinning?: boolean;
+  onForkChat?: () => void;
 }
 
 export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
@@ -26,7 +27,8 @@ export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
   onExport,
   onShare,
   isTemporary = false,
-  isPinning = false
+  isPinning = false,
+  onForkChat
 }) => {
   const { t } = useLanguage();
   const { isChatHistoryEnabled } = useChatHistory();
@@ -40,6 +42,13 @@ export const ChatActionsMenu: React.FC<ChatActionsMenuProps> = ({
           <div className="p-4 bg-[var(--md-sys-color-surface)] pb-8">
             {!isTemporary && isChatHistoryEnabled && (
               <>
+                <button
+                  onClick={onForkChat}
+                  className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-on-surface)] border-none bg-transparent"
+                >
+                  <span className="material-symbols-outlined">arrow_split</span>
+                  <span>{t('menu.fork_chat')}</span>
+                </button>
                 <button
                   onClick={onShare}
                   className="w-full flex items-center gap-4 px-6 py-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 transition-colors text-[var(--md-sys-color-on-surface)] border-none bg-transparent"

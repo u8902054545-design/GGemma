@@ -202,6 +202,56 @@ export default function App() {
     }
   }, [messages, chatTitle, language, refreshChats, setChatTitle, setChatId, loadChatMessages, setSnackbarMessage, setIsSnackbarOpen]);
 
+  const handleForkChat = useCallback(async (chatIdToFork: string, chatTitleToFork: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setSnackbarMessage(language === 'ru' ? 'Сессия истекла. Пожалуйста, войдите снова.' : 'Session expired. Please sign in again.');
+        setIsSnackbarOpen(true);
+        return;
+      }
+
+      const newChatId = crypto.randomUUID();
+      const branchTitle = language === 'ru' 
+        ? `Ветвь «${chatTitleToFork}»` 
+        : `The branch «${chatTitleToFork}»`;
+
+      const response = await fetch(SUPABASE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          action: 'fork_chat',
+          chat_id: chatIdToFork,
+          new_chat_id: newChatId,
+          branch_title: branchTitle,
+          parent_chat_title: chatTitleToFork
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to fork chat' }));
+        throw new Error(errorData.error || 'Server error');
+      }
+
+      // Success! Refresh chats list, switch to the new chat, and load its messages
+      await refreshChats(true);
+      setChatTitle(branchTitle);
+      setChatId(newChatId);
+      loadChatMessages(newChatId);
+      
+      setSnackbarMessage(language === 'ru' ? 'Чат разветвлен' : 'Chat forked');
+      setIsSnackbarOpen(true);
+
+    } catch (err: any) {
+      console.error('Failed to fork chat:', err);
+      setSnackbarMessage(language === 'ru' ? 'Не удалось разветвить чат' : 'Failed to fork chat');
+      setIsSnackbarOpen(true);
+    }
+  }, [language, refreshChats, setChatTitle, setChatId, loadChatMessages, setSnackbarMessage, setIsSnackbarOpen]);
+
   React.useEffect(() => {
     if (!isChatHistoryEnabled && isTemporary) {
       setIsTemporary(false);
@@ -346,6 +396,7 @@ export default function App() {
               togglePin={togglePin}
               setSnackbarMessage={setSnackbarMessage}
               setIsSnackbarOpen={setIsSnackbarOpen}
+              onForkChat={handleForkChat}
             />
 
             <div className="h-full w-full flex flex-col bg-[var(--md-sys-color-background)] relative shadow-2xl">
@@ -373,6 +424,7 @@ export default function App() {
                   setIsTemporary(false);
                   handleCreateNewChat(setMessages, setChatId as (id: string) => void, setChatTitle, resetSearch, () => {}, () => refreshChats(false));
                 }}
+                onForkChat={() => handleForkChat(chatId, chatTitle)}
               />
 
               <div className="flex-1 relative overflow-hidden flex flex-col">

@@ -119,6 +119,7 @@ export const en = {
   'message.menu.create_branch': 'Create a branch',
   'message.menu.generation_details': 'Generation Details',
   'chat.thread_from': 'Chat Thread — «{name}»',
+  'menu.fork_chat': 'Fork a chat',
   'message.search_progress': 'A web search is in progress...',
   'code.warning': 'Use the generated code with caution',
   'personalization.title': 'Personalization',
