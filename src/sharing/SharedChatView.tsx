@@ -233,34 +233,43 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
             </div>
           </div>
 
-          {sharedChat.messages.map((msg, index) => (
-            <ChatMessage
-              key={index}
-              messageId={`shared-${index}`}
-              role={msg.role}
-              content={msg.content}
-              imageUrl={msg.image_url}
-              videoUrl={msg.video_url}
-              codes={undefined}
-              modelName={undefined}
-              feedback={undefined}
-              onFeedback={() => {}}
-              isGenerating={false}
-              isLast={index === sharedChat.messages.length - 1}
-              onImageClick={(url) => {
-                // If there's an image click handler in the app, we can just open it in a new window or ignore
-                window.open(url, '_blank');
-              }}
-              onVideoClick={(url) => {
-                window.open(url, '_blank');
-              }}
-              isTemporary={false}
-              searchUsed={false}
-              isSearching={false}
-              searchSources={undefined}
-              hideActions={true}
-            />
-          ))}
+          {sharedChat.messages.map((msg, index) => {
+            const prevMsg = index > 0 ? sharedChat.messages[index - 1] : null;
+            const userHasImage = msg.role === 'ai' && prevMsg ? !!prevMsg.image_url : undefined;
+            const userHasVideo = msg.role === 'ai' && prevMsg ? !!prevMsg.video_url : undefined;
+            return (
+              <ChatMessage
+                key={index}
+                messageId={`shared-${index}`}
+                role={msg.role}
+                content={msg.content}
+                imageUrl={msg.image_url}
+                videoUrl={msg.video_url}
+                codes={undefined}
+                modelName={undefined}
+                feedback={undefined}
+                onFeedback={() => {}}
+                isGenerating={false}
+                isLast={index === sharedChat.messages.length - 1}
+                onImageClick={(url) => {
+                  // If there's an image click handler in the app, we can just open it in a new window or ignore
+                  window.open(url, '_blank');
+                }}
+                onVideoClick={(url) => {
+                  window.open(url, '_blank');
+                }}
+                isTemporary={false}
+                searchUsed={false}
+                isSearching={false}
+                isAnalyzingImage={false}
+                isAnalyzingVideo={false}
+                searchSources={undefined}
+                hideActions={true}
+                userHasImage={userHasImage}
+                userHasVideo={userHasVideo}
+              />
+            );
+          })}
         </div>
       </div>
     </div>

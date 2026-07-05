@@ -34,6 +34,8 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   onEditClick?: (messageId: string, content: string) => void;
   parentChatTitle?: string;
   onCreateBranch?: (messageId: string) => void;
+  userHasImage?: boolean;
+  userHasVideo?: boolean;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
@@ -53,13 +55,17 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   isTemporary = false,
   searchUsed,
   isSearching,
+  isAnalyzingImage,
+  isAnalyzingVideo,
   searchSources,
   hideActions = false,
   onRegenerate,
   isLastUserMessage = false,
   onEditClick,
   parentChatTitle,
-  onCreateBranch
+  onCreateBranch,
+  userHasImage,
+  userHasVideo
 }) => {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
@@ -204,7 +210,13 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
 
       <AnimatePresence mode="wait">
         {isAI && isSearching && (
-          <SearchProgress />
+          <SearchProgress statusText={t('message.search_progress')} key="search-progress" />
+        )}
+        {isAI && isAnalyzingImage && (
+          <SearchProgress statusText={t('message.image_analysis_progress')} key="image-progress" />
+        )}
+        {isAI && isAnalyzingVideo && (
+          <SearchProgress statusText={t('message.video_analysis_progress')} key="video-progress" />
         )}
       </AnimatePresence>
 
@@ -334,6 +346,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               onOpenChange={setIsDetailsOpen}
               modelName={modelName}
               searchUsed={searchUsed}
+              imageUsed={userHasImage}
+              videoUsed={userHasVideo}
             />
           </>
         )}

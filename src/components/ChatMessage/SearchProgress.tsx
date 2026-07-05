@@ -1,16 +1,17 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { useLanguage } from '../../hooks/useLanguage';
 import { 
   searchNotificationVariants, 
   typewriterContainerVariants, 
   typewriterLetterVariants 
 } from '../../motion/searchNotificationTransitions';
 
-export const SearchProgress: React.FC = () => {
-  const { t } = useLanguage();
-  const text = t('message.search_progress');
-  const letters = Array.from(text);
+interface SearchProgressProps {
+  statusText: string;
+}
+
+export const SearchProgress: React.FC<SearchProgressProps> = ({ statusText }) => {
+  const letters = Array.from(statusText);
 
   return (
     <motion.div

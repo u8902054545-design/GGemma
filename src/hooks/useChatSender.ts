@@ -152,6 +152,8 @@ export const useChatSender = (
       const decoder = new TextDecoder();
       let accumulatedContent = "";
       let searchTriggeredFlag = false;
+      let imageAnalysisTriggeredFlag = false;
+      let videoAnalysisTriggeredFlag = false;
 
       if (!reader) throw new Error('ReadableStream not supported');
 
@@ -164,25 +166,49 @@ export const useChatSender = (
         if (accumulatedContent.includes("[SEARCH_IN_PROGRESS]")) {
           searchTriggeredFlag = true;
         }
+        if (accumulatedContent.includes("[IMAGE_ANALYSIS_IN_PROGRESS]")) {
+          imageAnalysisTriggeredFlag = true;
+        }
+        if (accumulatedContent.includes("[VIDEO_ANALYSIS_IN_PROGRESS]")) {
+          videoAnalysisTriggeredFlag = true;
+        }
 
         let displayContent = accumulatedContent;
         let searchUsed = searchUsedFromServer;
         let isSearching = false;
+        let isAnalyzingImage = false;
+        let isAnalyzingVideo = false;
 
         if (searchTriggeredFlag) {
           const index = displayContent.indexOf("[SEARCH_IN_PROGRESS]");
           if (index !== -1) {
             displayContent = displayContent.substring(index + 20);
           }
-          
-          const cleanText = displayContent
-            .replace(/\[SEARCH_SOURCES:[^\]]*\]/g, "")
-            .replace(/\[SEARCH_USED\]/g, "")
-            .trim();
-            
-          if (cleanText.length === 0) {
-            isSearching = true;
+        }
+        if (imageAnalysisTriggeredFlag) {
+          const index = displayContent.indexOf("[IMAGE_ANALYSIS_IN_PROGRESS]");
+          if (index !== -1) {
+            displayContent = displayContent.substring(index + 28);
           }
+        }
+        if (videoAnalysisTriggeredFlag) {
+          const index = displayContent.indexOf("[VIDEO_ANALYSIS_IN_PROGRESS]");
+          if (index !== -1) {
+            displayContent = displayContent.substring(index + 28);
+          }
+        }
+
+        const cleanText = displayContent
+          .replace(/\[SEARCH_SOURCES:[^\]]*\]/g, "")
+          .replace(/\[SEARCH_USED\]/g, "")
+          .replace(/\[IMAGE_ANALYSIS_IN_PROGRESS\]/g, "")
+          .replace(/\[VIDEO_ANALYSIS_IN_PROGRESS\]/g, "")
+          .trim();
+          
+        if (cleanText.length === 0) {
+          if (searchTriggeredFlag) isSearching = true;
+          if (imageAnalysisTriggeredFlag) isAnalyzingImage = true;
+          if (videoAnalysisTriggeredFlag) isAnalyzingVideo = true;
         }
 
         if (displayContent.includes("[SEARCH_REQUIRED:")) {
@@ -233,6 +259,8 @@ export const useChatSender = (
               modelName: modelNameFromServer,
               searchUsed: searchUsed,
               isSearching: isSearching,
+              isAnalyzingImage: isAnalyzingImage,
+              isAnalyzingVideo: isAnalyzingVideo,
               searchSources: searchSourcesList || existingSources,
               searchEnabledBy: searchUsed ? (isSearchActive ? 'user' : 'model') : undefined
             };

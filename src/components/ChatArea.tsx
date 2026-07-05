@@ -67,33 +67,42 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
             layout
             className="p-4 md:p-6 pb-20 max-w-[1200px] w-full mx-auto flex flex-col"
           >
-            {messages.map((msg, index) => (
-              <ChatMessage
-                key={msg.id}
-                messageId={msg.id}
-                role={msg.role}
-                content={msg.content}
-                imageUrl={msg.imageUrl}
-                videoUrl={msg.videoUrl}
-                codes={msg.codes}
-                modelName={msg.modelName}
-                feedback={msg.feedback}
-                onFeedback={handleFeedback}
-                isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
-                isLast={index === messages.length - 1}
-                onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
-                onVideoClick={onVideoClick}
-                isTemporary={isTemporary}
-                searchUsed={msg.searchUsed}
-                isSearching={msg.isSearching}
-                searchSources={msg.searchSources}
-                onRegenerate={handleRegenerate}
-                isLastUserMessage={msg.id === lastUserMsgId}
-                onEditClick={onEditClick}
-                parentChatTitle={parentChatTitle}
-                onCreateBranch={onCreateBranch}
-              />
-            ))}
+            {messages.map((msg, index) => {
+              const prevMsg = index > 0 ? messages[index - 1] : null;
+              const userHasImage = msg.role === 'ai' && prevMsg ? !!prevMsg.imageUrl : undefined;
+              const userHasVideo = msg.role === 'ai' && prevMsg ? !!prevMsg.videoUrl : undefined;
+              return (
+                <ChatMessage
+                  key={msg.id}
+                  messageId={msg.id}
+                  role={msg.role}
+                  content={msg.content}
+                  imageUrl={msg.imageUrl}
+                  videoUrl={msg.videoUrl}
+                  codes={msg.codes}
+                  modelName={msg.modelName}
+                  feedback={msg.feedback}
+                  onFeedback={handleFeedback}
+                  isGenerating={isTyping && (msg.id === 'loading-skeleton' || index === messages.length - 1)}
+                  isLast={index === messages.length - 1}
+                  onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
+                  onVideoClick={onVideoClick}
+                  isTemporary={isTemporary}
+                  searchUsed={msg.searchUsed}
+                  isSearching={msg.isSearching}
+                  isAnalyzingImage={msg.isAnalyzingImage}
+                  isAnalyzingVideo={msg.isAnalyzingVideo}
+                  searchSources={msg.searchSources}
+                  onRegenerate={handleRegenerate}
+                  isLastUserMessage={msg.id === lastUserMsgId}
+                  onEditClick={onEditClick}
+                  parentChatTitle={parentChatTitle}
+                  onCreateBranch={onCreateBranch}
+                  userHasImage={userHasImage}
+                  userHasVideo={userHasVideo}
+                />
+              );
+            })}
             <div ref={messagesEndRef} className="h-1" />
           </motion.div>
         )}

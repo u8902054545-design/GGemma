@@ -31,6 +31,8 @@ export type Message = {
   voice?: string;
   searchUsed?: boolean;
   isSearching?: boolean;
+  isAnalyzingImage?: boolean;
+  isAnalyzingVideo?: boolean;
   searchSources?: { title: string; url: string }[];
   searchEnabledBy?: 'user' | 'model';
 };
