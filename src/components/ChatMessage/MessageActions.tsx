@@ -22,6 +22,8 @@ interface MessageActionsProps {
   hideActions?: boolean;
   onRegenerate?: (mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => void;
   messageId: string;
+  parentChatTitle?: string;
+  onCreateBranch?: () => void;
 }
 
 export const MessageActions: React.FC<MessageActionsProps> = ({
@@ -38,7 +40,9 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   onShowDetails,
   hideActions = false,
   onRegenerate,
-  messageId
+  messageId,
+  parentChatTitle,
+  onCreateBranch
 }) => {
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -46,14 +50,24 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   const menuRef = React.useRef<any>(null);
   const anchorId = `regen-btn-${React.useId().replace(/:/g, '')}`;
 
+  const [moreMenuOpen, setMoreMenuOpen] = React.useState(false);
+  const [moreMenuDirection, setMoreMenuDirection] = React.useState<'down' | 'up'>('down');
+  const moreMenuRef = React.useRef<any>(null);
+  const moreAnchorId = `more-btn-${React.useId().replace(/:/g, '')}`;
+
   React.useEffect(() => {
     const menu = menuRef.current;
-    if (!menu) return;
+    const moreMenu = moreMenuRef.current;
 
     const handleClosed = () => setMenuOpen(false);
-    menu.addEventListener('closed', handleClosed);
+    const handleMoreClosed = () => setMoreMenuOpen(false);
+
+    if (menu) menu.addEventListener('closed', handleClosed);
+    if (moreMenu) moreMenu.addEventListener('closed', handleMoreClosed);
+
     return () => {
-      menu.removeEventListener('closed', handleClosed);
+      if (menu) menu.removeEventListener('closed', handleClosed);
+      if (moreMenu) moreMenu.removeEventListener('closed', handleMoreClosed);
     };
   }, []);
 
@@ -71,6 +85,21 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
       }
     }
   }, [menuOpen, messageId]);
+
+  React.useEffect(() => {
+    if (moreMenuOpen) {
+      const bubble = document.getElementById(`msg-bubble-${messageId}`);
+      if (bubble) {
+        const rect = bubble.getBoundingClientRect();
+        const threshold = window.innerHeight - 250;
+        if (rect.bottom > threshold) {
+          setMoreMenuDirection('up');
+        } else {
+          setMoreMenuDirection('down');
+        }
+      }
+    }
+  }, [moreMenuOpen, messageId]);
 
   React.useEffect(() => {
     if (!menuOpen) return;
@@ -93,6 +122,28 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
       document.removeEventListener('click', handleDocumentClick);
     };
   }, [menuOpen]);
+
+  React.useEffect(() => {
+    if (!moreMenuOpen) return;
+    let active = true;
+    const handleDocumentClick = (e: MouseEvent) => {
+      if (!active) return;
+      const menu = moreMenuRef.current;
+      if (menu && !menu.contains(e.target as Node)) {
+        setMoreMenuOpen(false);
+      }
+    };
+    const timer = setTimeout(() => {
+      if (active) {
+        document.addEventListener('click', handleDocumentClick);
+      }
+    }, 0);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+      document.removeEventListener('click', handleDocumentClick);
+    };
+  }, [moreMenuOpen]);
 
   return (
     <motion.div
@@ -181,14 +232,42 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
           </span>
         </button>
 
-        <button
-          onClick={onShowDetails}
-          className="p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] transition-colors cursor-pointer"
-        >
-          <span className="material-symbols-outlined text-[20px]">
-            more_horiz
-          </span>
-        </button>
+        <div className="relative flex items-center justify-center">
+          <button
+            id={moreAnchorId}
+            onClick={() => setMoreMenuOpen(prev => !prev)}
+            className="p-2 rounded-full hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] transition-colors cursor-pointer"
+          >
+            <span className="material-symbols-outlined text-[20px]">
+              more_horiz
+            </span>
+          </button>
+          <md-menu
+            ref={moreMenuRef}
+            anchor={moreAnchorId}
+            open={moreMenuOpen || undefined}
+            anchorCorner={moreMenuDirection === 'up' ? 'start-start' : 'end-start'}
+            menuCorner={moreMenuDirection === 'up' ? 'end-start' : 'start-start'}
+            yOffset={moreMenuDirection === 'up' ? -4 : 4}
+            positioning="fixed"
+            style={{
+              '--md-menu-container-color': 'var(--md-sys-color-surface-container-high)',
+              '--md-menu-item-label-text-color': 'var(--md-sys-color-on-surface)',
+              '--md-menu-item-headline-color': 'var(--md-sys-color-on-surface)'
+            }}
+          >
+            {!isTemporary && onCreateBranch && (
+              <md-menu-item onClick={() => { setMoreMenuOpen(false); onCreateBranch(); }}>
+                <md-icon slot="start">arrow_split</md-icon>
+                <div slot="headline">{t('message.menu.create_branch')}</div>
+              </md-menu-item>
+            )}
+            <md-menu-item onClick={() => { setMoreMenuOpen(false); onShowDetails(); }}>
+              <md-icon slot="start">info</md-icon>
+              <div slot="headline">{t('message.menu.generation_details')}</div>
+            </md-menu-item>
+          </md-menu>
+        </div>
 
         <button
           onClick={onSpeech}
@@ -213,9 +292,17 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
       )}
 
       {isLast && (
-        <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-70 leading-tight">
-          {t('message.warning')}
-        </p>
+        <div className="flex flex-col gap-1.5 mt-2">
+          {parentChatTitle && (
+            <p className="text-[11px] font-semibold text-[var(--md-sys-color-primary)] opacity-90 leading-tight flex items-center gap-1 select-none">
+              <span className="material-symbols-outlined text-[14px]">arrow_split</span>
+              {t('chat.thread_from').replace('{name}', parentChatTitle)}
+            </p>
+          )}
+          <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)] opacity-70 leading-tight">
+            {t('message.warning')}
+          </p>
+        </div>
       )}
     </motion.div>
   );

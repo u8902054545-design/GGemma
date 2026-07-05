@@ -32,6 +32,8 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   onRegenerate?: (mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => void;
   isLastUserMessage?: boolean;
   onEditClick?: (messageId: string, content: string) => void;
+  parentChatTitle?: string;
+  onCreateBranch?: (messageId: string) => void;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
@@ -55,7 +57,9 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   hideActions = false,
   onRegenerate,
   isLastUserMessage = false,
-  onEditClick
+  onEditClick,
+  parentChatTitle,
+  onCreateBranch
 }) => {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
@@ -322,6 +326,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               hideActions={hideActions}
               onRegenerate={onRegenerate}
               messageId={messageId || ''}
+              parentChatTitle={parentChatTitle}
+              onCreateBranch={onCreateBranch ? () => onCreateBranch(messageId || '') : undefined}
             />
             <GenerationDetails
               isOpen={isDetailsOpen}

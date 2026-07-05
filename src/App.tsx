@@ -29,6 +29,7 @@ import { EditMessagePage } from './components/EditMessagePage';
 import BlockedScreen from './components/BlockedScreen';
 import { GeoblockDialog } from './components/GeoblockDialog';
 import { BlockedAccountDialog } from './components/BlockedAccountDialog';
+import { SUPABASE_ENDPOINT, supabase } from './config';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle, signInWithGitHub, signOut } = useAuth();
@@ -118,6 +119,88 @@ export default function App() {
     setEditingMessage(null);
     await handleSend(newText, isSearchActive, undefined, undefined, true, messageId);
   }, [editingMessage, handleSend, isSearchActive]);
+
+  const handleCreateBranch = useCallback(async (aiMessageId: string) => {
+    const aiIndex = messages.findIndex(m => m.id === aiMessageId);
+    if (aiIndex === -1) return;
+    
+    // Find the user message preceding this AI message
+    let userMsg = null;
+    for (let i = aiIndex - 1; i >= 0; i--) {
+      if (messages[i].role === 'user') {
+        userMsg = messages[i];
+        break;
+      }
+    }
+    
+    if (!userMsg) {
+      setSnackbarMessage(language === 'ru' ? 'Не найдено сообщение пользователя для ветвления.' : 'No user message found to branch from.');
+      setIsSnackbarOpen(true);
+      return;
+    }
+
+    const aiMsg = messages[aiIndex];
+
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        setSnackbarMessage(language === 'ru' ? 'Сессия истекла. Пожалуйста, войдите снова.' : 'Session expired. Please sign in again.');
+        setIsSnackbarOpen(true);
+        return;
+      }
+
+      const newChatId = crypto.randomUUID();
+      const branchTitle = language === 'ru' 
+        ? `Ветвь «${chatTitle}»` 
+        : `The branch «${chatTitle}»`;
+
+      const response = await fetch(SUPABASE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          action: 'create_branch',
+          new_chat_id: newChatId,
+          branch_title: branchTitle,
+          parent_chat_title: chatTitle,
+          user_message: {
+            content: userMsg.content,
+            image_url: userMsg.imageUrl,
+            video_url: userMsg.videoUrl,
+            codes: userMsg.codes
+          },
+          ai_message: {
+            content: aiMsg.content,
+            model_name: aiMsg.modelName,
+            search_used: aiMsg.searchUsed,
+            search_sources: aiMsg.searchSources,
+            search_enabled_by: aiMsg.searchEnabledBy
+          }
+        })
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to create branch' }));
+        throw new Error(errorData.error || 'Server error');
+      }
+
+      // Success! Refresh chats list, switch to the new chat, and load its messages
+      await refreshChats(true);
+      setChatTitle(branchTitle);
+      setChatId(newChatId);
+      loadChatMessages(newChatId);
+      
+      setSnackbarMessage(language === 'ru' ? 'Ветвь создана' : 'Branch created');
+      setIsSnackbarOpen(true);
+
+    } catch (err: any) {
+      console.error('Failed to create branch:', err);
+      setSnackbarMessage(language === 'ru' ? 'Не удалось создать ветвь' : 'Failed to create branch');
+      setIsSnackbarOpen(true);
+    }
+  }, [messages, chatTitle, language, refreshChats, setChatTitle, setChatId, loadChatMessages, setSnackbarMessage, setIsSnackbarOpen]);
 
   React.useEffect(() => {
     if (!isChatHistoryEnabled && isTemporary) {
@@ -309,6 +392,8 @@ export default function App() {
                   onVideoClick={setPreviewVideoUrl}
                   messagesEndRef={messagesEndRef}
                   onEditClick={(id, content) => setEditingMessage({ id, content })}
+                  parentChatTitle={chats.find(c => c.id === chatId)?.parent_chat_title}
+                  onCreateBranch={handleCreateBranch}
                 />
 
                 <AnimatePresence>

@@ -21,6 +21,8 @@ interface ChatAreaProps {
   onVideoClick?: (url: string) => void;
   messagesEndRef: React.RefObject<HTMLDivElement | null>;
   onEditClick?: (messageId: string, content: string) => void;
+  parentChatTitle?: string;
+  onCreateBranch?: (messageId: string) => void;
 }
 
 export const ChatArea: React.FC<ChatAreaProps> = ({
@@ -28,7 +30,9 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   handleSend, handleRegenerate, isSearchActive, handleFeedback, handleImagePreview, setFullscreenImage, 
   onVideoClick,
   messagesEndRef,
-  onEditClick
+  onEditClick,
+  parentChatTitle,
+  onCreateBranch
 }) => {
   const lastUserMsg = [...messages].reverse().find(msg => msg.role === 'user');
   const lastUserMsgId = lastUserMsg ? lastUserMsg.id : null;
@@ -86,6 +90,8 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                 onRegenerate={handleRegenerate}
                 isLastUserMessage={msg.id === lastUserMsgId}
                 onEditClick={onEditClick}
+                parentChatTitle={parentChatTitle}
+                onCreateBranch={onCreateBranch}
               />
             ))}
             <div ref={messagesEndRef} className="h-1" />
