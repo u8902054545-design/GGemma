@@ -333,7 +333,7 @@ export const useChatSender = (
           message: userMsg.content,
           publicModelName: modelToUse.name,
           chat_id: isTemporary ? `temp_${chatId}` : chatId,
-          isSearchActive: userMsg.searchEnabledBy === 'user',
+          isSearchActive: lastAiMsg.searchEnabledBy === 'user',
           image: userMsg.base64Image || null,
           video: userMsg.base64Video || null,
           codes: userMsg.codes || null,
@@ -440,7 +440,7 @@ export const useChatSender = (
               searchUsed: searchUsed,
               isSearching: isSearching,
               searchSources: searchSourcesList || existingSources,
-              searchEnabledBy: searchUsed ? (userMsg.searchEnabledBy || 'model') : undefined
+              searchEnabledBy: searchUsed ? (lastAiMsg.searchEnabledBy || 'model') : undefined
             };
             if (isTemporary) saveTempMessages(newMessages);
           }
