@@ -7,6 +7,10 @@ export const modelDescriptions: Record<string, { en: string; ru: string }> = {
     en: 'High performance, great balance of speed and capability',
     ru: 'Высокая производительность, отличный баланс скорости и возможностей'
   },
+  'Gemma 4 12B': {
+    en: 'Compact 4th gen model with high efficiency',
+    ru: 'Компактная модель 4-го поколения с высокой эффективностью'
+  },
   'Gemma 3 27B': {
     en: 'Powerful 3rd gen model with strong reasoning',
     ru: 'Мощная модель 3-го поколения с сильной логикой'

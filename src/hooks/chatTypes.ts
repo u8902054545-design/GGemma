@@ -40,6 +40,7 @@ export type Message = {
 export const MODELS: SelectedModel[] = [
   { id: 'Gemma 4 31B', name: 'Gemma 4 31B' },
   { id: 'Gemma 4 26B', name: 'Gemma 4 26B' },
+  { id: 'Gemma 4 12B', name: 'Gemma 4 12B' },
   { id: 'Gemma 3 27B', name: 'Gemma 3 27B' },
   { id: 'Gemma 3 12B', name: 'Gemma 3 12B' },
   { id: 'Gemma 3 4B', name: 'Gemma 3 4B' },

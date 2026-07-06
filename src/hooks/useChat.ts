@@ -65,7 +65,7 @@ export const useChat = (onNewChatCreated?: () => void, isTemporary: boolean = fa
 
   useEffect(() => {
     if (exhaustedModels.includes(selectedModel.id)) {
-      const fallbackOrder = ['Gemma 4 31B', 'Gemma 4 26B', 'Gemma 3 27B', 'Gemma 3 12B'];
+      const fallbackOrder = ['Gemma 4 31B', 'Gemma 4 26B', 'Gemma 4 12B', 'Gemma 3 27B', 'Gemma 3 12B'];
       const currentIdx = fallbackOrder.indexOf(selectedModel.id);
       if (currentIdx !== -1) {
         for (let i = currentIdx + 1; i < fallbackOrder.length; i++) {
