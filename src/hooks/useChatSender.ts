@@ -37,7 +37,10 @@ export const useChatSender = (
     file?: File,
     codes?: ImportedCode[],
     isEdit?: boolean,
-    editMessageId?: string
+    editMessageId?: string,
+    isTranslationActive?: boolean,
+    translationInputLang?: string,
+    translationOutputLang?: string
   ) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
     if ((!textToSend.trim() && !file && (!codes || codes.length === 0)) && !isEdit || isTyping) return;
@@ -137,7 +140,10 @@ export const useChatSender = (
           history: (isTemporary || !isChatHistoryEnabled) ? updatedMessages : undefined,
           voice: currentVoice,
           isEdit: !!isEdit,
-          editMessageId: editMessageId || null
+          editMessageId: editMessageId || null,
+          isTranslationActive,
+          translationInputLang,
+          translationOutputLang
         }),
       });
 

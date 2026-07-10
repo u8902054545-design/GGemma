@@ -5,6 +5,22 @@ import { searchButtonVariants, searchTextVariants } from '../../motion/searchTra
 
 import { useLanguage } from '../../hooks/useLanguage';
 
+const TRANSLATION_LANGUAGES = [
+  'Auto Detect',
+  'English',
+  'Russian',
+  'Spanish',
+  'French',
+  'German',
+  'Chinese',
+  'Japanese',
+  'Korean',
+  'Italian',
+  'Portuguese',
+  'Arabic',
+  'Turkish'
+];
+
 interface InputAreaProps {
   input: string;
   setInput: (value: string) => void;
@@ -19,6 +35,12 @@ interface InputAreaProps {
   onSearchClick?: () => void;
   isListening: boolean;
   toggleListening: () => void;
+  isTranslationActive?: boolean;
+  translationInputLang?: string;
+  translationOutputLang?: string;
+  onTranslationToggle?: () => void;
+  onChangeInputLang?: (lang: string) => void;
+  onChangeOutputLang?: (lang: string) => void;
 }
 
 export const InputArea: React.FC<InputAreaProps> = ({
@@ -35,6 +57,12 @@ export const InputArea: React.FC<InputAreaProps> = ({
   onSearchClick,
   isListening,
   toggleListening,
+  isTranslationActive = false,
+  translationInputLang = 'English',
+  translationOutputLang = 'Russian',
+  onTranslationToggle,
+  onChangeInputLang,
+  onChangeOutputLang,
 }) => {
   const { t } = useLanguage();
   const mediaType = selectedFile?.type.startsWith('video/') ? 'video' : 'image';
@@ -75,6 +103,71 @@ export const InputArea: React.FC<InputAreaProps> = ({
                  <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-on-primary-container)]">close</span>
                </button>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isTranslationActive && (
+          <motion.div 
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            className="px-5 overflow-hidden flex items-center justify-between gap-2"
+          >
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--md-sys-color-secondary-container)] border border-[var(--md-sys-color-secondary)]/20 shadow-sm min-w-0 flex-1 justify-center">
+                <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-secondary)] flex-shrink-0">translate</span>
+                <select
+                  value={translationInputLang}
+                  onChange={(e) => onChangeInputLang?.(e.target.value)}
+                  className="bg-transparent text-[12px] font-semibold text-[var(--md-sys-color-on-secondary-container)] outline-none border-none cursor-pointer pr-1 min-w-0 text-ellipsis overflow-hidden whitespace-nowrap"
+                  style={{ colorScheme: 'dark' }}
+                >
+                  <option value="" disabled hidden>
+                    {t('chat.translation.input_lang') || 'Input Language'}
+                  </option>
+                  {TRANSLATION_LANGUAGES.map((lang) => (
+                    <option key={lang} value={lang} className="bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)]">
+                      {lang}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-on-surface-variant)] select-none flex-shrink-0">
+                arrow_forward
+              </span>
+
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[var(--md-sys-color-primary-container)] border border-[var(--md-sys-color-primary)]/20 shadow-sm min-w-0 flex-1 justify-center">
+                <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-primary)] flex-shrink-0">g_translate</span>
+                <select
+                  value={translationOutputLang}
+                  onChange={(e) => onChangeOutputLang?.(e.target.value)}
+                  className="bg-transparent text-[12px] font-semibold text-[var(--md-sys-color-on-primary-container)] outline-none border-none cursor-pointer pr-1 min-w-0 text-ellipsis overflow-hidden whitespace-nowrap"
+                  style={{ colorScheme: 'dark' }}
+                >
+                  <option value="" disabled hidden>
+                    {t('chat.translation.output_lang') || 'Translated Output'}
+                  </option>
+                  {TRANSLATION_LANGUAGES.filter(lang => lang !== 'Auto Detect').map((lang) => (
+                    <option key={lang} value={lang} className="bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)]">
+                      {lang}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                onTranslationToggle?.();
+              }}
+              className="flex items-center justify-center p-1 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors text-[var(--md-sys-color-on-surface-variant)] flex-shrink-0"
+            >
+              <span className="material-symbols-outlined text-[18px]">close</span>
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

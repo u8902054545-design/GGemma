@@ -81,6 +81,9 @@ export default function App() {
   }, [signOut]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
+  const [isTranslationActive, setIsTranslationActive] = useState(false);
+  const [translationInputLang, setTranslationInputLang] = useState('');
+  const [translationOutputLang, setTranslationOutputLang] = useState('');
   const { chats, loading: chatsLoading, error, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
@@ -291,19 +294,37 @@ export default function App() {
     setIsCodeImportOpen(false);
   };
 
-  const executeSend = useCallback(async (text?: string, isSearch?: boolean, file?: File, codes?: any[]) => {
+  const executeSend = useCallback(async (
+    text?: string, 
+    isSearch?: boolean, 
+    file?: File, 
+    codes?: any[],
+    isTranslation?: boolean,
+    inLang?: string,
+    outLang?: string
+  ) => {
     let finalInput = text || input;
     const targetCodes = codes !== undefined ? codes : importedCodes;
     if (targetCodes && targetCodes.length > 0) {
       const codesMarkdown = targetCodes.map(c => `File: ${c.filename}\n\`\`\`\n${c.code}\n\`\`\``).join('\n\n');
       finalInput = finalInput ? `${finalInput}\n\n${codesMarkdown}` : codesMarkdown;
     }
-    await handleSend(finalInput, isSearch, file);
+    await handleSend(
+      finalInput, 
+      isSearch, 
+      file, 
+      undefined, 
+      undefined, 
+      undefined, 
+      isTranslation !== undefined ? isTranslation : isTranslationActive,
+      inLang !== undefined ? inLang : translationInputLang,
+      outLang !== undefined ? outLang : translationOutputLang
+    );
     setImportedCodes([]);
     if (isSearch) {
       resetSearch();
     }
-  }, [input, handleSend, resetSearch, importedCodes]);
+  }, [input, handleSend, resetSearch, importedCodes, isTranslationActive, translationInputLang, translationOutputLang]);
 
   const {
     isOpen: isSearchConfirmOpen,
@@ -320,14 +341,24 @@ export default function App() {
     executeSend
   );
 
-  const handleCustomSend = async (text?: string, isSearch?: boolean, file?: File, codes?: any[]) => {
+  const handleCustomSend = async (
+    text?: string, 
+    isSearch?: boolean, 
+    file?: File, 
+    codes?: any[],
+    isEdit?: boolean,
+    editMessageId?: string,
+    isTranslation?: boolean,
+    inLang?: string,
+    outLang?: string
+  ) => {
     if (!isChatHistoryEnabled && chats.some(c => c.id === chatId)) {
       setSnackbarMessage(t('errors.historyDisabled.send'));
       setIsSnackbarOpen(true);
       return;
     }
 
-    await checkAndSend(text, isSearch, file, codes);
+    await checkAndSend(text, isSearch, file, codes, isTranslation, inLang, outLang);
   };
 
   const pathname = window.location.pathname;
@@ -469,6 +500,12 @@ export default function App() {
                 messages={messages}
                 setSnackbarMessage={setSnackbarMessage}
                 setIsSnackbarOpen={setIsSnackbarOpen}
+                isTranslationActive={isTranslationActive}
+                translationInputLang={translationInputLang}
+                translationOutputLang={translationOutputLang}
+                onTranslationToggle={() => setIsTranslationActive(prev => !prev)}
+                onChangeInputLang={setTranslationInputLang}
+                onChangeOutputLang={setTranslationOutputLang}
               />
             </div>
           </motion.div>

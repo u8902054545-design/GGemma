@@ -10,7 +10,17 @@ export interface ImportedCode {
 export interface ChatInputProps {
   input: string;
   setInput: (value: string) => void;
-  handleSend: (text?: string, isSearch?: boolean, file?: File, codes?: ImportedCode[]) => void;
+  handleSend: (
+    text?: string,
+    isSearch?: boolean,
+    file?: File,
+    codes?: ImportedCode[],
+    isEdit?: boolean,
+    editMessageId?: string,
+    isTranslationActive?: boolean,
+    translationInputLang?: string,
+    translationOutputLang?: string
+  ) => void;
   stopRequest: () => void;
   selectedModel: { id: string; name: string };
   isTyping: boolean;
@@ -23,6 +33,12 @@ export interface ChatInputProps {
   messages: Message[];
   setSnackbarMessage?: (msg: string) => void;
   setIsSnackbarOpen?: (open: boolean) => void;
+  isTranslationActive?: boolean;
+  translationInputLang?: string;
+  translationOutputLang?: string;
+  onTranslationToggle?: () => void;
+  onChangeInputLang?: (lang: string) => void;
+  onChangeOutputLang?: (lang: string) => void;
 }
 
 

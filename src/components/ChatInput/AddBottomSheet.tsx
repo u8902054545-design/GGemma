@@ -17,6 +17,8 @@ interface AddBottomSheetProps {
   onCodeImportClick: () => void;
   isImageDisabled?: boolean;
   isVideoDisabled?: boolean;
+  isTranslationActive?: boolean;
+  onTranslationToggle?: () => void;
 }
 
 export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
@@ -29,7 +31,9 @@ export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
   onSearchToggle,
   onCodeImportClick,
   isImageDisabled = false,
-  isVideoDisabled = false
+  isVideoDisabled = false,
+  isTranslationActive = false,
+  onTranslationToggle = () => {}
 }) => {
   const { t } = useLanguage();
 
@@ -125,6 +129,25 @@ export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
                   search
                 </md-icon>
                 {isSearchActive && (
+                   <md-icon slot="end" style={{ color: 'var(--md-sys-color-primary)' }}>check</md-icon>
+                )}
+              </md-list-item>
+
+              <md-list-item
+                type="button"
+                onClick={() => { onTranslationToggle(); onClose(); }}
+                style={{
+                  '--md-list-item-label-text-color': isTranslationActive ? 'var(--md-sys-color-primary)' : 'var(--md-sys-color-on-surface)',
+                  '--md-list-item-container-color': isTranslationActive ? 'var(--md-sys-color-primary-container)' : 'transparent',
+                  'border-radius': '16px',
+                  'margin': '8px 8px 0 8px'
+                }}
+              >
+                <div slot="headline">{t('chat.add.translation') || 'Translation'}</div>
+                <md-icon slot="start" style={{ color: isTranslationActive ? 'var(--md-sys-color-primary)' : 'inherit' }}>
+                  g_translate
+                </md-icon>
+                {isTranslationActive && (
                    <md-icon slot="end" style={{ color: 'var(--md-sys-color-primary)' }}>check</md-icon>
                 )}
               </md-list-item>

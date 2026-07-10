@@ -28,6 +28,12 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   messages,
   setSnackbarMessage,
   setIsSnackbarOpen,
+  isTranslationActive = false,
+  translationInputLang = 'English',
+  translationOutputLang = 'Russian',
+  onTranslationToggle,
+  onChangeInputLang,
+  onChangeOutputLang,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -73,7 +79,17 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
 
   const handleWrappedSend = () => {
     if (!input.trim() && !selectedFile && importedCodes.length === 0) return;
-    handleSend(undefined, isSearchActive, selectedFile || undefined, importedCodes);
+    handleSend(
+      undefined, 
+      isSearchActive, 
+      selectedFile || undefined, 
+      importedCodes, 
+      undefined, 
+      undefined, 
+      isTranslationActive, 
+      translationInputLang, 
+      translationOutputLang
+    );
     clearSelection();
   };
 
@@ -161,6 +177,12 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                     onSearchClick={onSearchClick}
                     isListening={false}
                     toggleListening={() => setIsVoiceInputActive(true)}
+                    isTranslationActive={isTranslationActive}
+                    translationInputLang={translationInputLang}
+                    translationOutputLang={translationOutputLang}
+                    onTranslationToggle={onTranslationToggle}
+                    onChangeInputLang={onChangeInputLang}
+                    onChangeOutputLang={onChangeOutputLang}
                   />
                 </motion.div>
               ) : (
@@ -171,7 +193,17 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                     if (text) {
                       const newText = input + (input ? " " : "") + text;
                       if (sendImmediately) {
-                        handleSend(newText, isSearchActive, selectedFile || undefined, importedCodes);
+                        handleSend(
+                          newText, 
+                          isSearchActive, 
+                          selectedFile || undefined, 
+                          importedCodes, 
+                          undefined, 
+                          undefined, 
+                          isTranslationActive, 
+                          translationInputLang, 
+                          translationOutputLang
+                        );
                         clearSelection();
                       } else {
                         setInput(newText);
@@ -226,6 +258,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         onCodeImportClick={onCodeImportClick || (() => {})}
         isImageDisabled={isImageDisabled}
         isVideoDisabled={isVideoDisabled}
+        isTranslationActive={isTranslationActive}
+        onTranslationToggle={onTranslationToggle}
       />
 
       <AnimatePresence>
