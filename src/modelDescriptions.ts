@@ -11,6 +11,10 @@ export const modelDescriptions: Record<string, { en: string; ru: string }> = {
     en: 'Compact 4th gen model with high efficiency',
     ru: 'Компактная модель 4-го поколения с высокой эффективностью'
   },
+  'DiffusionGemma 26B A4B IT': {
+    en: 'Diffusion-based thinking model for advanced reasoning',
+    ru: 'Диффузионная модель рассуждений для глубокой логики'
+  },
   'Gemma 3 27B': {
     en: 'Powerful 3rd gen model with strong reasoning',
     ru: 'Мощная модель 3-го поколения с сильной логикой'
