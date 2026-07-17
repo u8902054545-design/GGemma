@@ -159,13 +159,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </AnimatePresence>
 
       <aside
-        className="fixed inset-y-0 left-0 h-full w-[300px] bg-[var(--md-sys-color-surface)] border-r border-[var(--md-sys-color-outline-variant)]/10 flex flex-col z-[150] shadow-2xl overflow-hidden"
+        className="fixed inset-0 h-full w-full bg-[var(--md-sys-color-surface)] flex flex-col z-[150] shadow-2xl overflow-hidden"
         style={{ 
-          transform: isOpen ? 'translateX(0px)' : 'translateX(-300px)',
+          transform: isOpen ? 'translateX(0px)' : 'translateX(-100%)',
           transition: 'transform 0.4s cubic-bezier(0.2, 0, 0, 1)'
         }}
       >
+        {/* Sidebar Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--md-sys-color-outline-variant)]/10">
+          <span className="text-xl font-semibold text-[var(--md-sys-color-on-surface)] select-none">
+            Gemma
+          </span>
+          <button
+            onClick={onClose}
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[var(--md-sys-color-on-surface)]/10 text-[var(--md-sys-color-on-surface)] transition-colors cursor-pointer"
+            aria-label="Close sidebar"
+          >
+            <span className="material-symbols-outlined text-[24px]">close</span>
+          </button>
+        </div>
+
         <div className="p-4 flex flex-col gap-4 mt-2">
+          <NewChatButton onClick={() => { onNewChat(); onClose(); }} />
+
           <SidebarSearch onClick={() => {
             if (!isChatHistoryEnabled) {
               setSnackbarMessage(t('errors.historyDisabled.search'));
@@ -174,8 +190,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }
             setIsSearchOpen(true);
           }} />
-
-          <NewChatButton onClick={() => { onNewChat(); onClose(); }} />
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 mt-2 custom-scrollbar min-h-0">
