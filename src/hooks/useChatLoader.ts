@@ -41,7 +41,8 @@ export const useChatLoader = (
         codes: m.codes,
         searchUsed: m.search_used,
         searchSources: m.search_sources,
-        searchEnabledBy: m.search_enabled_by
+        searchEnabledBy: m.search_enabled_by,
+        isTranslationActive: m.is_translation_active
       }));
 
       setMessages(formattedMessages);

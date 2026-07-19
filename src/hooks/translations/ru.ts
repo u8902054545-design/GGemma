@@ -185,5 +185,8 @@ export const ru = {
   'editMessage.close': 'Закрыть',
   'editMessage.apply': 'Применить изменения',
   'editMessage.placeholder': 'Введите сообщение...',
+  'dialog.translation.title': 'Отключить перевод?',
+  'dialog.translation.desc': 'Отключение перевода в активном чате потребует начала нового чата.',
+  'dialog.translation.confirm': 'Начать новый чат',
 };
 

@@ -12,4 +12,5 @@ export type ChatMessageProps = {
   isAnalyzingVideo?: boolean;
   searchSources?: { title: string; url: string }[];
   hideActions?: boolean;
+  isTranslationActive?: boolean;
 };

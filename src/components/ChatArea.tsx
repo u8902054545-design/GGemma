@@ -100,6 +100,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                   onCreateBranch={onCreateBranch}
                   userHasImage={userHasImage}
                   userHasVideo={userHasVideo}
+                  isTranslationActive={msg.isTranslationActive}
                 />
               );
             })}

@@ -24,6 +24,7 @@ interface MessageActionsProps {
   messageId: string;
   parentChatTitle?: string;
   onCreateBranch?: () => void;
+  isTranslationActive?: boolean;
 }
 
 export const MessageActions: React.FC<MessageActionsProps> = ({
@@ -42,7 +43,8 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
   onRegenerate,
   messageId,
   parentChatTitle,
-  onCreateBranch
+  onCreateBranch,
+  isTranslationActive
 }) => {
   const { t } = useLanguage();
   const [menuOpen, setMenuOpen] = React.useState(false);
@@ -178,8 +180,9 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
             </button>
           </>
         )}
-        {isLast && onRegenerate && (
+        {isLast && onRegenerate && !isTranslationActive && (
           <>
+            {console.log('Regenerate button: isLast:', isLast, 'onRegenerate:', !!onRegenerate, 'isTranslationActive:', isTranslationActive)}
             <md-icon-button
               id={anchorId}
               onClick={() => setMenuOpen(prev => !prev)}

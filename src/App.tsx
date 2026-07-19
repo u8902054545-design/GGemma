@@ -29,6 +29,7 @@ import { EditMessagePage } from './components/EditMessagePage';
 import BlockedScreen from './components/BlockedScreen';
 import { GeoblockDialog } from './components/GeoblockDialog';
 import { BlockedAccountDialog } from './components/BlockedAccountDialog';
+import { TranslationNewChatDialog } from './components/TranslationNewChatDialog';
 import { SUPABASE_ENDPOINT, supabase } from './config';
 
 export default function App() {
@@ -82,8 +83,28 @@ export default function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
   const [isTranslationActive, setIsTranslationActive] = useState(false);
+  const [isTranslationNewChatDialogOpen, setIsTranslationNewChatDialogOpen] = useState(false);
   const [translationInputLang, setTranslationInputLang] = useState('');
   const [translationOutputLang, setTranslationOutputLang] = useState('');
+
+  const handleTranslationToggle = () => {
+    if (isTranslationActive) {
+      const hasTranslationMessages = messages.some(m => m.isTranslationActive);
+      if (hasTranslationMessages) {
+        setIsTranslationNewChatDialogOpen(true);
+      } else {
+        setIsTranslationActive(false);
+      }
+    } else {
+      setIsTranslationActive(true);
+    }
+  };
+
+  const handleNewChatAfterTranslationDisabled = () => {
+    setIsTranslationNewChatDialogOpen(false);
+    handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
+    setIsTranslationActive(false);
+  };
   const { chats, loading: chatsLoading, error, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
@@ -503,13 +524,18 @@ export default function App() {
                 isTranslationActive={isTranslationActive}
                 translationInputLang={translationInputLang}
                 translationOutputLang={translationOutputLang}
-                onTranslationToggle={() => setIsTranslationActive(prev => !prev)}
+                onTranslationToggle={handleTranslationToggle}
                 onChangeInputLang={setTranslationInputLang}
                 onChangeOutputLang={setTranslationOutputLang}
               />
             </div>
           </motion.div>
 
+          <TranslationNewChatDialog 
+            isOpen={isTranslationNewChatDialogOpen} 
+            onClose={() => setIsTranslationNewChatDialogOpen(false)}
+            onConfirm={handleNewChatAfterTranslationDisabled}
+          />
           <GemmaBottomSheet isOpen={isModelSelectorOpen} onOpenChange={setIsModelSelectorOpen} selectedModel={selectedModel} onModelSelect={setSelectedModel} models={models} exhaustedModels={exhaustedModels} />
           <GemmaBottomSheet 
             isOpen={isRegenModelSelectorOpen} 

@@ -185,5 +185,8 @@ export const en = {
   'editMessage.close': 'Close',
   'editMessage.apply': 'Apply changes',
   'editMessage.placeholder': 'Type your message...',
+  'dialog.translation.title': 'Disable Translation?',
+  'dialog.translation.desc': 'Disabling translation in an active chat will require starting a new chat.',
+  'dialog.translation.confirm': 'Open new chat',
 };
 

@@ -35,6 +35,7 @@ export type Message = {
   isAnalyzingVideo?: boolean;
   searchSources?: { title: string; url: string }[];
   searchEnabledBy?: 'user' | 'model';
+  isTranslationActive?: boolean;
 };
 
 export const MODELS: SelectedModel[] = [

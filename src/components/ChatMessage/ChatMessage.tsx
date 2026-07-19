@@ -36,6 +36,7 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   onCreateBranch?: (messageId: string) => void;
   userHasImage?: boolean;
   userHasVideo?: boolean;
+  isTranslationActive?: boolean;
 }
 
 const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
@@ -65,7 +66,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   parentChatTitle,
   onCreateBranch,
   userHasImage,
-  userHasVideo
+  userHasVideo,
+  isTranslationActive
 }) => {
   const [isDetailsOpen, setIsDetailsOpen] = React.useState(false);
   const isAI = role === 'ai';
@@ -340,6 +342,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               messageId={messageId || ''}
               parentChatTitle={parentChatTitle}
               onCreateBranch={onCreateBranch ? () => onCreateBranch(messageId || '') : undefined}
+              isTranslationActive={isTranslationActive}
             />
             <GenerationDetails
               isOpen={isDetailsOpen}
