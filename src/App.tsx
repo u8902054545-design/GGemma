@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { useChat } from './hooks/useChat';
 import { useAuth } from './hooks/useAuth';
@@ -86,11 +86,41 @@ export default function App() {
   const [isTranslationNewChatDialogOpen, setIsTranslationNewChatDialogOpen] = useState(false);
   const [translationInputLang, setTranslationInputLang] = useState('');
   const [translationOutputLang, setTranslationOutputLang] = useState('');
+  const [lastLoadedChatId, setLastLoadedChatId] = useState<string | null>(null);
+  const [isTemporary, setIsTemporary] = useState(false);
+  const { chats, loading: chatsLoading, error, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
+
+  const {
+    messages, setMessages, input, setInput, selectedModel, setSelectedModel,
+    isTyping, isLoading, messagesEndRef, scrollContainerRef, handleSend, handleRegenerate, handleFeedback, chatId, setChatId,
+    chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
+    isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage, exhaustedModels
+  } = useChat(() => refreshChats(true), isTemporary);
+
+  useEffect(() => {
+    const hasEverUsedTranslation = messages.some(m => m.isTranslationActive);
+
+    if (hasEverUsedTranslation) {
+      setIsTranslationActive(true);
+      if (chatId !== lastLoadedChatId) {
+        setLastLoadedChatId(chatId);
+      }
+      return;
+    }
+
+    if (chatId !== lastLoadedChatId) {
+      setIsTranslationActive(false);
+      setLastLoadedChatId(chatId);
+    }
+  }, [messages, chatId, lastLoadedChatId]);
 
   const handleTranslationToggle = () => {
+    // Check if translation was ever used in this chat
+    const hasEverUsedTranslation = messages.some(m => m.isTranslationActive);
+    
     if (isTranslationActive) {
-      const hasTranslationMessages = messages.some(m => m.isTranslationActive);
-      if (hasTranslationMessages) {
+      if (hasEverUsedTranslation) {
+        // If it was ever used, prompt the user for a new chat instead of just disabling it
         setIsTranslationNewChatDialogOpen(true);
       } else {
         setIsTranslationActive(false);
@@ -105,24 +135,15 @@ export default function App() {
     handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
     setIsTranslationActive(false);
   };
-  const { chats, loading: chatsLoading, error, refreshChats, deleteChat, togglePin } = useUserChats(user?.id);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
-  const [isTemporary, setIsTemporary] = useState(false);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
   const [isCodeImportOpen, setIsCodeImportOpen] = useState(false);
   const [importedCodes, setImportedCodes] = useState<any[]>([]);
   const { t, language, setLanguage } = useLanguage();
   const { theme, setTheme } = useTheme();
-
-  const {
-    messages, setMessages, input, setInput, selectedModel, setSelectedModel,
-    isTyping, isLoading, messagesEndRef, scrollContainerRef, handleSend, handleRegenerate, handleFeedback, chatId, setChatId,
-    chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
-    isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage, exhaustedModels
-  } = useChat(() => refreshChats(true), isTemporary);
 
   const [isRegenModelSelectorOpen, setIsRegenModelSelectorOpen] = useState(false);
 

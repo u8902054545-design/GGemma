@@ -36,6 +36,8 @@ export type Message = {
   searchSources?: { title: string; url: string }[];
   searchEnabledBy?: 'user' | 'model';
   isTranslationActive?: boolean;
+  translationInputLang?: string;
+  translationOutputLang?: string;
 };
 
 export const MODELS: SelectedModel[] = [

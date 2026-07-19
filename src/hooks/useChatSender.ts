@@ -91,7 +91,10 @@ export const useChatSender = (
         ? (file.type.startsWith('video/') ? base64Video : undefined) 
         : oldUserMsg?.base64Video,
       codes: codes !== undefined ? codes : oldUserMsg?.codes,
-      voice: currentVoice
+      voice: currentVoice,
+      isTranslationActive: !!isTranslationActive,
+      translationInputLang,
+      translationOutputLang
     };
 
     let baseMessages = [...messages];
@@ -114,7 +117,15 @@ export const useChatSender = (
     });
 
     const aiMsgId = crypto.randomUUID();
-    const newAiMsg: Message = { id: aiMsgId, role: 'ai', content: '', voice: currentVoice };
+    const newAiMsg: Message = { 
+      id: aiMsgId, 
+      role: 'ai', 
+      content: '', 
+      voice: currentVoice, 
+      isTranslationActive: !!isTranslationActive,
+      translationInputLang,
+      translationOutputLang
+    };
     setMessages(prev => [...prev, newAiMsg]);
 
     try {
@@ -316,7 +327,15 @@ export const useChatSender = (
     const regeneratedAiMsgId = crypto.randomUUID();
     const cleanMessages = messages.slice(0, -1);
 
-    const newAiMsg: Message = { id: regeneratedAiMsgId, role: 'ai', content: '', voice: currentVoice };
+    const newAiMsg: Message = { 
+      id: regeneratedAiMsgId, 
+      role: 'ai', 
+      content: '', 
+      voice: currentVoice,
+      isTranslationActive: userMsg.isTranslationActive,
+      translationInputLang: userMsg.translationInputLang,
+      translationOutputLang: userMsg.translationOutputLang
+    };
     setMessages([...cleanMessages, newAiMsg]);
 
     setIsTyping(true);
@@ -349,7 +368,10 @@ export const useChatSender = (
             : undefined,
           voice: currentVoice,
           isRegenerate: true,
-          regenerateMode: mode || 'repeat'
+          regenerateMode: mode || 'repeat',
+          isTranslationActive: userMsg.isTranslationActive,
+          translationInputLang: userMsg.translationInputLang,
+          translationOutputLang: userMsg.translationOutputLang
         }),
       });
 

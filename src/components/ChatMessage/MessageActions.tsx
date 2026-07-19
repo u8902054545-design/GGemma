@@ -180,9 +180,8 @@ export const MessageActions: React.FC<MessageActionsProps> = ({
             </button>
           </>
         )}
-        {isLast && onRegenerate && !isTranslationActive && (
+        {isLast && onRegenerate && (
           <>
-            {console.log('Regenerate button: isLast:', isLast, 'onRegenerate:', !!onRegenerate, 'isTranslationActive:', isTranslationActive)}
             <md-icon-button
               id={anchorId}
               onClick={() => setMenuOpen(prev => !prev)}
