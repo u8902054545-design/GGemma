@@ -15,7 +15,8 @@ import { toggleState, closeState, handleImagePreview } from './Functions/uiUtils
 import { clearTempMessages } from './TemporaryChat/temporaryStorage';
 import { mainContentBackdropVariants } from './motion/modelPageTransitions';
 import { ChatArea } from './components/ChatArea';
-import { GemmaBottomSheet } from './components/GemmaBottomSheet';
+import { GemmaModelDialog } from './components/GemmaModelDialog';
+import { ModelSelectionPage } from './components/ModelSelectionPage';
 import { useLanguage } from './hooks/useLanguage';
 import { useTheme } from './hooks/useTheme';
 import { ThemeTransition } from './motion/ThemeTransition';
@@ -139,6 +140,7 @@ export default function App() {
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
   const [isModelSelectorOpen, setIsModelSelectorOpen] = useState(false);
+  const [isAllModelsPageOpen, setIsAllModelsPageOpen] = useState(false);
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
   const [isCodeImportOpen, setIsCodeImportOpen] = useState(false);
   const [importedCodes, setImportedCodes] = useState<any[]>([]);
@@ -146,6 +148,7 @@ export default function App() {
   const { theme, setTheme } = useTheme();
 
   const [isRegenModelSelectorOpen, setIsRegenModelSelectorOpen] = useState(false);
+  const [isRegenAllModelsPageOpen, setIsRegenAllModelsPageOpen] = useState(false);
 
   const handleRegenerateWithModelSelection = useCallback((mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => {
     if (mode === 'repeat') {
@@ -440,7 +443,7 @@ export default function App() {
 
       {user && (
         <>
-          <motion.div variants={mainContentBackdropVariants} animate={isModelSelectorOpen ? "pushed" : "idle"} className="h-full w-full flex flex-col bg-[var(--md-sys-color-background)] relative">
+          <motion.div variants={mainContentBackdropVariants} animate={(isModelSelectorOpen || isRegenModelSelectorOpen) ? "pushed" : "idle"} className="h-full w-full flex flex-col bg-[var(--md-sys-color-background)] relative">
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={() => closeState(setIsSidebarOpen)}
@@ -557,8 +560,19 @@ export default function App() {
             onClose={() => setIsTranslationNewChatDialogOpen(false)}
             onConfirm={handleNewChatAfterTranslationDisabled}
           />
-          <GemmaBottomSheet isOpen={isModelSelectorOpen} onOpenChange={setIsModelSelectorOpen} selectedModel={selectedModel} onModelSelect={setSelectedModel} models={models} exhaustedModels={exhaustedModels} />
-          <GemmaBottomSheet 
+          <GemmaModelDialog
+            isOpen={isModelSelectorOpen}
+            onOpenChange={setIsModelSelectorOpen}
+            selectedModel={selectedModel}
+            onModelSelect={setSelectedModel}
+            models={models}
+            exhaustedModels={exhaustedModels}
+            onViewAllModels={() => {
+              setIsModelSelectorOpen(false);
+              setIsAllModelsPageOpen(true);
+            }}
+          />
+          <GemmaModelDialog
             isOpen={isRegenModelSelectorOpen} 
             onOpenChange={setIsRegenModelSelectorOpen} 
             selectedModel={selectedModel} 
@@ -567,7 +581,31 @@ export default function App() {
               handleRegenerate('repeat', model);
             }} 
             models={models} 
-            exhaustedModels={exhaustedModels} 
+            exhaustedModels={exhaustedModels}
+            onViewAllModels={() => {
+              setIsRegenModelSelectorOpen(false);
+              setIsRegenAllModelsPageOpen(true);
+            }}
+          />
+
+          <ModelSelectionPage
+            isOpen={isAllModelsPageOpen}
+            onClose={() => setIsAllModelsPageOpen(false)}
+            selectedModel={selectedModel}
+            onModelSelect={setSelectedModel}
+            models={models}
+            exhaustedModels={exhaustedModels}
+          />
+          <ModelSelectionPage
+            isOpen={isRegenAllModelsPageOpen}
+            onClose={() => setIsRegenAllModelsPageOpen(false)}
+            selectedModel={selectedModel}
+            onModelSelect={(model) => {
+              setSelectedModel(model);
+              handleRegenerate('repeat', model);
+            }}
+            models={models}
+            exhaustedModels={exhaustedModels}
           />
 
           <WebSearchConfirmationBottomSheet
