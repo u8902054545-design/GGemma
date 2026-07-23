@@ -18,6 +18,7 @@ import { SidebarProfile } from './SidebarParts/SidebarProfile';
 import { useChatHistory } from '../hooks/useChatHistory';
 import { ChatHistorySelection } from './Settings/chatHistorySelection';
 import '@material/web/icon/icon.js';
+import '@material/web/iconbutton/icon-button.js';
 
 const backdropVariants = {
   closed: { opacity: 0 },
@@ -165,22 +166,17 @@ export const Sidebar: React.FC<SidebarProps> = ({
           transition: 'transform 0.4s cubic-bezier(0.2, 0, 0, 1)'
         }}
       >
-        {/* Sidebar Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--md-sys-color-outline-variant)]/10">
-          <span className="text-xl font-semibold text-[var(--md-sys-color-on-surface)] select-none">
-            Gemma
-          </span>
-          <button
+        <div className="flex items-center gap-2 px-3 pt-3 pb-2">
+          <md-icon-button
             onClick={onClose}
-            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-[var(--md-sys-color-on-surface)]/10 text-[var(--md-sys-color-on-surface)] transition-colors cursor-pointer"
-            aria-label="Close sidebar"
+            aria-label="Back"
+            style={{
+              '--md-icon-button-icon-color': 'var(--md-sys-color-on-surface)',
+              '--md-icon-button-state-layer-color': 'var(--md-sys-color-on-surface)'
+            }}
           >
-            <span className="material-symbols-outlined text-[24px]">close</span>
-          </button>
-        </div>
-
-        <div className="p-4 flex flex-col gap-4 mt-2">
-          <NewChatButton onClick={() => { onNewChat(); onClose(); }} />
+            <md-icon>arrow_back</md-icon>
+          </md-icon-button>
 
           <SidebarSearch onClick={() => {
             if (!isChatHistoryEnabled) {
@@ -190,6 +186,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             }
             setIsSearchOpen(true);
           }} />
+        </div>
+
+        <div className="px-4 pt-3 pb-4">
+          <NewChatButton onClick={() => { onNewChat(); onClose(); }} />
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 mt-2 custom-scrollbar min-h-0">
