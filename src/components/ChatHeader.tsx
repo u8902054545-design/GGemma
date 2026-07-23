@@ -121,6 +121,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
 
         <button
           onClick={onModelSelectorToggle}
+          data-model-selector-button="true"
           className="flex items-center gap-1 px-3 py-1.5 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors group"
         >
           <span className="text-sm font-medium text-[var(--md-sys-color-on-surface)] truncate max-w-[150px]">

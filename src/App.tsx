@@ -443,7 +443,7 @@ export default function App() {
 
       {user && (
         <>
-          <motion.div variants={mainContentBackdropVariants} animate={(isModelSelectorOpen || isRegenModelSelectorOpen) ? "pushed" : "idle"} className="h-full w-full flex flex-col bg-[var(--md-sys-color-background)] relative">
+          <motion.div variants={mainContentBackdropVariants} animate="idle" className="h-full w-full flex flex-col bg-[var(--md-sys-color-background)] relative">
             <Sidebar
               isOpen={isSidebarOpen}
               onClose={() => closeState(setIsSidebarOpen)}
