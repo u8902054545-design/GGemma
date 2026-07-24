@@ -16,7 +16,7 @@ export const updateChatTitle = async (
   onNewChatCreated: (() => void) | undefined
 ) => {
   let attempts = 0;
-  const maxAttempts = 5;
+  const maxAttempts = 30;
 
   const update = async () => {
     const { data } = await supabase
