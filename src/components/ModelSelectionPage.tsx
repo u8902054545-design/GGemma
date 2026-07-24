@@ -4,6 +4,7 @@ import { SelectedModel } from '../hooks/chatTypes';
 import { useLanguage } from '../hooks/useLanguage';
 import { modelDescriptions } from '../modelDescriptions';
 import { GemmaIcon } from './IconsApp/GemmaIcon';
+import { GeminiIcon } from './IconsApp/GeminiIcon';
 
 interface ModelSelectionPageProps {
   isOpen: boolean;
@@ -23,7 +24,9 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
   exhaustedModels = []
 }) => {
   const { language } = useLanguage();
-  const [activeFamily, setActiveFamily] = useState<'gemma' | 'gemini'>('gemma');
+  const [activeFamily, setActiveFamily] = useState<'gemma' | 'gemini'>(() => {
+    return selectedModel.id.startsWith('google/gemini') ? 'gemini' : 'gemma';
+  });
   const isAutoSelect = selectedModel.id === 'auto';
 
   const selectModel = (model: SelectedModel) => {
@@ -41,6 +44,9 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
       onModelSelect({ id: 'auto', name: 'Automatic' });
     }
   };
+
+  const gemmaModels = models.filter(m => !m.id.startsWith('google/gemini'));
+  const geminiModels = models.filter(m => m.id.startsWith('google/gemini'));
 
   return (
     <AnimatePresence>
@@ -76,12 +82,13 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                 <button
                   type="button"
                   onClick={() => setActiveFamily('gemini')}
-                  className={`flex items-center gap-2 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
+                  className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
                     activeFamily === 'gemini'
                       ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
                       : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
                   }`}
                 >
+                  <GeminiIcon className="h-5 w-5 shrink-0" />
                   <span>Gemini models</span>
                 </button>
 
@@ -106,14 +113,56 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.2 }}
-                  className="flex h-36 flex-col items-center justify-center rounded-[28px] border border-dashed border-[var(--md-sys-color-outline-variant)]/30 bg-[var(--md-sys-color-surface-container-low)]/40 px-4 text-center"
+                  className="space-y-3"
                 >
-                  <p className="text-sm font-medium text-[var(--md-sys-color-on-surface-variant)]">
-                    No models available in this section yet
-                  </p>
-                  <p className="mt-1 text-xs text-[var(--md-sys-color-on-surface-variant)]/60">
-                    Gemini models will appear here soon
-                  </p>
+                  {geminiModels.map((model) => {
+                    const isSelected = selectedModel.id === model.id;
+                    const isExhausted = exhaustedModels.includes(model.id);
+
+                    return (
+                      <button
+                        key={model.id}
+                        type="button"
+                        disabled={isExhausted}
+                        onClick={() => selectModel(model)}
+                        className={`group relative flex w-full items-start gap-4 rounded-[28px] border p-5 text-left transition-all duration-200 ${
+                          isSelected
+                            ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-md'
+                            : 'border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] hover:border-[var(--md-sys-color-primary)]/40 hover:bg-[var(--md-sys-color-surface-container-highest)]'
+                        } disabled:pointer-events-none disabled:opacity-40`}
+                      >
+                        <div
+                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+                            isSelected
+                              ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]'
+                              : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-primary)]'
+                          }`}
+                        >
+                          <GeminiIcon className="h-6 w-6 shrink-0" />
+                        </div>
+
+                        <div className="min-w-0 flex-1 pt-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-base font-semibold tracking-tight">{model.name}</span>
+                            {isSelected && (
+                              <span className="rounded-full bg-[var(--md-sys-color-primary)]/15 px-2.5 py-0.5 text-[11px] font-medium text-[var(--md-sys-color-primary)]">
+                                Selected
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-1 text-sm leading-relaxed text-[var(--md-sys-color-on-surface-variant)]">
+                            {modelDescriptions[model.id]?.[language] || ''}
+                          </p>
+                        </div>
+
+                        {isSelected && (
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]">
+                            <span className="material-symbols-outlined text-[18px]">check</span>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </motion.div>
               )}
 
@@ -189,7 +238,7 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                         transition={{ duration: 0.2 }}
                         className="space-y-3"
                       >
-                        {models.map((model) => {
+                        {gemmaModels.map((model) => {
                           const isSelected = selectedModel.id === model.id;
                           const isExhausted = exhaustedModels.includes(model.id);
 

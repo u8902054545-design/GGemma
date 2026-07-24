@@ -522,6 +522,7 @@ export default function App() {
                   onEditClick={(id, content) => setEditingMessage({ id, content })}
                   parentChatTitle={chats.find(c => c.id === chatId)?.parent_chat_title}
                   onCreateBranch={handleCreateBranch}
+                  selectedModel={selectedModel}
                 />
 
                 <AnimatePresence>

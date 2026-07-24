@@ -1,14 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { GemmaIcon } from '../IconsApp/GemmaIcon';
+import { GeminiIcon } from '../IconsApp/GeminiIcon';
 import { useLanguage } from '../../hooks/useLanguage';
 import { getRandomGreeting } from './Greetings';
+import { SelectedModel } from '../../hooks/chatTypes';
 
 type StartScreenProps = {
   userName: string | null;
+  selectedModel: SelectedModel;
 };
 
-export const StartScreen: React.FC<StartScreenProps> = ({ userName }) => {
+export const StartScreen: React.FC<StartScreenProps> = ({ userName, selectedModel }) => {
   const { language } = useLanguage();
   
   // Choose a random greeting only once on mount to avoid flashing on re-renders
@@ -17,11 +20,17 @@ export const StartScreen: React.FC<StartScreenProps> = ({ userName }) => {
     [userName, language]
   );
 
+  const isGemini = selectedModel.id.startsWith('google/gemini');
+
   return (
     <div className="flex-1 flex flex-col items-center justify-center w-full max-w-6xl mx-auto px-4">
       <div className="flex flex-col items-center text-center">
         <div className="w-16 h-16 mb-6">
-           <GemmaIcon className="w-full h-full" />
+          {isGemini ? (
+            <GeminiIcon className="w-full h-full" />
+          ) : (
+            <GemmaIcon className="w-full h-full" />
+          )}
         </div>
 
         <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight">

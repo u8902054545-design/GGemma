@@ -4,6 +4,7 @@ import { ChatMessage } from './ChatMessage';
 import { TemporaryChatPage } from '../TemporaryChat/TemporaryChatPage';
 import { StartScreen } from './MainScreen/StartScreen';
 import { pageVariants } from '../motion/transitions';
+import { SelectedModel } from '../hooks/chatTypes';
 
 interface ChatAreaProps {
   messages: any[];
@@ -23,6 +24,7 @@ interface ChatAreaProps {
   onEditClick?: (messageId: string, content: string) => void;
   parentChatTitle?: string;
   onCreateBranch?: (messageId: string) => void;
+  selectedModel: SelectedModel;
 }
 
 export const ChatArea: React.FC<ChatAreaProps> = ({
@@ -32,10 +34,17 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
   messagesEndRef,
   onEditClick,
   parentChatTitle,
-  onCreateBranch
+  onCreateBranch,
+  selectedModel
 }) => {
   const lastUserMsg = [...messages].reverse().find(msg => msg.role === 'user');
   const lastUserMsgId = lastUserMsg ? lastUserMsg.id : null;
+
+  const handleScrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <main
@@ -57,6 +66,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
           >
             <StartScreen
               userName={user.user_metadata?.full_name || user.email}
+              selectedModel={selectedModel}
             />
           </motion.div>
         ) : (

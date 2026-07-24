@@ -49,5 +49,15 @@ export const MODELS: SelectedModel[] = [
   { id: 'Gemma 3 12B', name: 'Gemma 3 12B' },
   { id: 'Gemma 3 4B', name: 'Gemma 3 4B' },
   { id: 'Gemma 3n E4B', name: 'Gemma 3n E4B' },
-  { id: 'Gemma 2 27B', name: 'Gemma 2 27B' }
+  { id: 'Gemma 2 27B', name: 'Gemma 2 27B' },
+  { id: 'google/gemini-2.5-flash-lite', name: 'Gemini 2.5 Flash Lite' },
+  { id: 'google/gemini-2.5-flash', name: 'Gemini 2.5 Flash' },
+  { id: 'google/gemini-3-flash-preview', name: 'Gemini 3 Flash Preview' },
+  { id: 'google/gemini-3.1-flash-lite', name: 'Gemini 3.1 Flash Lite' },
+  { id: 'google/gemini-3.1-flash-lite-preview', name: 'Gemini 3.1 Flash Lite Preview' },
+  { id: 'google/gemini-2.5-pro', name: 'Gemini 2.5 Pro' },
+  { id: 'google/gemini-3.1-pro-preview', name: 'Gemini 3.1 Pro Preview' },
+  { id: 'google/gemini-3.5-flash', name: 'Gemini 3.5 Flash' },
+  { id: 'google/gemini-3.5-flash-lite', name: 'Gemini 3.5 Flash Lite' },
+  { id: 'google/gemini-3.6-flash', name: 'Gemini 3.6 Flash' }
 ];
