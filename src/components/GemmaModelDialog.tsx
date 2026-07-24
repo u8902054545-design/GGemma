@@ -28,7 +28,7 @@ export const GemmaModelDialog: React.FC<GemmaModelDialogProps> = ({
 }) => {
   const { t, language } = useLanguage();
   const latestModels = models.slice(0, 3);
-  const [dialogStyle, setDialogStyle] = useState<React.CSSProperties>({
+  const [dialogStyle, setDialogStyle] = useState<React.CSSProperties & { originX?: number; originY?: number }>({
     originX: 0.05,
     originY: 0,
   });

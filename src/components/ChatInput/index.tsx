@@ -43,7 +43,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
 
   const isImageDisabled = selectedModel.id === 'Gemma 2 27B' || selectedModel.id === 'Gemma 3n E4B';
-  const isVideoDisabled = !(selectedModel.id === 'Gemma 4 31B' || selectedModel.id === 'Gemma 4 26B' || selectedModel.id === 'DiffusionGemma 26B A4B IT');
+  const isVideoDisabled = !(selectedModel.id === 'Gemma 4 31B' || selectedModel.id === 'Gemma 4 26B' || selectedModel.id === 'Gemma 4 12B' || selectedModel.id === 'DiffusionGemma 26B A4B IT');
   const isSearchDisabled = false;
 
   const { 
