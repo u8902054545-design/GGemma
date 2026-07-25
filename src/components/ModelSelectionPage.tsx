@@ -5,6 +5,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { modelDescriptions } from '../modelDescriptions';
 import { GemmaIcon } from './IconsApp/GemmaIcon';
 import { GeminiIcon } from './IconsApp/GeminiIcon';
+import { AntigravityIcon } from './IconsApp/AntigravityIcon';
 
 interface ModelSelectionPageProps {
   isOpen: boolean;
@@ -24,8 +25,10 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
   exhaustedModels = []
 }) => {
   const { language } = useLanguage();
-  const [activeFamily, setActiveFamily] = useState<'gemma' | 'gemini'>(() => {
-    return selectedModel.id.startsWith('google/gemini') ? 'gemini' : 'gemma';
+  const [activeFamily, setActiveFamily] = useState<'gemma' | 'gemini' | 'antigravity'>(() => {
+    if (selectedModel.id.startsWith('google/gemini')) return 'gemini';
+    if (selectedModel.id.startsWith('antigravity')) return 'antigravity';
+    return 'gemma';
   });
   const isAutoSelect = selectedModel.id === 'auto';
 
@@ -74,15 +77,28 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
             </h1>
           </header>
 
-          <main className="flex-1 overflow-y-auto px-4 pb-8 pt-5">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-8 pt-5">
             <div className="mx-auto w-full max-w-[720px] space-y-6">
 
               {/* Family Selector Buttons Row (On the same horizontal level) */}
-              <div className="flex items-center gap-3 border-b border-[var(--md-sys-color-outline-variant)]/20 pb-4">
+              <div className="flex items-center gap-3 border-b border-[var(--md-sys-color-outline-variant)]/20 pb-4 overflow-x-auto">
+                <button
+                  type="button"
+                  onClick={() => setActiveFamily('gemma')}
+                  className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
+                    activeFamily === 'gemma'
+                      ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
+                      : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
+                  }`}
+                >
+                  <GemmaIcon className="h-5 w-5 shrink-0" />
+                  <span>Gemma models</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setActiveFamily('gemini')}
-                  className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
+                  className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
                     activeFamily === 'gemini'
                       ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
                       : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
@@ -94,78 +110,19 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
 
                 <button
                   type="button"
-                  onClick={() => setActiveFamily('gemma')}
-                  className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all ${
-                    activeFamily === 'gemma'
+                  onClick={() => setActiveFamily('antigravity')}
+                  className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
+                    activeFamily === 'antigravity'
                       ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
                       : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
                   }`}
                 >
-                  <GemmaIcon className="h-5 w-5 shrink-0" />
-                  <span>Gemma models</span>
+                  <AntigravityIcon className="h-5 w-5 shrink-0" />
+                  <span>Antigravity</span>
                 </button>
               </div>
 
               {/* Active Family Section */}
-              {activeFamily === 'gemini' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-3"
-                >
-                  {geminiModels.map((model) => {
-                    const isSelected = selectedModel.id === model.id;
-                    const isExhausted = exhaustedModels.includes(model.id);
-
-                    return (
-                      <button
-                        key={model.id}
-                        type="button"
-                        disabled={isExhausted}
-                        onClick={() => selectModel(model)}
-                        className={`group relative flex w-full items-start gap-4 rounded-[28px] border p-5 text-left transition-all duration-200 ${
-                          isSelected
-                            ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-md'
-                            : 'border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] hover:border-[var(--md-sys-color-primary)]/40 hover:bg-[var(--md-sys-color-surface-container-highest)]'
-                        } disabled:pointer-events-none disabled:opacity-40`}
-                      >
-                        <div
-                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
-                            isSelected
-                              ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]'
-                              : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-primary)]'
-                          }`}
-                        >
-                          <GeminiIcon className="h-6 w-6 shrink-0" />
-                        </div>
-
-                        <div className="min-w-0 flex-1 pt-0.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-base font-semibold tracking-tight">{model.name}</span>
-                            {isSelected && (
-                              <span className="rounded-full bg-[var(--md-sys-color-primary)]/15 px-2.5 py-0.5 text-[11px] font-medium text-[var(--md-sys-color-primary)]">
-                                Selected
-                              </span>
-                            )}
-                          </div>
-                          <p className="mt-1 text-sm leading-relaxed text-[var(--md-sys-color-on-surface-variant)]">
-                            {modelDescriptions[model.id]?.[language] || ''}
-                          </p>
-                        </div>
-
-                        {isSelected && (
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]">
-                            <span className="material-symbols-outlined text-[18px]">check</span>
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </motion.div>
-              )}
-
               {activeFamily === 'gemma' && (
                 <motion.div
                   initial={{ opacity: 0, y: 8 }}
@@ -289,6 +246,85 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                       </motion.div>
                     )}
                   </AnimatePresence>
+                </motion.div>
+              )}
+
+              {activeFamily === 'gemini' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-3"
+                >
+                  {geminiModels.map((model) => {
+                    const isSelected = selectedModel.id === model.id;
+                    const isExhausted = exhaustedModels.includes(model.id);
+
+                    return (
+                      <button
+                        key={model.id}
+                        type="button"
+                        disabled={isExhausted}
+                        onClick={() => selectModel(model)}
+                        className={`group relative flex w-full items-start gap-4 rounded-[28px] border p-5 text-left transition-all duration-200 ${
+                          isSelected
+                            ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-md'
+                            : 'border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] hover:border-[var(--md-sys-color-primary)]/40 hover:bg-[var(--md-sys-color-surface-container-highest)]'
+                        } disabled:pointer-events-none disabled:opacity-40`}
+                      >
+                        <div
+                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+                            isSelected
+                              ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]'
+                              : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-primary)]'
+                          }`}
+                        >
+                          <GeminiIcon className="h-6 w-6 shrink-0" />
+                        </div>
+
+                        <div className="min-w-0 flex-1 pt-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-base font-semibold tracking-tight">{model.name}</span>
+                            {isSelected && (
+                              <span className="rounded-full bg-[var(--md-sys-color-primary)]/15 px-2.5 py-0.5 text-[11px] font-medium text-[var(--md-sys-color-primary)]">
+                                Selected
+                              </span>
+                            )}
+                          </div>
+                          <p className="mt-1 text-sm leading-relaxed text-[var(--md-sys-color-on-surface-variant)]">
+                            {modelDescriptions[model.id]?.[language] || ''}
+                          </p>
+                        </div>
+
+                        {isSelected && (
+                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]">
+                            <span className="material-symbols-outlined text-[18px]">check</span>
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </motion.div>
+              )}
+
+              {activeFamily === 'antigravity' && (
+                <motion.div
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-3"
+                >
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <AntigravityIcon className="h-16 w-16 mb-4 text-[var(--md-sys-color-on-surface-variant)]" />
+                    <h3 className="text-lg font-medium text-[var(--md-sys-color-on-surface)] mb-2">
+                      No models available
+                    </h3>
+                    <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] max-w-[300px]">
+                      Antigravity models will be available soon. Check back later.
+                    </p>
+                  </div>
                 </motion.div>
               )}
 
