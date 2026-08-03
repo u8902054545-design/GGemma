@@ -402,7 +402,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
       initial="initial"
       animate="animate"
       exit="exit"
-      className="flex-1 flex flex-col justify-between bg-[var(--md-sys-color-surface-container-high)] rounded-[32px] p-4 min-h-[96px] border border-[var(--md-sys-color-primary)]/10 shadow-lg relative overflow-hidden min-w-0 gap-3"
+      className="flex-1 flex flex-col justify-between bg-[var(--md-sys-color-surface-container)] rounded-[32px] p-4 min-h-[96px] border border-[var(--md-sys-color-primary)]/10 shadow-lg relative overflow-hidden min-w-0 gap-3"
     >
       {/* Visual background ripple/pulse when listening */}
       <AnimatePresence>

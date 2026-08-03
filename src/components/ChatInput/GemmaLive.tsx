@@ -60,7 +60,7 @@ export const GemmaLive: React.FC<GemmaLiveProps> = ({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 15 }}
       transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
-      className="flex-1 flex items-center justify-between bg-[var(--md-sys-color-surface-container-high)] rounded-[32px] px-4 py-3 min-h-[72px] border border-[var(--md-sys-color-primary)]/10 shadow-2xl relative overflow-hidden select-none"
+      className="flex-1 flex items-center justify-between bg-[var(--md-sys-color-surface-container)] rounded-[32px] px-4 py-3 min-h-[72px] border border-[var(--md-sys-color-primary)]/10 shadow-2xl relative overflow-hidden select-none"
     >
       {/* Morphing blob CSS style injection for all conversation states */}
       <style>{`

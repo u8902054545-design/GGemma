@@ -1,9 +1,7 @@
 import React, { memo, useEffect, useRef, useState } from 'react';
 import { useImageUpload } from '../../hooks/useImageUpload';
 import { ChatInputProps } from './types';
-import { AddAction } from './AddAction';
 import { InputArea } from './InputArea';
-import { SendAction } from './SendAction';
 import { AddBottomSheet } from './AddBottomSheet';
 import { VideoPreview } from '../VideoPreview';
 import { motion, AnimatePresence } from 'motion/react';
@@ -153,12 +151,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.25 }}
-            className="flex items-end gap-3 justify-center min-h-[52px] w-full"
+            className="flex items-end justify-center min-h-[52px] w-full"
           >
-            {!isVoiceInputActive && (
-              <AddAction onAddClick={() => setIsBottomSheetOpen(true)} />
-            )}
-
             <AnimatePresence mode="wait">
               {!isVoiceInputActive ? (
                 <motion.div
@@ -189,6 +183,18 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                     onTranslationToggle={onTranslationToggle}
                     onChangeInputLang={onChangeInputLang}
                     onChangeOutputLang={onChangeOutputLang}
+                    
+                    onAddClick={() => setIsBottomSheetOpen(true)}
+                    isTyping={isTyping}
+                    stopRequest={stopRequest}
+                    handleWrappedSend={handleWrappedSend}
+                    isSendDisabled={isSendDisabled}
+                    showVoiceChat={!input.trim() && !selectedFile && importedCodes.length === 0}
+                    onVoiceChatClick={() => {
+                      initLiveAudioContext();
+                      playLiveOpenSound();
+                      setIsLiveActive(true);
+                    }}
                   />
                 </motion.div>
               ) : (
@@ -227,21 +233,6 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                 />
               )}
             </AnimatePresence>
-
-            {!isVoiceInputActive && (
-              <SendAction 
-                isTyping={isTyping}
-                stopRequest={stopRequest}
-                handleWrappedSend={handleWrappedSend}
-                isSendDisabled={isSendDisabled}
-                showVoiceChat={!input.trim() && !selectedFile && importedCodes.length === 0}
-                onVoiceChatClick={() => {
-                  initLiveAudioContext();
-                  playLiveOpenSound();
-                  setIsLiveActive(true);
-                }}
-              />
-            )}
           </motion.div>
         )}
       </AnimatePresence>

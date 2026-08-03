@@ -41,6 +41,15 @@ interface InputAreaProps {
   onTranslationToggle?: () => void;
   onChangeInputLang?: (lang: string) => void;
   onChangeOutputLang?: (lang: string) => void;
+  
+  // Integrated actions props
+  onAddClick: () => void;
+  isTyping: boolean;
+  stopRequest: () => void;
+  handleWrappedSend: () => void;
+  isSendDisabled: boolean;
+  showVoiceChat: boolean;
+  onVoiceChatClick: () => void;
 }
 
 export const InputArea: React.FC<InputAreaProps> = ({
@@ -63,13 +72,21 @@ export const InputArea: React.FC<InputAreaProps> = ({
   onTranslationToggle,
   onChangeInputLang,
   onChangeOutputLang,
+  
+  onAddClick,
+  isTyping,
+  stopRequest,
+  handleWrappedSend,
+  isSendDisabled,
+  showVoiceChat,
+  onVoiceChatClick,
 }) => {
   const { t } = useLanguage();
   const mediaType = selectedFile?.type.startsWith('video/') ? 'video' : 'image';
 
   return (
     <div 
-      className="flex-1 rounded-[32px] shadow-2xl flex flex-col overflow-hidden min-h-[52px] transition-all duration-300 ease-[var(--md-sys-motion-easing-emphasized)] bg-[var(--md-sys-color-surface-container-high)]"
+      className="flex-1 rounded-[32px] shadow-2xl flex flex-col overflow-hidden min-h-[52px] transition-all duration-300 ease-[var(--md-sys-motion-easing-emphasized)] bg-[var(--md-sys-color-surface-container)]"
     >
       {previewUrl && (
         <div className="px-5 pt-3">
@@ -171,23 +188,36 @@ export const InputArea: React.FC<InputAreaProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Textarea at the top */}
+      <textarea
+        ref={textareaRef}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={onKeyDown}
+        placeholder={t('chat.input.placeholder.gemma')}
+        className="w-full bg-transparent border-none outline-none resize-none max-h-60 min-h-[52px] px-4 pt-4 pb-2 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] text-[16px] leading-relaxed select-text"
+        rows={1}
+      />
 
-      <div className="relative flex items-end w-full px-2">
-        <textarea
-          ref={textareaRef}
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={onKeyDown}
-          placeholder={t('chat.input.placeholder.gemma')}
-          className="w-full bg-transparent border-none outline-none resize-none max-h-60 min-h-[52px] pl-4 pr-12 py-3.5 text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] text-[16px] leading-relaxed select-text"
-          rows={1}
-        />
+      {/* Action buttons row at the bottom */}
+      <div className="flex items-center justify-between px-3 pb-3 pt-1.5 w-full">
+        {/* Left actions: Add button */}
+        <div className="flex items-center">
+          <button
+            type="button"
+            onClick={onAddClick}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:bg-[var(--md-sys-color-on-surface-variant)]/10 active:scale-95 text-[var(--md-sys-color-on-surface)] hover:text-[var(--md-sys-color-primary)]"
+          >
+            <span className="material-symbols-outlined text-[24px]">add</span>
+          </button>
+        </div>
 
-        <div className="absolute right-4 bottom-2 flex items-center gap-1">
+        {/* Right actions: Mic & Send/Live */}
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={toggleListening}
-            className={`w-9 h-9 rounded-full flex items-center justify-center transition-all active:scale-90 ${
+            className={`w-10 h-10 rounded-full flex items-center justify-center transition-all active:scale-90 ${
               isListening ? "bg-[#EA4335]/20" : "hover:bg-[var(--md-sys-color-on-surface-variant)]/10"
             }`}
           >
@@ -197,6 +227,57 @@ export const InputArea: React.FC<InputAreaProps> = ({
               mic
             </span>
           </button>
+
+          <AnimatePresence mode="wait">
+            {isTyping ? (
+              <motion.button
+                key="stop"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                type="button"
+                onClick={stopRequest}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:brightness-110 active:scale-95 bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]"
+              >
+                <span className="material-symbols-outlined text-[22px]">stop</span>
+              </motion.button>
+            ) : showVoiceChat ? (
+              <motion.button
+                key="voice-chat"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                type="button"
+                onClick={onVoiceChatClick}
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:brightness-110 active:scale-95 cursor-pointer bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]"
+              >
+                <span className="material-symbols-outlined text-[22px]">
+                  voice_chat
+                </span>
+              </motion.button>
+            ) : (
+              <motion.button
+                key="send"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                type="button"
+                onClick={handleWrappedSend}
+                disabled={isSendDisabled}
+                className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
+                  isSendDisabled 
+                    ? "opacity-40 cursor-not-allowed text-[var(--md-sys-color-on-surface-variant)]" 
+                    : "hover:brightness-110 active:scale-95 cursor-pointer bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]"
+                }`}
+              >
+                <span className={`material-symbols-outlined text-[20px] ${
+                  !isSendDisabled ? "fill-[1]" : ""
+                }`}>
+                  send
+                </span>
+              </motion.button>
+            )}
+          </AnimatePresence>
         </div>
       </div>
     </div>
