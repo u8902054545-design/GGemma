@@ -1,10 +1,9 @@
-import React, { useState, useMemo } from 'react';
-import { motion } from 'motion/react';
+import React, { useMemo } from 'react';
 import { GemmaIcon } from '../IconsApp/GemmaIcon';
 import { GeminiIcon } from '../IconsApp/GeminiIcon';
-import { useLanguage } from '../../hooks/useLanguage';
 import { getRandomGreeting } from './Greetings';
 import { SelectedModel } from '../../hooks/chatTypes';
+import { useAuth } from '../../hooks/useAuth';
 
 type StartScreenProps = {
   userName: string | null;
@@ -12,12 +11,19 @@ type StartScreenProps = {
 };
 
 export const StartScreen: React.FC<StartScreenProps> = ({ userName, selectedModel }) => {
-  const { language } = useLanguage();
-  
-  // Choose a random greeting only once on mount to avoid flashing on re-renders
+  const { user } = useAuth();
+
+  const effectiveName = useMemo(() => {
+    if (userName && userName.trim().length > 0) {
+      return userName;
+    }
+    const accountName = user?.user_metadata?.full_name || user?.user_metadata?.name;
+    return accountName || null;
+  }, [userName, user]);
+
   const greetingData = useMemo(() => 
-    getRandomGreeting(userName, (language === 'ru' ? 'ru' : 'en')), 
-    [userName, language]
+    getRandomGreeting(effectiveName), 
+    [effectiveName]
   );
 
   const isGemini = selectedModel.id.startsWith('google/gemini');

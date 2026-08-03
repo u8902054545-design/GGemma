@@ -19,6 +19,7 @@ interface PersonalInstructionsProps {
 
 const PersonalInstructions: React.FC<PersonalInstructionsProps> = ({ isOpen, onClose }) => {
   const { t } = useLanguage();
+  const [name, setName] = useState('');
   const [text, setText] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +35,7 @@ const PersonalInstructions: React.FC<PersonalInstructionsProps> = ({ isOpen, onC
           headers: { 'Authorization': `Bearer ${session.access_token}` }
         });
         const data = await response.json();
+        if (data?.user_name) setName(data.user_name);
         if (data?.personalization_text) setText(data.personalization_text);
       } catch (err) {
         console.error('Failed to load personalization:', err);
@@ -62,7 +64,12 @@ const PersonalInstructions: React.FC<PersonalInstructionsProps> = ({ isOpen, onC
           'Authorization': `Bearer ${session.access_token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ settings: { personalization_text: text } })
+        body: JSON.stringify({ 
+          settings: { 
+            user_name: name,
+            personalization_text: text 
+          } 
+        })
       });
       setSnackbarOpen(true);
     } catch (err) {
@@ -101,7 +108,23 @@ const PersonalInstructions: React.FC<PersonalInstructionsProps> = ({ isOpen, onC
           {t('personalization.menu.instructions.desc')}
         </p>
 
-        <div className="w-full mb-6">
+        <div className="w-full mb-5 flex flex-col gap-1.5">
+          <label className="text-[14px] font-medium text-[var(--md-sys-color-on-surface)]">
+            Your name
+          </label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="What should the assistant call you?"
+            className="w-full px-4 py-3 rounded-xl border border-[var(--md-sys-color-outline)] bg-transparent text-[var(--md-sys-color-on-surface)] placeholder-[var(--md-sys-color-on-surface-variant)] text-[16px] outline-none focus:border-[var(--md-sys-color-primary)] transition-colors"
+          />
+        </div>
+
+        <div className="w-full mb-6 flex flex-col gap-1.5">
+          <label className="text-[14px] font-medium text-[var(--md-sys-color-on-surface)]">
+            Custom instructions
+          </label>
           <textarea
             ref={textareaRef}
             value={text}

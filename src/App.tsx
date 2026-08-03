@@ -38,6 +38,28 @@ export default function App() {
   const [isBlocked, setIsBlocked] = useState<boolean | null>(null);
   const [showGeoblockDialog, setShowGeoblockDialog] = useState(false);
   const [showBlockedDialog, setShowBlockedDialog] = useState(false);
+  const [userName, setUserName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUserSettings = async () => {
+      if (!user) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const response = await fetch(`${SUPABASE_ENDPOINT}?type=settings`, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${session.access_token}` }
+        });
+        const data = await response.json();
+        if (data?.user_name) {
+          setUserName(data.user_name);
+        }
+      } catch (err) {
+        console.error('Failed to load user settings:', err);
+      }
+    };
+    loadUserSettings();
+  }, [user]);
 
   React.useEffect(() => {
     const checkIp = async () => {
@@ -116,12 +138,10 @@ export default function App() {
   }, [messages, chatId, lastLoadedChatId]);
 
   const handleTranslationToggle = () => {
-    // Check if translation was ever used in this chat
     const hasEverUsedTranslation = messages.some(m => m.isTranslationActive);
     
     if (isTranslationActive) {
       if (hasEverUsedTranslation) {
-        // If it was ever used, prompt the user for a new chat instead of just disabling it
         setIsTranslationNewChatDialogOpen(true);
       } else {
         setIsTranslationActive(false);
@@ -172,7 +192,6 @@ export default function App() {
     const aiIndex = messages.findIndex(m => m.id === aiMessageId);
     if (aiIndex === -1) return;
     
-    // Find the user message preceding this AI message
     let userMsg = null;
     for (let i = aiIndex - 1; i >= 0; i--) {
       if (messages[i].role === 'user') {
@@ -234,7 +253,6 @@ export default function App() {
         throw new Error(errorData.error || 'Server error');
       }
 
-      // Success! Refresh chats list, switch to the new chat, and load its messages
       await refreshChats(true);
       setChatTitle(branchTitle);
       setChatId(newChatId);
@@ -284,7 +302,6 @@ export default function App() {
         throw new Error(errorData.error || 'Server error');
       }
 
-      // Success! Refresh chats list, switch to the new chat, and load its messages
       await refreshChats(true);
       setChatTitle(branchTitle);
       setChatId(newChatId);
@@ -523,6 +540,7 @@ export default function App() {
                   parentChatTitle={chats.find(c => c.id === chatId)?.parent_chat_title}
                   onCreateBranch={handleCreateBranch}
                   selectedModel={selectedModel}
+                  userName={userName}
                 />
 
                 <AnimatePresence>
