@@ -86,7 +86,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
 
   return (
     <div 
-      className="flex-1 rounded-[32px] shadow-2xl flex flex-col overflow-hidden min-h-[52px] transition-all duration-300 ease-[var(--md-sys-motion-easing-emphasized)] bg-[var(--md-sys-color-surface-container)]"
+      className="flex-1 rounded-[32px] shadow-2xl flex flex-col overflow-hidden min-h-[52px] transition-all duration-300 ease-[var(--md-sys-motion-easing-emphasized)] bg-[var(--md-sys-color-surface-container-high)]"
     >
       {previewUrl && (
         <div className="px-5 pt-3">
