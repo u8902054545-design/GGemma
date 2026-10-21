@@ -419,7 +419,7 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                       {restrictedAlertModel.name}
                     </h3>
                     <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] mt-2 leading-relaxed">
-                      This model is exclusively available to <strong>Premium</strong> users with active status in the <strong>«Premium_User»</strong> table.
+                      This model is exclusively available to <strong>Premium</strong> users. Start the upgrade to unlock access to all flagship models.
                     </p>
 
                     <div className="mt-6 flex flex-col gap-2.5">

@@ -38,7 +38,7 @@ export function usePremium() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchQuotaAndPremiumData = useCallback(async () => {
+  const fetchQuotaAndPremiumData = useCallback(async (isBackground: boolean = false) => {
     if (!user) {
       setIsPremium(false);
       setPremiumUserRecord(null);
@@ -47,11 +47,13 @@ export function usePremium() {
       return;
     }
 
-    setLoading(true);
+    if (!isBackground) {
+      setLoading(true);
+    }
     setError(null);
 
     try {
-      // 1. Load exclusively from "Premium_User" table
+      // 1. Load from "Premium_User" table
       let premiumData: any = null;
       const { data: pData1, error: pErr1 } = await supabase
         .from('Premium_User')
@@ -62,7 +64,6 @@ export function usePremium() {
       if (pData1) {
         premiumData = pData1;
       } else if (pErr1) {
-        console.warn('Could not query Premium_User by user_id, trying id:', pErr1.message);
         const { data: pData2 } = await supabase
           .from('Premium_User')
           .select('*')
@@ -81,7 +82,7 @@ export function usePremium() {
         setPremiumUserRecord(null);
       }
 
-      // 2. Load exclusively from "Quotas" table
+      // 2. Load from "Quotas" table
       const { data: quotasData, error: quotasError } = await supabase
         .from('Quotas')
         .select('*');
@@ -103,14 +104,62 @@ export function usePremium() {
       }
     } catch (err: any) {
       console.error('Error in usePremium hook:', err);
-      setError(err.message || 'Failed to fetch premium and quota data');
+      if (!isBackground) {
+        setError(err.message || 'Failed to fetch premium and quota data');
+      }
     } finally {
-      setLoading(false);
+      if (!isBackground) {
+        setLoading(false);
+      }
     }
   }, [user]);
 
+  // Initial fetch and automatic background synchronization
   useEffect(() => {
-    fetchQuotaAndPremiumData();
+    fetchQuotaAndPremiumData(false);
+
+    // Background auto-refresh every 20 seconds
+    const interval = setInterval(() => {
+      fetchQuotaAndPremiumData(true);
+    }, 20000);
+
+    // Background refresh on tab focus / document visibility change
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        fetchQuotaAndPremiumData(true);
+      }
+    };
+    const handleFocus = () => {
+      fetchQuotaAndPremiumData(true);
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleFocus);
+
+    // Realtime Supabase channel synchronization
+    let channel: any = null;
+    try {
+      channel = supabase
+        .channel('realtime_premium_quotas')
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'Premium_User' }, () => {
+          fetchQuotaAndPremiumData(true);
+        })
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'Quotas' }, () => {
+          fetchQuotaAndPremiumData(true);
+        })
+        .subscribe();
+    } catch (e) {
+      console.warn('Realtime channel error:', e);
+    }
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleFocus);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
   }, [fetchQuotaAndPremiumData]);
 
   /**
