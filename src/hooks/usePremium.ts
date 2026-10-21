@@ -30,53 +30,253 @@ export const RESTRICTED_MODELS = [
   'google/gemini-4-argon'
 ];
 
+export const DEFAULT_QUOTAS: QuotaItem[] = [
+  // Paid flagship models
+  {
+    id: 1,
+    model_name: 'Gemini 3.1 Pro Preview',
+    model_id: 'google/gemini-3.1-pro-preview',
+    is_paid: true,
+    daily_limit: 100,
+    tier: 'paid',
+    description: 'Flagship reasoning model with advanced capabilities. Available exclusively to Premium users.'
+  },
+  {
+    id: 2,
+    model_name: 'Gemini 4 Argon',
+    model_id: 'google/gemini-4-argon',
+    is_paid: true,
+    daily_limit: 80,
+    tier: 'paid',
+    description: 'Next-generation high-precision model. Available exclusively to Premium users.'
+  },
+  // Free models
+  {
+    id: 3,
+    model_name: 'Gemma 4 31B',
+    model_id: 'google/gemma-4-31b-it',
+    is_paid: false,
+    daily_limit: 5,
+    tier: 'free',
+    description: 'Most powerful model for complex reasoning and logic.'
+  },
+  {
+    id: 4,
+    model_name: 'Gemma 4 26B',
+    model_id: 'google/gemma-4-26b-a4b-it',
+    is_paid: false,
+    daily_limit: 10,
+    tier: 'free',
+    description: 'High performance, great balance of speed and capability.'
+  },
+  {
+    id: 5,
+    model_name: 'Gemma 4 12B',
+    model_id: 'google/gemma-4-12B-it',
+    is_paid: false,
+    daily_limit: 30,
+    tier: 'free',
+    description: 'Compact 4th gen model with high efficiency.'
+  },
+  {
+    id: 6,
+    model_name: 'DiffusionGemma 26B A4B IT',
+    model_id: 'google/diffusiongemma-26b-a4b-it',
+    is_paid: false,
+    daily_limit: 15,
+    tier: 'free',
+    description: 'Diffusion-based thinking model for advanced reasoning.'
+  },
+  {
+    id: 7,
+    model_name: 'Gemma 3 27B',
+    model_id: 'google/gemma-3-27b-it',
+    is_paid: false,
+    daily_limit: 50,
+    tier: 'free',
+    description: 'Powerful 3rd gen model with strong reasoning.'
+  },
+  {
+    id: 8,
+    model_name: 'Gemma 3 12B',
+    model_id: 'google/gemma-3-12b-it',
+    is_paid: false,
+    daily_limit: 100,
+    tier: 'free',
+    description: 'Versatile mid-range model for everyday tasks.'
+  },
+  {
+    id: 9,
+    model_name: 'Gemma 3 4B',
+    model_id: 'google/gemma-3-4b-it',
+    is_paid: false,
+    daily_limit: 150,
+    tier: 'free',
+    description: 'Lightweight model optimized for speed.'
+  },
+  {
+    id: 10,
+    model_name: 'Gemma 3n E4B',
+    model_id: 'google/gemma-3n-e4b-it',
+    is_paid: false,
+    daily_limit: 100,
+    tier: 'free',
+    description: 'Experimental low-latency model for quick tasks.'
+  },
+  {
+    id: 11,
+    model_name: 'Gemma 2 27B',
+    model_id: 'google/gemma-2-27b-it',
+    is_paid: false,
+    daily_limit: 50,
+    tier: 'free',
+    description: 'Legacy 2nd generation model.'
+  },
+  {
+    id: 12,
+    model_name: 'Gemini 3.8 Flash',
+    model_id: 'google/gemini-3.8-flash',
+    is_paid: false,
+    daily_limit: 50,
+    tier: 'free',
+    description: 'Latest ultra-fast Flash 3.8 model.'
+  },
+  {
+    id: 13,
+    model_name: 'Gemini 3.7 Flash',
+    model_id: 'google/gemini-3.7-flash',
+    is_paid: false,
+    daily_limit: 50,
+    tier: 'free',
+    description: 'Fast and precise Flash 3.7 model.'
+  },
+  {
+    id: 14,
+    model_name: 'Gemini 3.6 Flash',
+    model_id: 'google/gemini-3.6-flash',
+    is_paid: false,
+    daily_limit: 60,
+    tier: 'free',
+    description: 'Stable and performant Flash 3.6.'
+  },
+  {
+    id: 15,
+    model_name: 'Gemini 3.5 Flash',
+    model_id: 'google/gemini-3.5-flash',
+    is_paid: false,
+    daily_limit: 60,
+    tier: 'free',
+    description: 'Standard Flash 3.5 model.'
+  },
+  {
+    id: 16,
+    model_name: 'Gemini 3.5 Flash Lite',
+    model_id: 'google/gemini-3.5-flash-lite',
+    is_paid: false,
+    daily_limit: 80,
+    tier: 'free',
+    description: 'Lightweight Flash Lite 3.5.'
+  },
+  {
+    id: 17,
+    model_name: 'Gemini 3 Flash Preview',
+    model_id: 'google/gemini-3-flash-preview',
+    is_paid: false,
+    daily_limit: 50,
+    tier: 'free',
+    description: 'Preview release of Gemini 3 Flash.'
+  },
+  {
+    id: 18,
+    model_name: 'Gemini 3.1 Flash Lite',
+    model_id: 'google/gemini-3.1-flash-lite',
+    is_paid: false,
+    daily_limit: 80,
+    tier: 'free',
+    description: 'Efficient Flash Lite 3.1.'
+  },
+  {
+    id: 19,
+    model_name: 'Gemini 3.1 Flash Lite Preview',
+    model_id: 'google/gemini-3.1-flash-lite-preview',
+    is_paid: false,
+    daily_limit: 80,
+    tier: 'free',
+    description: 'Preview version of Flash Lite 3.1.'
+  },
+  {
+    id: 20,
+    model_name: 'Gemini 2.5 Flash',
+    model_id: 'google/gemini-2.5-flash',
+    is_paid: false,
+    daily_limit: 70,
+    tier: 'free',
+    description: 'Balanced speed and quality for multimodal tasks.'
+  },
+  {
+    id: 21,
+    model_name: 'Gemini 2.5 Flash Lite',
+    model_id: 'google/gemini-2.5-flash-lite',
+    is_paid: false,
+    daily_limit: 100,
+    tier: 'free',
+    description: 'Efficient and fast model for general tasks.'
+  },
+  {
+    id: 22,
+    model_name: 'Gemini 2.5 Pro',
+    model_id: 'google/gemini-2.5-pro',
+    is_paid: false,
+    daily_limit: 40,
+    tier: 'free',
+    description: 'Advanced Gemini 2.5 Pro model.'
+  }
+];
+
 export function usePremium() {
   const { user } = useAuth();
   const [isPremium, setIsPremium] = useState<boolean>(false);
   const [premiumUserRecord, setPremiumUserRecord] = useState<PremiumUserRecord | null>(null);
-  const [quotas, setQuotas] = useState<QuotaItem[]>([]);
+  const [quotas, setQuotas] = useState<QuotaItem[]>(DEFAULT_QUOTAS);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const fetchQuotaAndPremiumData = useCallback(async (isBackground: boolean = false) => {
-    if (!user) {
-      setIsPremium(false);
-      setPremiumUserRecord(null);
-      setQuotas([]);
-      setLoading(false);
-      return;
-    }
-
     if (!isBackground) {
       setLoading(true);
     }
     setError(null);
 
     try {
-      // 1. Load from "Premium_User" table
-      let premiumData: any = null;
-      const { data: pData1, error: pErr1 } = await supabase
-        .from('Premium_User')
-        .select('*')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      if (pData1) {
-        premiumData = pData1;
-      } else if (pErr1) {
-        const { data: pData2 } = await supabase
+      if (user) {
+        // 1. Load from "Premium_User" table
+        let premiumData: any = null;
+        const { data: pData1, error: pErr1 } = await supabase
           .from('Premium_User')
           .select('*')
-          .eq('id', user.id)
+          .eq('user_id', user.id)
           .maybeSingle();
-        if (pData2) premiumData = pData2;
-      }
 
-      if (premiumData) {
-        setPremiumUserRecord(premiumData);
-        const val = premiumData.is_premium ?? premiumData.status ?? premiumData.premium ?? premiumData.value;
-        const premiumFlag = val === true || String(val).toLowerCase() === 'true' || val === 1 || String(val).toLowerCase() === 'premium';
-        setIsPremium(premiumFlag);
+        if (pData1) {
+          premiumData = pData1;
+        } else if (pErr1) {
+          const { data: pData2 } = await supabase
+            .from('Premium_User')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle();
+          if (pData2) premiumData = pData2;
+        }
+
+        if (premiumData) {
+          setPremiumUserRecord(premiumData);
+          const val = premiumData.is_premium ?? premiumData.status ?? premiumData.premium ?? premiumData.value;
+          const premiumFlag = val === true || String(val).toLowerCase() === 'true' || val === 1 || String(val).toLowerCase() === 'premium';
+          setIsPremium(premiumFlag);
+        } else {
+          setIsPremium(false);
+          setPremiumUserRecord(null);
+        }
       } else {
         setIsPremium(false);
         setPremiumUserRecord(null);
@@ -91,19 +291,36 @@ export function usePremium() {
         console.warn('Could not query Quotas table:', quotasError.message);
       }
 
-      if (quotasData && Array.isArray(quotasData)) {
-        const sorted = [...quotasData].sort((a, b) => {
-          if (a.id !== undefined && b.id !== undefined) {
-            return Number(a.id) - Number(b.id);
-          }
-          return 0;
+      if (quotasData && Array.isArray(quotasData) && quotasData.length > 0) {
+        const dbMap = new Map<string, any>();
+        quotasData.forEach((q: any) => {
+          if (q.model_name) dbMap.set(q.model_name.toLowerCase(), q);
+          if (q.model_id) dbMap.set(q.model_id.toLowerCase(), q);
         });
-        setQuotas(sorted);
+
+        const merged = DEFAULT_QUOTAS.map((def, idx) => {
+          const fromDb = dbMap.get(def.model_name.toLowerCase()) || (def.model_id ? dbMap.get(def.model_id.toLowerCase()) : null);
+          return fromDb ? { id: idx + 1, ...def, ...fromDb } : { id: idx + 1, ...def };
+        });
+
+        // Extra models in DB not in defaults
+        quotasData.forEach((dbItem: any, idx: number) => {
+          const exists = merged.some(m =>
+            m.model_name.toLowerCase() === (dbItem.model_name || '').toLowerCase() ||
+            (m.model_id && dbItem.model_id && m.model_id.toLowerCase() === dbItem.model_id.toLowerCase())
+          );
+          if (!exists) {
+            merged.push({ id: merged.length + idx + 1, ...dbItem });
+          }
+        });
+
+        setQuotas(merged);
       } else {
-        setQuotas([]);
+        setQuotas(DEFAULT_QUOTAS);
       }
     } catch (err: any) {
       console.error('Error in usePremium hook:', err);
+      setQuotas(prev => (prev && prev.length > 0 ? prev : DEFAULT_QUOTAS));
       if (!isBackground) {
         setError(err.message || 'Failed to fetch premium and quota data');
       }

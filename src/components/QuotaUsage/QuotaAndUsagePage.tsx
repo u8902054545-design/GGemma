@@ -28,15 +28,11 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
       name.includes('gemini 4 argon') || id.includes('gemini-4-argon');
   };
 
-  const paidModelsCount = quotas.filter(isPaidItem).length;
-  const freeModelsCount = quotas.length - paidModelsCount;
+  const paidQuotas = quotas.filter(isPaidItem);
+  const freeQuotas = quotas.filter(item => !isPaidItem(item));
+  const paidModelsCount = paidQuotas.length;
+  const freeModelsCount = freeQuotas.length;
   const accessibleModelsCount = isPremium ? quotas.length : freeModelsCount;
-
-  const displayQuotas = quotas.filter(item => {
-    if (activeTab === 'paid') return isPaidItem(item);
-    if (activeTab === 'free') return !isPaidItem(item);
-    return true;
-  });
 
   const maxLimit = Math.max(...quotas.map(q => Number(q.daily_limit || 50)), 100);
 
@@ -48,6 +44,85 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
   const freeStrokeDash = (freePercent / 100) * circumference;
   const paidStrokeDash = (paidPercent / 100) * circumference;
 
+  const renderQuotaCard = (item: QuotaItem) => {
+    const isPaid = isPaidItem(item);
+    const isAccessible = !isPaid || isPremium;
+    const limit = item.daily_limit || 50;
+
+    return (
+      <div
+        key={item.id || item.model_name}
+        className={`rounded-[24px] border p-5 transition-all duration-200 flex flex-col justify-between ${
+          isAccessible
+            ? 'border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface-container-low)] hover:border-[var(--md-sys-color-primary)]/40 hover:shadow-sm'
+            : 'border-[var(--md-sys-color-error)]/20 bg-[var(--md-sys-color-surface-container-low)]/70 opacity-90'
+        }`}
+      >
+        <div>
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
+                isPaid
+                  ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]'
+                  : 'bg-[var(--md-sys-color-tertiary-container)] text-[var(--md-sys-color-on-tertiary-container)]'
+              }`}>
+                <span className="material-symbols-outlined text-[22px]">
+                  {isPaid ? 'workspace_premium' : 'smart_toy'}
+                </span>
+              </div>
+
+              <div className="min-w-0">
+                <h4 className="text-sm font-semibold text-[var(--md-sys-color-on-surface)] truncate">
+                  {item.model_name}
+                </h4>
+                {item.model_id && (
+                  <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)]/70 truncate font-mono">
+                    {item.model_id}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase shrink-0 ${
+              isPaid
+                ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]'
+                : 'bg-[var(--md-sys-color-tertiary-container)] text-[var(--md-sys-color-on-tertiary-container)]'
+            }`}>
+              {isPaid ? 'Flagship' : 'Free'}
+            </span>
+          </div>
+
+          {item.description && (
+            <p className="text-xs text-[var(--md-sys-color-on-surface-variant)]/80 mt-3 line-clamp-2 leading-relaxed">
+              {item.description}
+            </p>
+          )}
+        </div>
+
+        <div className="mt-4 pt-3 border-t border-[var(--md-sys-color-outline-variant)]/15 flex items-center justify-between text-xs">
+          <div className="flex items-center gap-1.5 text-[var(--md-sys-color-on-surface-variant)]">
+            <span className="material-symbols-outlined text-[16px]">speed</span>
+            <span>Daily limit:</span>
+            <span className="font-semibold text-[var(--md-sys-color-on-surface)]">
+              {limit} requests
+            </span>
+          </div>
+
+          <span className={`inline-flex items-center gap-1 font-semibold text-[11px] ${
+            isAccessible
+              ? 'text-[var(--md-sys-color-primary)]'
+              : 'text-[var(--md-sys-color-error)]'
+          }`}>
+            <span className="material-symbols-outlined text-[15px]">
+              {isAccessible ? 'check_circle' : 'lock'}
+            </span>
+            {isAccessible ? 'Available' : 'Upgrade Required'}
+          </span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <motion.div
       variants={pageVariants}
@@ -57,7 +132,7 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
       style={{ zIndex: 100000 }}
       className="fixed inset-0 bg-[var(--md-sys-color-background)] flex flex-col font-sans overflow-hidden text-[var(--md-sys-color-on-background)]"
     >
-      {/* 1. Top App Bar (Google Material Design 3) */}
+      {/* 1. Top App Bar (Google Material Design 3) with Data Usage icon */}
       <header className="w-full h-16 px-4 border-b border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface)]/95 backdrop-blur-md flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <button
@@ -68,13 +143,18 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
           >
             <span className="material-symbols-outlined text-[24px]">arrow_back</span>
           </button>
-          <div>
-            <h1 className="text-xl font-medium text-[var(--md-sys-color-on-surface)] leading-tight">
-              Quota and usage
-            </h1>
-            <p className="text-xs text-[var(--md-sys-color-on-surface-variant)] max-w-xl truncate hidden sm:block">
-              Everything about your resources: view available models, monitor your current and weekly request usage, and select the right pricing plan.
-            </p>
+          <div className="flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-full bg-[var(--md-sys-color-primary-container)]/60 flex items-center justify-center text-[var(--md-sys-color-primary)] shrink-0">
+              <span className="material-symbols-outlined text-[20px]">data_usage</span>
+            </div>
+            <div>
+              <h1 className="text-xl font-medium text-[var(--md-sys-color-on-surface)] leading-tight">
+                Quota and usage
+              </h1>
+              <p className="text-xs text-[var(--md-sys-color-on-surface-variant)] max-w-xl truncate hidden sm:block">
+                Everything about your resources: view available models, monitor your current and weekly request usage, and select the right pricing plan.
+              </p>
+            </div>
           </div>
         </div>
 
@@ -208,62 +288,7 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
               </div>
             </div>
 
-            {/* 3. Overview Metric Cards */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-              <div className="rounded-[24px] border border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface-container)] p-4.5">
-                <div className="flex items-center justify-between text-[var(--md-sys-color-on-surface-variant)] mb-2">
-                  <span className="text-xs font-medium">Available Models</span>
-                  <span className="material-symbols-outlined text-[20px]">dataset</span>
-                </div>
-                <div className="text-2xl font-bold text-[var(--md-sys-color-on-surface)]">
-                  {quotas.length}
-                </div>
-                <span className="text-[11px] text-[var(--md-sys-color-on-surface-variant)]/70 mt-1 block">
-                  Total in catalog
-                </span>
-              </div>
-
-              <div className="rounded-[24px] border border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface-container)] p-4.5">
-                <div className="flex items-center justify-between text-[var(--md-sys-color-on-surface-variant)] mb-2">
-                  <span className="text-xs font-medium">Free Models</span>
-                  <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-tertiary)]">check_circle</span>
-                </div>
-                <div className="text-2xl font-bold text-[var(--md-sys-color-on-surface)]">
-                  {freeModelsCount}
-                </div>
-                <span className="text-[11px] text-[var(--md-sys-color-tertiary)] mt-1 block font-medium">
-                  {freePercent}% of catalog
-                </span>
-              </div>
-
-              <div className="rounded-[24px] border border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface-container)] p-4.5">
-                <div className="flex items-center justify-between text-[var(--md-sys-color-on-surface-variant)] mb-2">
-                  <span className="text-xs font-medium">Flagship Models</span>
-                  <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">workspace_premium</span>
-                </div>
-                <div className="text-2xl font-bold text-[var(--md-sys-color-on-surface)]">
-                  {paidModelsCount}
-                </div>
-                <span className="text-[11px] text-[var(--md-sys-color-primary)] mt-1 block font-medium">
-                  {paidPercent}% of catalog
-                </span>
-              </div>
-
-              <div className="rounded-[24px] border border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface-container)] p-4.5">
-                <div className="flex items-center justify-between text-[var(--md-sys-color-on-surface-variant)] mb-2">
-                  <span className="text-xs font-medium">Current Access</span>
-                  <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">lock_open</span>
-                </div>
-                <div className="text-2xl font-bold text-[var(--md-sys-color-on-surface)]">
-                  {accessibleModelsCount} <span className="text-sm font-normal text-[var(--md-sys-color-on-surface-variant)]">/ {quotas.length}</span>
-                </div>
-                <span className="text-[11px] text-[var(--md-sys-color-primary)] mt-1 block font-medium">
-                  {isPremium ? 'All unlocked' : `${Math.round((accessibleModelsCount / total) * 100)}% available`}
-                </span>
-              </div>
-            </div>
-
-            {/* 4. Visual Charts Section (Material 3) */}
+            {/* 3. Visual Charts Section (Material 3) */}
             {quotas.length > 0 && (
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Chart 1: Daily Request Allowance Bar Chart */}
@@ -445,8 +470,8 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
               </div>
             )}
 
-            {/* 5. Available Models List */}
-            <div className="space-y-4">
+            {/* 4. Available Models & Quotas Section (Separate Free and Paid Lists) */}
+            <div className="space-y-6 pt-2">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                 <div>
                   <h3 className="text-lg font-semibold text-[var(--md-sys-color-on-surface)]">
@@ -495,7 +520,7 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
                 </div>
               </div>
 
-              {displayQuotas.length === 0 ? (
+              {quotas.length === 0 ? (
                 <div className="rounded-[28px] border border-dashed border-[var(--md-sys-color-outline-variant)]/30 p-8 text-center bg-[var(--md-sys-color-surface-container-low)]">
                   <span className="material-symbols-outlined text-4xl text-[var(--md-sys-color-on-surface-variant)]/50 mb-2">
                     table_rows
@@ -505,77 +530,46 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
                   </p>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
-                  {displayQuotas.map((item) => {
-                    const isPaid = isPaidItem(item);
-                    const isAccessible = !isPaid || isPremium;
-                    const limit = item.daily_limit || 50;
-
-                    return (
-                      <div
-                        key={item.id}
-                        className={`rounded-[24px] border p-5 transition-all duration-200 flex flex-col justify-between ${
-                          isAccessible
-                            ? 'border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface-container-low)] hover:border-[var(--md-sys-color-primary)]/40'
-                            : 'border-[var(--md-sys-color-error)]/20 bg-[var(--md-sys-color-surface-container-low)]/70 opacity-90'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 ${
-                              isPaid
-                                ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]'
-                                : 'bg-[var(--md-sys-color-tertiary-container)] text-[var(--md-sys-color-on-tertiary-container)]'
-                            }`}>
-                              <span className="material-symbols-outlined text-[22px]">
-                                {isPaid ? 'workspace_premium' : 'smart_toy'}
-                              </span>
-                            </div>
-
-                            <div className="min-w-0">
-                              <h4 className="text-sm font-semibold text-[var(--md-sys-color-on-surface)] truncate">
-                                {item.model_name}
-                              </h4>
-                              {item.model_id && (
-                                <p className="text-[11px] text-[var(--md-sys-color-on-surface-variant)]/70 truncate font-mono">
-                                  {item.model_id}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase shrink-0 ${
-                            isPaid
-                              ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]'
-                              : 'bg-[var(--md-sys-color-tertiary-container)] text-[var(--md-sys-color-on-tertiary-container)]'
-                          }`}>
-                            {isPaid ? 'Flagship' : 'Free'}
-                          </span>
-                        </div>
-
-                        <div className="mt-4 pt-3 border-t border-[var(--md-sys-color-outline-variant)]/15 flex items-center justify-between text-xs">
-                          <div className="flex items-center gap-1.5 text-[var(--md-sys-color-on-surface-variant)]">
-                            <span className="material-symbols-outlined text-[16px]">speed</span>
-                            <span>Daily limit:</span>
-                            <span className="font-semibold text-[var(--md-sys-color-on-surface)]">
-                              {limit} requests
-                            </span>
-                          </div>
-
-                          <span className={`inline-flex items-center gap-1 font-semibold text-[11px] ${
-                            isAccessible
-                              ? 'text-[var(--md-sys-color-primary)]'
-                              : 'text-[var(--md-sys-color-error)]'
-                          }`}>
-                            <span className="material-symbols-outlined text-[15px]">
-                              {isAccessible ? 'check_circle' : 'lock'}
-                            </span>
-                            {isAccessible ? 'Available' : 'Upgrade Required'}
-                          </span>
-                        </div>
+                <div className="space-y-6">
+                  {/* Flagship Models (Paid) List */}
+                  {(activeTab === 'all' || activeTab === 'paid') && paidQuotas.length > 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">
+                          workspace_premium
+                        </span>
+                        <h4 className="text-sm font-semibold text-[var(--md-sys-color-on-surface)]">
+                          Flagship Models (Paid)
+                        </h4>
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] font-semibold">
+                          {paidQuotas.length}
+                        </span>
                       </div>
-                    );
-                  })}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        {paidQuotas.map(renderQuotaCard)}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Free Models List */}
+                  {(activeTab === 'all' || activeTab === 'free') && freeQuotas.length > 0 && (
+                    <div className="space-y-3">
+                      <div className="flex items-center gap-2">
+                        <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-tertiary)]">
+                          check_circle
+                        </span>
+                        <h4 className="text-sm font-semibold text-[var(--md-sys-color-on-surface)]">
+                          Free Models
+                        </h4>
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-[var(--md-sys-color-tertiary-container)] text-[var(--md-sys-color-on-tertiary-container)] font-semibold">
+                          {freeQuotas.length}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                        {freeQuotas.map(renderQuotaCard)}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

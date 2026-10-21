@@ -95,7 +95,7 @@ export const SettingsApp: React.FC<SettingsAppProps> = ({ isOpen, onClose }) => 
             onClick={() => setIsQuotaUsageOpen(true)}
             className="ripple-container w-full py-4 px-3 flex items-center gap-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 rounded-2xl transition-all text-left active:scale-[0.99]"
           >
-            <span className="material-symbols-outlined text-[24px] text-[var(--md-sys-color-primary)]">monitoring</span>
+            <span className="material-symbols-outlined text-[24px] text-[var(--md-sys-color-primary)]">data_usage</span>
             <div className="flex flex-col gap-0.5">
               <span className="text-[16px] font-medium text-[var(--md-sys-color-on-surface)]">{t('quota.title')}</span>
               <span className="text-[14px] text-[var(--md-sys-color-on-surface-variant)]">{t('quota.subtitle')}</span>

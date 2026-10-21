@@ -101,7 +101,7 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25 transition-all"
               >
                 <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-primary)]">
-                  monitoring
+                  data_usage
                 </span>
                 <span className="hidden sm:inline">Quota and usage</span>
               </button>
@@ -431,7 +431,7 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                         }}
                         className="w-full h-10 px-5 rounded-full bg-[var(--md-sys-color-primary)] hover:bg-[var(--md-sys-color-primary)]/90 text-[var(--md-sys-color-on-primary)] text-sm font-medium transition-all active:scale-98 shadow-sm flex items-center justify-center gap-2"
                       >
-                        <span className="material-symbols-outlined text-[18px]">monitoring</span>
+                        <span className="material-symbols-outlined text-[18px]">data_usage</span>
                         <span>Open Quota and usage</span>
                       </button>
                       <button
