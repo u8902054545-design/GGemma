@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { motion, AnimatePresence } from 'motion/react';
 import { mdEasing } from '../motion/transitions';
@@ -6,9 +6,23 @@ import { mdEasing } from '../motion/transitions';
 interface GeoblockDialogProps {
   isOpen: boolean;
   onConfirm: () => void;
+  onRepeat?: () => void | Promise<void>;
 }
 
-export const GeoblockDialog: React.FC<GeoblockDialogProps> = ({ isOpen, onConfirm }) => {
+export const GeoblockDialog: React.FC<GeoblockDialogProps> = ({ isOpen, onConfirm, onRepeat }) => {
+  const [isRepeating, setIsRepeating] = useState(false);
+
+  const handleRepeat = async () => {
+    if (onRepeat) {
+      setIsRepeating(true);
+      try {
+        await onRepeat();
+      } finally {
+        setIsRepeating(false);
+      }
+    }
+  };
+
   return (
     <AlertDialog.Root open={isOpen}>
       <AnimatePresence>
@@ -25,7 +39,7 @@ export const GeoblockDialog: React.FC<GeoblockDialogProps> = ({ isOpen, onConfir
             <AlertDialog.Content asChild>
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
+                animate={{ scale: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2, ease: mdEasing.standard }}
                 className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[320px] bg-[var(--md-sys-color-surface-container-high)] rounded-[28px] p-6 z-[310] outline-none shadow-xl border border-[var(--md-sys-color-outline-variant)]/20"
@@ -35,19 +49,26 @@ export const GeoblockDialog: React.FC<GeoblockDialogProps> = ({ isOpen, onConfir
                 </AlertDialog.Title>
                 <AlertDialog.Description className="text-[var(--md-sys-color-on-surface-variant)] text-sm leading-relaxed mb-6 font-sans">
                   The service is not supported in this country.
-                  <br />
-                  <span className="text-xs opacity-80 mt-1 block">
-                    Сервис не поддерживается в этой стране.
-                  </span>
                 </AlertDialog.Description>
                 
-                <div className="flex justify-end">
+                <div className="flex justify-end gap-2">
+                  <button 
+                    type="button"
+                    onClick={handleRepeat}
+                    disabled={isRepeating}
+                    className="px-4 py-2 text-[var(--md-sys-color-primary)] font-medium hover:bg-[var(--md-sys-color-primary)]/10 rounded-full transition-colors active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-1.5"
+                  >
+                    {isRepeating && (
+                      <span className="material-symbols-outlined animate-spin text-[16px]">progress_activity</span>
+                    )}
+                    Repeat
+                  </button>
                   <button 
                     type="button"
                     onClick={onConfirm}
                     className="px-6 py-2 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] font-medium hover:opacity-90 rounded-full transition-all active:scale-[0.98]"
                   >
-                    OK / Ок
+                    OK
                   </button>
                 </div>
               </motion.div>

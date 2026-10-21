@@ -61,22 +61,42 @@ export default function App() {
     loadUserSettings();
   }, [user]);
 
-  React.useEffect(() => {
-    const checkIp = async () => {
-      try {
-        const response = await fetch('https://ipinfo.io/json');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.country === 'RU') {
-            setIsBlocked(true);
-            return;
-          }
+  const checkIp = useCallback(async () => {
+    try {
+      const response = await fetch(`https://ipinfo.io/json?t=${Date.now()}`, { cache: 'no-store' });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.country === 'RU') {
+          setIsBlocked(true);
+          return false;
         }
-      } catch (err) {
-        console.error('IP block check failed:', err);
       }
-      setIsBlocked(false);
-    };
+    } catch (err) {
+      console.error('IP block check failed:', err);
+    }
+    setIsBlocked(false);
+    return true;
+  }, []);
+
+  const handleRepeatCheck = useCallback(async () => {
+    const unblocked = await checkIp();
+    if (unblocked) {
+      setShowGeoblockDialog(false);
+      window.location.reload();
+    }
+  }, [checkIp]);
+
+  const handleRepeatModal = useCallback(async () => {
+    const unblocked = await checkIp();
+    if (unblocked) {
+      setShowGeoblockDialog(false);
+    } else {
+      setShowGeoblockDialog(false);
+      setIsBlocked(true);
+    }
+  }, [checkIp]);
+
+  React.useEffect(() => {
     checkIp();
 
     const originalFetch = window.fetch;
@@ -102,7 +122,7 @@ export default function App() {
     return () => {
       window.fetch = originalFetch;
     };
-  }, [signOut]);
+  }, [signOut, checkIp]);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
   const [isTranslationActive, setIsTranslationActive] = useState(false);
@@ -440,7 +460,7 @@ export default function App() {
 
   if (isBlocked === null || authLoading) return <div className="h-screen w-full bg-[var(--md-sys-color-background)]" />;
 
-  if (isBlocked) return <BlockedScreen />;
+  if (isBlocked) return <BlockedScreen onRepeat={handleRepeatCheck} />;
 
   return (
     <div className="h-screen w-full bg-[var(--md-sys-color-background)] overflow-hidden relative">
@@ -658,6 +678,7 @@ export default function App() {
 
           <GeoblockDialog
             isOpen={showGeoblockDialog}
+            onRepeat={handleRepeatModal}
             onConfirm={() => {
               setShowGeoblockDialog(false);
               setIsBlocked(true);

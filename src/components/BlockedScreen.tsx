@@ -1,8 +1,27 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { pageVariants } from '../motion/transitions';
 
-export default function BlockedScreen() {
+interface BlockedScreenProps {
+  onRepeat?: () => void | Promise<void>;
+}
+
+export default function BlockedScreen({ onRepeat }: BlockedScreenProps) {
+  const [isChecking, setIsChecking] = useState(false);
+
+  const handleRepeat = async () => {
+    setIsChecking(true);
+    try {
+      if (onRepeat) {
+        await onRepeat();
+      } else {
+        window.location.reload();
+      }
+    } finally {
+      setIsChecking(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center relative bg-[var(--md-sys-color-background)] p-4 overflow-hidden font-sans">
       <div className="absolute inset-0 opacity-30 pointer-events-none">
@@ -46,6 +65,19 @@ export default function BlockedScreen() {
         <p className="text-[var(--md-sys-color-on-surface-variant)] text-sm mb-6 text-center leading-relaxed">
           Unfortunately, the Gemma application is not available in your country. Access from your region has been blocked. We apologize for any inconvenience.
         </p>
+
+        <button
+          type="button"
+          onClick={handleRepeat}
+          disabled={isChecking}
+          className="w-full py-2.5 px-6 mb-6 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] font-medium rounded-full hover:opacity-90 transition-all active:scale-[0.98] flex items-center justify-center gap-2 disabled:opacity-60 shadow-sm"
+        >
+          {isChecking ? (
+            <span className="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+          ) : (
+            'Repeat'
+          )}
+        </button>
 
         <div className="w-full pt-6 border-t border-[var(--md-sys-color-outline-variant)]/10 flex flex-col items-center gap-2">
           <span className="text-[10px] text-[var(--md-sys-color-on-surface-variant)]/30 uppercase tracking-[2px]">
