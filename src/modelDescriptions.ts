@@ -78,5 +78,13 @@ export const modelDescriptions: Record<string, { en: string; ru: string }> = {
   'google/gemini-3.7-flash': {
     en: 'Next-generation multimodal model with superior reasoning and speed',
     ru: 'Мультимодальная модель следующего поколения с продвинутым мышлением и высокой скоростью'
+  },
+  'google/gemini-3.8-flash': {
+    en: 'Next-generation Flash model with advanced reasoning and universal multimodal processing',
+    ru: 'Модель Flash следующего поколения с продвинутым мышлением и универсальной поддержкой любой мультимедиа'
+  },
+  'google/gemini-4-argon': {
+    en: 'Next-generation flagship model with state-of-the-art intelligence and universal multimodal processing',
+    ru: 'Флагманская модель нового поколения с передовым интеллектом и универсальной поддержкой любой мультимедиа'
   }
 };
