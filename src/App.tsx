@@ -31,6 +31,7 @@ import BlockedScreen from './components/BlockedScreen';
 import { GeoblockDialog } from './components/GeoblockDialog';
 import { BlockedAccountDialog } from './components/BlockedAccountDialog';
 import { TranslationNewChatDialog } from './components/TranslationNewChatDialog';
+import { usePremium } from './hooks/usePremium';
 import { SUPABASE_ENDPOINT, supabase } from './config';
 
 export default function App() {
@@ -188,17 +189,34 @@ export default function App() {
   const [importedCodes, setImportedCodes] = useState<any[]>([]);
   const { t, language, setLanguage } = useLanguage();
   const { theme, setTheme } = useTheme();
+  const { isPremium, isModelPaid } = usePremium();
 
   const [isRegenModelSelectorOpen, setIsRegenModelSelectorOpen] = useState(false);
   const [isRegenAllModelsPageOpen, setIsRegenAllModelsPageOpen] = useState(false);
+
+  // Fallback to non-restricted model if user is not premium but a paid model is selected
+  useEffect(() => {
+    if (!isPremium && (isModelPaid(selectedModel.id) || isModelPaid(selectedModel.name))) {
+      const fallback = models.find(m => !isModelPaid(m.id) && !isModelPaid(m.name) && m.id !== 'auto') || models[0];
+      if (fallback) {
+        setSelectedModel(fallback);
+      }
+    }
+  }, [isPremium, selectedModel, models, isModelPaid, setSelectedModel]);
 
   const handleRegenerateWithModelSelection = useCallback((mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => {
     if (mode === 'repeat') {
       setIsRegenModelSelectorOpen(true);
     } else {
+      const isPaid = isModelPaid(selectedModel.id) || isModelPaid(selectedModel.name);
+      if (isPaid && !isPremium) {
+        setSnackbarMessage(t('model.premium_required', { model: selectedModel.name }));
+        setIsSnackbarOpen(true);
+        return;
+      }
       handleRegenerate(mode);
     }
-  }, [handleRegenerate]);
+  }, [handleRegenerate, isModelPaid, isPremium, selectedModel, setSnackbarMessage, setIsSnackbarOpen, t]);
 
   const { isChatHistoryEnabled } = useChatHistory();
   const [editingMessage, setEditingMessage] = useState<{ id: string; content: string } | null>(null);
@@ -436,6 +454,13 @@ export default function App() {
     inLang?: string,
     outLang?: string
   ) => {
+    const isPaid = isModelPaid(selectedModel.id) || isModelPaid(selectedModel.name);
+    if (isPaid && !isPremium) {
+      setSnackbarMessage(t('model.premium_required', { model: selectedModel.name }));
+      setIsSnackbarOpen(true);
+      return;
+    }
+
     if (!isChatHistoryEnabled && chats.some(c => c.id === chatId)) {
       setSnackbarMessage(t('errors.historyDisabled.send'));
       setIsSnackbarOpen(true);

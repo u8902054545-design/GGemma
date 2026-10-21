@@ -9,7 +9,7 @@ export { translations };
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -54,13 +54,19 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     document.documentElement.lang = language;
   }, [language]);
 
-  const t = (key: string): string => {
+  const t = (key: string, params?: Record<string, string | number>): string => {
     const translation = translations[key];
     if (!translation) {
       console.warn(`Translation key not found: ${key}`);
       return key;
     }
-    return translation[language];
+    let str = translation[language] || key;
+    if (params) {
+      Object.entries(params).forEach(([paramKey, val]) => {
+        str = str.replace(new RegExp(`\\{${paramKey}\\}`, 'g'), String(val));
+      });
+    }
+    return str;
   };
 
   return (

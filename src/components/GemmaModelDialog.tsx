@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { SelectedModel } from '../hooks/chatTypes';
 import { useLanguage } from '../hooks/useLanguage';
 import { modelDescriptions } from '../modelDescriptions';
+import { usePremium } from '../hooks/usePremium';
 
 interface GemmaModelDialogProps {
   isOpen: boolean;
@@ -27,6 +28,7 @@ export const GemmaModelDialog: React.FC<GemmaModelDialogProps> = ({
   triggerRef
 }) => {
   const { t, language } = useLanguage();
+  const { isPremium, isModelPaid } = usePremium();
   const latestModels = models.slice(0, 3);
   const [dialogStyle, setDialogStyle] = useState<React.CSSProperties & { originX?: number; originY?: number }>({
     originX: 0.05,
@@ -71,6 +73,11 @@ export const GemmaModelDialog: React.FC<GemmaModelDialogProps> = ({
   }, [isOpen, triggerRef]);
 
   const selectModel = (model: SelectedModel) => {
+    const isPaid = isModelPaid(model.id) || isModelPaid(model.name);
+    if (isPaid && !isPremium) {
+      onViewAllModels();
+      return;
+    }
     onModelSelect(model);
     onOpenChange(false);
   };
@@ -105,6 +112,8 @@ export const GemmaModelDialog: React.FC<GemmaModelDialogProps> = ({
                     {latestModels.map((model) => {
                       const isSelected = selectedModel.id === model.id;
                       const isExhausted = exhaustedModels.includes(model.id);
+                      const isPaid = isModelPaid(model.id) || isModelPaid(model.name);
+                      const isRestricted = isPaid && !isPremium;
 
                       return (
                         <button
@@ -115,10 +124,17 @@ export const GemmaModelDialog: React.FC<GemmaModelDialogProps> = ({
                           className={`mb-1 flex w-full items-center gap-4 rounded-[20px] px-4 py-3 text-left transition-colors duration-200 ${isSelected ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]' : 'text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-on-surface-variant)]/10'} disabled:pointer-events-none disabled:opacity-40`}
                         >
                           <span className={`material-symbols-outlined text-[22px] ${isSelected ? 'text-[var(--md-sys-color-primary)]' : 'text-[var(--md-sys-color-on-surface-variant)]'}`}>
-                            auto_awesome
+                            {isPaid ? 'workspace_premium' : 'auto_awesome'}
                           </span>
                           <span className="min-w-0 flex-1">
-                            <span className="block truncate text-[15px] font-medium">{model.name}</span>
+                            <span className="flex items-center gap-1.5 truncate text-[15px] font-medium">
+                              <span>{model.name}</span>
+                              {isPaid && (
+                                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${isPremium ? 'bg-emerald-500/15 text-emerald-500' : 'bg-violet-500/15 text-violet-500'}`}>
+                                  {isPremium ? 'PRO' : 'PREMIUM'}
+                                </span>
+                              )}
+                            </span>
                             <span className="mt-0.5 block truncate text-[13px] text-[var(--md-sys-color-on-surface-variant)]">
                               {modelDescriptions[model.id]?.[language] || ''}
                             </span>
@@ -126,6 +142,11 @@ export const GemmaModelDialog: React.FC<GemmaModelDialogProps> = ({
                           {isSelected && (
                             <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary)]">
                               check
+                            </span>
+                          )}
+                          {!isSelected && isRestricted && (
+                            <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-on-surface-variant)]">
+                              lock
                             </span>
                           )}
                         </button>

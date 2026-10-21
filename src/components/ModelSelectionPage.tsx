@@ -6,6 +6,8 @@ import { modelDescriptions } from '../modelDescriptions';
 import { GemmaIcon } from './IconsApp/GemmaIcon';
 import { GeminiIcon } from './IconsApp/GeminiIcon';
 import { AntigravityIcon } from './IconsApp/AntigravityIcon';
+import { usePremium } from '../hooks/usePremium';
+import { QuotaAndUsagePage } from './QuotaUsage/QuotaAndUsagePage';
 
 interface ModelSelectionPageProps {
   isOpen: boolean;
@@ -25,16 +27,29 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
   exhaustedModels = []
 }) => {
   const { language } = useLanguage();
+  const { isPremium, isModelPaid } = usePremium();
   const [activeFamily, setActiveFamily] = useState<'gemma' | 'gemini' | 'antigravity'>(() => {
     if (selectedModel.id.startsWith('google/gemini')) return 'gemini';
     if (selectedModel.id.startsWith('antigravity')) return 'antigravity';
     return 'gemma';
   });
+  const [restrictedAlertModel, setRestrictedAlertModel] = useState<SelectedModel | null>(null);
+  const [isQuotaUsageOpen, setIsQuotaUsageOpen] = useState(false);
+
   const isAutoSelect = selectedModel.id === 'auto';
 
   const selectModel = (model: SelectedModel) => {
     onModelSelect(model);
     onClose();
+  };
+
+  const handleModelClick = (model: SelectedModel) => {
+    const isPaid = isModelPaid(model.id) || isModelPaid(model.name);
+    if (isPaid && !isPremium) {
+      setRestrictedAlertModel(model);
+      return;
+    }
+    selectModel(model);
   };
 
   const toggleAutoSelect = () => {
@@ -52,286 +67,396 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
   const geminiModels = models.filter(m => m.id.startsWith('google/gemini'));
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <motion.section
-          initial={{ y: '100%', opacity: 0.98 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: '100%', opacity: 0.98 }}
-          transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
-          className="fixed inset-0 z-[240] flex transform-gpu flex-col overflow-hidden bg-[var(--md-sys-color-background)] text-[var(--md-sys-color-on-background)] will-change-transform"
-        >
-          {/* Header at arrow level */}
-          <header className="sticky top-0 z-10 flex h-[64px] items-center border-b border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-background)]/90 px-3 backdrop-blur-md">
-            <button
-              type="button"
-              onClick={onClose}
-              className="flex h-10 w-10 items-center justify-center rounded-full text-[var(--md-sys-color-on-surface)] transition-colors hover:bg-[var(--md-sys-color-on-surface-variant)]/10"
-              aria-label="Back"
-            >
-              <span className="material-symbols-outlined text-[24px]">arrow_back</span>
-            </button>
-
-            <h1 className="ml-2 text-lg font-medium text-[var(--md-sys-color-on-surface)]">
-              All models
-            </h1>
-          </header>
-
-          <main className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-8 pt-5">
-            <div className="mx-auto w-full max-w-[720px] space-y-6">
-
-              {/* Family Selector Buttons Row (On the same horizontal level) */}
-              <div className="flex items-center gap-3 border-b border-[var(--md-sys-color-outline-variant)]/20 pb-4 overflow-x-auto">
+    <>
+      <AnimatePresence>
+        {isOpen && (
+          <motion.section
+            initial={{ y: '100%', opacity: 0.98 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '100%', opacity: 0.98 }}
+            transition={{ duration: 0.58, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-[240] flex transform-gpu flex-col overflow-hidden bg-[var(--md-sys-color-background)] text-[var(--md-sys-color-on-background)] will-change-transform"
+          >
+            {/* Header at arrow level */}
+            <header className="sticky top-0 z-10 flex h-[64px] items-center justify-between border-b border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-background)]/90 px-3 backdrop-blur-md">
+              <div className="flex items-center">
                 <button
                   type="button"
-                  onClick={() => setActiveFamily('gemma')}
-                  className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
-                    activeFamily === 'gemma'
-                      ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
-                      : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
-                  }`}
+                  onClick={onClose}
+                  className="flex h-10 w-10 items-center justify-center rounded-full text-[var(--md-sys-color-on-surface)] transition-colors hover:bg-[var(--md-sys-color-on-surface-variant)]/10"
+                  aria-label="Back"
                 >
-                  <GemmaIcon className="h-5 w-5 shrink-0" />
-                  <span>Gemma models</span>
+                  <span className="material-symbols-outlined text-[24px]">arrow_back</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={() => setActiveFamily('gemini')}
-                  className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
-                    activeFamily === 'gemini'
-                      ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
-                      : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
-                  }`}
-                >
-                  <GeminiIcon className="h-5 w-5 shrink-0" />
-                  <span>Gemini models</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setActiveFamily('antigravity')}
-                  className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
-                    activeFamily === 'antigravity'
-                      ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
-                      : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
-                  }`}
-                >
-                  <AntigravityIcon className="h-5 w-5 shrink-0" />
-                  <span>Antigravity</span>
-                </button>
+                <h1 className="ml-2 text-lg font-medium text-[var(--md-sys-color-on-surface)]">
+                  All models
+                </h1>
               </div>
 
-              {/* Active Family Section */}
-              {activeFamily === 'gemma' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  {/* Material 3 Auto-Select Toggle Card */}
-                  <div className="mb-4 rounded-[28px] border border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] p-5 shadow-sm transition-all">
-                    <div className="flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3.5 min-w-0">
-                        <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${isAutoSelect ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]' : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)]'}`}>
-                          <span className="material-symbols-outlined text-[24px]">magic_button</span>
+              {/* Quota & Usage Quick Button */}
+              <button
+                type="button"
+                onClick={() => setIsQuotaUsageOpen(true)}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25 transition-all"
+              >
+                <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-primary)]">
+                  monitoring
+                </span>
+                <span className="hidden sm:inline">Quota and usage</span>
+              </button>
+            </header>
+
+            <main className="flex-1 overflow-y-auto overflow-x-hidden px-4 pb-8 pt-5">
+              <div className="mx-auto w-full max-w-[720px] space-y-6">
+
+                {/* Family Selector Buttons Row */}
+                <div className="flex items-center gap-3 border-b border-[var(--md-sys-color-outline-variant)]/20 pb-4 overflow-x-auto">
+                  <button
+                    type="button"
+                    onClick={() => setActiveFamily('gemma')}
+                    className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
+                      activeFamily === 'gemma'
+                        ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
+                        : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
+                    }`}
+                  >
+                    <GemmaIcon className="h-5 w-5 shrink-0" />
+                    <span>Gemma models</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveFamily('gemini')}
+                    className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
+                      activeFamily === 'gemini'
+                        ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
+                        : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
+                    }`}
+                  >
+                    <GeminiIcon className="h-5 w-5 shrink-0" />
+                    <span>Gemini models</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveFamily('antigravity')}
+                    className={`flex items-center gap-2.5 rounded-full px-4 py-2.5 text-sm font-semibold transition-all whitespace-nowrap ${
+                      activeFamily === 'antigravity'
+                        ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
+                        : 'bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] hover:text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25'
+                    }`}
+                  >
+                    <AntigravityIcon className="h-5 w-5 shrink-0" />
+                    <span>Antigravity</span>
+                  </button>
+                </div>
+
+                {/* Active Family Section */}
+                {activeFamily === 'gemma' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {/* Material 3 Auto-Select Toggle Card */}
+                    <div className="mb-4 rounded-[28px] border border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] p-5 shadow-sm transition-all">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${isAutoSelect ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]' : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)]'}`}>
+                            <span className="material-symbols-outlined text-[24px]">magic_button</span>
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <h2 className="text-base font-medium text-[var(--md-sys-color-on-surface)]">
+                              Automatic model selection
+                            </h2>
+                            <p className="mt-0.5 text-xs text-[var(--md-sys-color-on-surface-variant)] leading-relaxed">
+                              Optimal model selection for each prompt
+                            </p>
+                          </div>
                         </div>
-                        <div className="min-w-0 flex-1">
-                          <h2 className="text-base font-medium text-[var(--md-sys-color-on-surface)]">
-                            Automatic model selection
-                          </h2>
-                          <p className="mt-0.5 text-xs text-[var(--md-sys-color-on-surface-variant)] leading-relaxed">
-                            Optimal model selection for each prompt
-                          </p>
-                        </div>
+
+                        <button
+                          type="button"
+                          role="switch"
+                          aria-checked={isAutoSelect}
+                          onClick={toggleAutoSelect}
+                          className={`relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center rounded-full p-1 transition-colors duration-300 ease-in-out focus:outline-none ${
+                            isAutoSelect
+                              ? 'bg-[var(--md-sys-color-primary)]'
+                              : 'bg-[var(--md-sys-color-surface-container-highest)] border border-[var(--md-sys-color-outline-variant)]'
+                          }`}
+                        >
+                          <span
+                            className={`pointer-events-none inline-block h-6 w-6 transform rounded-full shadow-md transition duration-300 ease-in-out flex items-center justify-center ${
+                              isAutoSelect
+                                ? 'translate-x-6 bg-[var(--md-sys-color-on-primary)] text-[var(--md-sys-color-primary)]'
+                                : 'translate-x-0 bg-[var(--md-sys-color-outline)] text-transparent'
+                            }`}
+                          >
+                            {isAutoSelect && <span className="material-symbols-outlined text-[16px]">check</span>}
+                          </span>
+                        </button>
                       </div>
 
-                      <button
-                        type="button"
-                        role="switch"
-                        aria-checked={isAutoSelect}
-                        onClick={toggleAutoSelect}
-                        className={`relative inline-flex h-8 w-14 shrink-0 cursor-pointer items-center rounded-full p-1 transition-colors duration-300 ease-in-out focus:outline-none ${
-                          isAutoSelect
-                            ? 'bg-[var(--md-sys-color-primary)]'
-                            : 'bg-[var(--md-sys-color-surface-container-highest)] border border-[var(--md-sys-color-outline-variant)]'
-                        }`}
-                      >
-                        <span
-                          className={`pointer-events-none inline-block h-6 w-6 transform rounded-full shadow-md transition duration-300 ease-in-out flex items-center justify-center ${
-                            isAutoSelect
-                              ? 'translate-x-6 bg-[var(--md-sys-color-on-primary)] text-[var(--md-sys-color-primary)]'
-                              : 'translate-x-0 bg-[var(--md-sys-color-outline)] text-transparent'
-                          }`}
+                      {isAutoSelect && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          transition={{ duration: 0.25 }}
+                          className="mt-4 pt-3 border-t border-[var(--md-sys-color-outline-variant)]/20 text-xs text-[var(--md-sys-color-primary)] font-medium flex items-center gap-2"
                         >
-                          {isAutoSelect && <span className="material-symbols-outlined text-[16px]">check</span>}
-                        </span>
-                      </button>
+                          <span className="material-symbols-outlined text-[18px]">info</span>
+                          <span>Automatic selection is active. The system will automatically select the best Gemma model for your prompt.</span>
+                        </motion.div>
+                      )}
                     </div>
 
-                    {isAutoSelect && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.25 }}
-                        className="mt-4 pt-3 border-t border-[var(--md-sys-color-outline-variant)]/20 text-xs text-[var(--md-sys-color-primary)] font-medium flex items-center gap-2"
-                      >
-                        <span className="material-symbols-outlined text-[18px]">info</span>
-                        <span>Automatic selection is active. The system will automatically select the best Gemma model for your prompt.</span>
-                      </motion.div>
-                    )}
-                  </div>
-
-                  {/* Gemma Models List (Only rendered when Auto Select is OFF) */}
-                  <AnimatePresence mode="wait">
-                    {!isAutoSelect && (
-                      <motion.div
-                        key="models-list"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="space-y-3"
-                      >
-                        {gemmaModels.map((model) => {
-                          const isSelected = selectedModel.id === model.id;
-                          const isExhausted = exhaustedModels.includes(model.id);
-
-                          return (
-                            <button
-                              key={model.id}
-                              type="button"
-                              disabled={isExhausted}
-                              onClick={() => selectModel(model)}
-                              className={`group relative flex w-full items-start gap-4 rounded-[28px] border p-5 text-left transition-all duration-200 ${
-                                isSelected
-                                  ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-md'
-                                  : 'border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] hover:border-[var(--md-sys-color-primary)]/40 hover:bg-[var(--md-sys-color-surface-container-highest)]'
-                              } disabled:pointer-events-none disabled:opacity-40`}
-                            >
-                              <div
-                                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
-                                  isSelected
-                                    ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]'
-                                    : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-primary)]'
-                                }`}
-                              >
-                                <span className="material-symbols-outlined text-[24px]">auto_awesome</span>
-                              </div>
-
-                              <div className="min-w-0 flex-1 pt-0.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-base font-semibold tracking-tight">{model.name}</span>
-                                  {isSelected && (
-                                    <span className="rounded-full bg-[var(--md-sys-color-primary)]/15 px-2.5 py-0.5 text-[11px] font-medium text-[var(--md-sys-color-primary)]">
-                                      Selected
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="mt-1 text-sm leading-relaxed text-[var(--md-sys-color-on-surface-variant)]">
-                                  {modelDescriptions[model.id]?.[language] || ''}
-                                </p>
-                              </div>
-
-                              {isSelected && (
-                                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]">
-                                  <span className="material-symbols-outlined text-[18px]">check</span>
-                                </div>
-                              )}
-                            </button>
-                          );
-                        })}
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </motion.div>
-              )}
-
-              {activeFamily === 'gemini' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-3"
-                >
-                  {geminiModels.map((model) => {
-                    const isSelected = selectedModel.id === model.id;
-                    const isExhausted = exhaustedModels.includes(model.id);
-
-                    return (
-                      <button
-                        key={model.id}
-                        type="button"
-                        disabled={isExhausted}
-                        onClick={() => selectModel(model)}
-                        className={`group relative flex w-full items-start gap-4 rounded-[28px] border p-5 text-left transition-all duration-200 ${
-                          isSelected
-                            ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-md'
-                            : 'border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] hover:border-[var(--md-sys-color-primary)]/40 hover:bg-[var(--md-sys-color-surface-container-highest)]'
-                        } disabled:pointer-events-none disabled:opacity-40`}
-                      >
-                        <div
-                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
-                            isSelected
-                              ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]'
-                              : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-primary)]'
-                          }`}
+                    {/* Gemma Models List */}
+                    <AnimatePresence mode="wait">
+                      {!isAutoSelect && (
+                        <motion.div
+                          key="models-list"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          transition={{ duration: 0.2 }}
+                          className="space-y-3"
                         >
-                          <GeminiIcon className="h-6 w-6 shrink-0" />
-                        </div>
+                          {gemmaModels.map((model) => {
+                            const isSelected = selectedModel.id === model.id;
+                            const isExhausted = exhaustedModels.includes(model.id);
+                            const isPaid = isModelPaid(model.id) || isModelPaid(model.name);
+                            const isRestricted = isPaid && !isPremium;
 
-                        <div className="min-w-0 flex-1 pt-0.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-base font-semibold tracking-tight">{model.name}</span>
-                            {isSelected && (
-                              <span className="rounded-full bg-[var(--md-sys-color-primary)]/15 px-2.5 py-0.5 text-[11px] font-medium text-[var(--md-sys-color-primary)]">
-                                Selected
-                              </span>
-                            )}
+                            return (
+                              <button
+                                key={model.id}
+                                type="button"
+                                disabled={isExhausted}
+                                onClick={() => handleModelClick(model)}
+                                className={`group relative flex w-full items-start gap-4 rounded-[28px] border p-5 text-left transition-all duration-200 ${
+                                  isSelected
+                                    ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-md'
+                                    : 'border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] hover:border-[var(--md-sys-color-primary)]/40 hover:bg-[var(--md-sys-color-surface-container-highest)]'
+                                } disabled:pointer-events-none disabled:opacity-40`}
+                              >
+                                <div
+                                  className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+                                    isSelected
+                                      ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]'
+                                      : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-primary)]'
+                                  }`}
+                                >
+                                  <span className="material-symbols-outlined text-[24px]">auto_awesome</span>
+                                </div>
+
+                                <div className="min-w-0 flex-1 pt-0.5">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-base font-semibold tracking-tight">{model.name}</span>
+                                    {isPaid && (
+                                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                                        isPremium
+                                          ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                                          : 'bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-500/20'
+                                      }`}>
+                                        {isPremium ? (
+                                          <span className="material-symbols-outlined text-[12px]">verified</span>
+                                        ) : (
+                                          <span className="material-symbols-outlined text-[12px]">lock</span>
+                                        )}
+                                        {isPremium ? 'PRO' : 'PREMIUM'}
+                                      </span>
+                                    )}
+                                    {isSelected && (
+                                      <span className="rounded-full bg-[var(--md-sys-color-primary)]/15 px-2.5 py-0.5 text-[11px] font-medium text-[var(--md-sys-color-primary)]">
+                                        Selected
+                                      </span>
+                                    )}
+                                  </div>
+                                  <p className="mt-1 text-sm leading-relaxed text-[var(--md-sys-color-on-surface-variant)]">
+                                    {modelDescriptions[model.id]?.[language] || ''}
+                                  </p>
+                                </div>
+
+                                {isSelected && (
+                                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]">
+                                    <span className="material-symbols-outlined text-[18px]">check</span>
+                                  </div>
+                                )}
+                                {!isSelected && isRestricted && (
+                                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)]">
+                                    <span className="material-symbols-outlined text-[16px]">lock</span>
+                                  </div>
+                                )}
+                              </button>
+                            );
+                          })}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                )}
+
+                {/* Gemini Models Section */}
+                {activeFamily === 'gemini' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-3"
+                  >
+                    {geminiModels.map((model) => {
+                      const isSelected = selectedModel.id === model.id;
+                      const isExhausted = exhaustedModels.includes(model.id);
+                      const isPaid = isModelPaid(model.id) || isModelPaid(model.name);
+                      const isRestricted = isPaid && !isPremium;
+
+                      return (
+                        <button
+                          key={model.id}
+                          type="button"
+                          disabled={isExhausted}
+                          onClick={() => handleModelClick(model)}
+                          className={`group relative flex w-full items-start gap-4 rounded-[28px] border p-5 text-left transition-all duration-200 ${
+                            isSelected
+                              ? 'border-[var(--md-sys-color-primary)] bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-md'
+                              : 'border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] hover:border-[var(--md-sys-color-primary)]/40 hover:bg-[var(--md-sys-color-surface-container-highest)]'
+                          } disabled:pointer-events-none disabled:opacity-40`}
+                        >
+                          <div
+                            className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl transition-colors ${
+                              isSelected
+                                ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]'
+                                : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] group-hover:text-[var(--md-sys-color-primary)]'
+                            }`}
+                          >
+                            <GeminiIcon className="h-6 w-6 shrink-0" />
                           </div>
-                          <p className="mt-1 text-sm leading-relaxed text-[var(--md-sys-color-on-surface-variant)]">
-                            {modelDescriptions[model.id]?.[language] || ''}
-                          </p>
-                        </div>
 
-                        {isSelected && (
-                          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]">
-                            <span className="material-symbols-outlined text-[18px]">check</span>
+                          <div className="min-w-0 flex-1 pt-0.5">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-base font-semibold tracking-tight">{model.name}</span>
+                              {isPaid && (
+                                <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                                  isPremium
+                                    ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                                    : 'bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-500/20 shadow-sm'
+                                }`}>
+                                  {isPremium ? (
+                                    <span className="material-symbols-outlined text-[12px]">verified</span>
+                                  ) : (
+                                    <span className="material-symbols-outlined text-[12px]">lock</span>
+                                  )}
+                                  {isPremium ? 'PRO' : 'PREMIUM'}
+                                </span>
+                              )}
+                              {isSelected && (
+                                <span className="rounded-full bg-[var(--md-sys-color-primary)]/15 px-2.5 py-0.5 text-[11px] font-medium text-[var(--md-sys-color-primary)]">
+                                  Selected
+                                </span>
+                              )}
+                            </div>
+                            <p className="mt-1 text-sm leading-relaxed text-[var(--md-sys-color-on-surface-variant)]">
+                              {modelDescriptions[model.id]?.[language] || ''}
+                            </p>
                           </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </motion.div>
-              )}
 
-              {activeFamily === 'antigravity' && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.2 }}
-                  className="space-y-3"
-                >
-                  <div className="flex flex-col items-center justify-center py-12 text-center">
-                    <AntigravityIcon className="h-16 w-16 mb-4 text-[var(--md-sys-color-on-surface-variant)]" />
-                    <h3 className="text-lg font-medium text-[var(--md-sys-color-on-surface)] mb-2">
-                      No models available
+                          {isSelected && (
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)]">
+                              <span className="material-symbols-outlined text-[18px]">check</span>
+                            </div>
+                          )}
+                          {!isSelected && isRestricted && (
+                            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)]">
+                              <span className="material-symbols-outlined text-[16px]">lock</span>
+                            </div>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </motion.div>
+                )}
+
+                {/* Antigravity Section */}
+                {activeFamily === 'antigravity' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="space-y-3"
+                  >
+                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                      <AntigravityIcon className="h-16 w-16 mb-4 text-[var(--md-sys-color-on-surface-variant)]" />
+                      <h3 className="text-lg font-medium text-[var(--md-sys-color-on-surface)] mb-2">
+                        No models available
+                      </h3>
+                      <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] max-w-[300px]">
+                        Antigravity models will be available soon. Check back later.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+
+              </div>
+            </main>
+
+            {/* Restricted Model Alert Dialog */}
+            <AnimatePresence>
+              {restrictedAlertModel && (
+                <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
+                    className="w-full max-w-sm rounded-[28px] border border-[var(--md-sys-color-outline-variant)]/30 bg-[var(--md-sys-color-surface)] p-6 shadow-2xl text-center"
+                  >
+                    <div className="mx-auto w-14 h-14 rounded-2xl bg-violet-500/15 text-violet-500 flex items-center justify-center mb-4">
+                      <span className="material-symbols-outlined text-[32px]">workspace_premium</span>
+                    </div>
+
+                    <h3 className="text-lg font-semibold text-[var(--md-sys-color-on-surface)]">
+                      {restrictedAlertModel.name}
                     </h3>
-                    <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] max-w-[300px]">
-                      Antigravity models will be available soon. Check back later.
+                    <p className="text-xs text-[var(--md-sys-color-on-surface-variant)] mt-2 leading-relaxed">
+                      Эта модель доступна исключительно пользователям со статусом <strong>Premium</strong> (значение True в таблице <strong>«Premium_User»</strong>).
                     </p>
-                  </div>
-                </motion.div>
-              )}
 
-            </div>
-          </main>
-        </motion.section>
-      )}
-    </AnimatePresence>
+                    <div className="mt-6 flex flex-col gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRestrictedAlertModel(null);
+                          setIsQuotaUsageOpen(true);
+                        }}
+                        className="w-full py-2.5 px-4 rounded-full bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] text-sm font-semibold shadow-md active:scale-95 transition-transform"
+                      >
+                        Открыть Quota and usage
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRestrictedAlertModel(null)}
+                        className="w-full py-2 px-4 rounded-full text-xs font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
+                      >
+                        Закрыть
+                      </button>
+                    </div>
+                  </motion.div>
+                </div>
+              )}
+            </AnimatePresence>
+          </motion.section>
+        )}
+      </AnimatePresence>
+
+      <QuotaAndUsagePage
+        isOpen={isQuotaUsageOpen}
+        onClose={() => setIsQuotaUsageOpen(false)}
+      />
+    </>
   );
 };
