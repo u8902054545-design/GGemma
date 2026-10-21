@@ -257,16 +257,14 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                                   <div className="flex items-center gap-2 flex-wrap">
                                     <span className="text-base font-semibold tracking-tight">{model.name}</span>
                                     {isPaid && (
-                                      <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                                      <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                                         isPremium
-                                          ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                                          : 'bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-500/20'
+                                          ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]'
+                                          : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] border border-[var(--md-sys-color-outline-variant)]/40'
                                       }`}>
-                                        {isPremium ? (
-                                          <span className="material-symbols-outlined text-[12px]">verified</span>
-                                        ) : (
-                                          <span className="material-symbols-outlined text-[12px]">lock</span>
-                                        )}
+                                        <span className="material-symbols-outlined text-[12px]">
+                                          {isPremium ? 'verified' : 'lock'}
+                                        </span>
                                         {isPremium ? 'PRO' : 'PREMIUM'}
                                       </span>
                                     )}
@@ -343,14 +341,12 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                               {isPaid && (
                                 <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                                   isPremium
-                                    ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                                    : 'bg-violet-500/15 text-violet-600 dark:text-violet-400 border border-violet-500/20 shadow-sm'
+                                    ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]'
+                                    : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] border border-[var(--md-sys-color-outline-variant)]/40'
                                 }`}>
-                                  {isPremium ? (
-                                    <span className="material-symbols-outlined text-[12px]">verified</span>
-                                  ) : (
-                                    <span className="material-symbols-outlined text-[12px]">lock</span>
-                                  )}
+                                  <span className="material-symbols-outlined text-[12px]">
+                                    {isPremium ? 'verified' : 'lock'}
+                                  </span>
                                   {isPremium ? 'PRO' : 'PREMIUM'}
                                 </span>
                               )}
@@ -405,44 +401,45 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
               </div>
             </main>
 
-            {/* Restricted Model Alert Dialog */}
+            {/* Restricted Model Alert Dialog (M3 Dialog) */}
             <AnimatePresence>
               {restrictedAlertModel && (
                 <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
                   <motion.div
-                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    initial={{ opacity: 0, scale: 0.92, y: 8 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: 10 }}
-                    className="w-full max-w-sm rounded-[28px] border border-[var(--md-sys-color-outline-variant)]/30 bg-[var(--md-sys-color-surface)] p-6 shadow-2xl text-center"
+                    exit={{ opacity: 0, scale: 0.92, y: 8 }}
+                    className="w-full max-w-sm rounded-[28px] border border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface-container-high)] p-6 shadow-2xl text-center"
                   >
-                    <div className="mx-auto w-14 h-14 rounded-2xl bg-violet-500/15 text-violet-500 flex items-center justify-center mb-4">
-                      <span className="material-symbols-outlined text-[32px]">workspace_premium</span>
+                    <div className="mx-auto w-12 h-12 rounded-2xl bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] flex items-center justify-center mb-4">
+                      <span className="material-symbols-outlined text-[28px]">workspace_premium</span>
                     </div>
 
-                    <h3 className="text-lg font-semibold text-[var(--md-sys-color-on-surface)]">
+                    <h3 className="text-xl font-medium text-[var(--md-sys-color-on-surface)]">
                       {restrictedAlertModel.name}
                     </h3>
-                    <p className="text-xs text-[var(--md-sys-color-on-surface-variant)] mt-2 leading-relaxed">
-                      Эта модель доступна исключительно пользователям со статусом <strong>Premium</strong> (значение True в таблице <strong>«Premium_User»</strong>).
+                    <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] mt-2 leading-relaxed">
+                      This model is exclusively available to <strong>Premium</strong> users with active status in the <strong>«Premium_User»</strong> table.
                     </p>
 
-                    <div className="mt-6 flex flex-col gap-2">
+                    <div className="mt-6 flex flex-col gap-2.5">
                       <button
                         type="button"
                         onClick={() => {
                           setRestrictedAlertModel(null);
                           setIsQuotaUsageOpen(true);
                         }}
-                        className="w-full py-2.5 px-4 rounded-full bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] text-sm font-semibold shadow-md active:scale-95 transition-transform"
+                        className="w-full h-10 px-5 rounded-full bg-[var(--md-sys-color-primary)] hover:bg-[var(--md-sys-color-primary)]/90 text-[var(--md-sys-color-on-primary)] text-sm font-medium transition-all active:scale-98 shadow-sm flex items-center justify-center gap-2"
                       >
-                        Открыть Quota and usage
+                        <span className="material-symbols-outlined text-[18px]">monitoring</span>
+                        <span>Open Quota and usage</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setRestrictedAlertModel(null)}
-                        className="w-full py-2 px-4 rounded-full text-xs font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)]"
+                        className="w-full h-10 px-5 rounded-full text-sm font-medium text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-highest)] transition-colors"
                       >
-                        Закрыть
+                        Close
                       </button>
                     </div>
                   </motion.div>

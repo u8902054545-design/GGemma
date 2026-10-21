@@ -130,7 +130,11 @@ export const GemmaModelDialog: React.FC<GemmaModelDialogProps> = ({
                             <span className="flex items-center gap-1.5 truncate text-[15px] font-medium">
                               <span>{model.name}</span>
                               {isPaid && (
-                                <span className={`rounded-full px-1.5 py-0.2 text-[9px] font-bold ${isPremium ? 'bg-emerald-500/15 text-emerald-500' : 'bg-violet-500/15 text-violet-500'}`}>
+                                <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold tracking-wider ${
+                                  isPremium
+                                    ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]'
+                                    : 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)]'
+                                }`}>
                                   {isPremium ? 'PRO' : 'PREMIUM'}
                                 </span>
                               )}

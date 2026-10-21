@@ -15,6 +15,8 @@
   --md-sys-color-background: #000000;
   --md-sys-color-on-background: #e2e2e2;
   --md-sys-color-surface: #0b0b0b;
+  --md-sys-color-surface-container-low: #17191c;
+  --md-sys-color-surface-container: #1e2023;
   --md-sys-color-surface-container-high: #282a2d;
   --md-sys-color-surface-container-highest: #333537;
   --md-sys-color-on-surface: #e2e2e2;
@@ -25,15 +27,26 @@
   --md-sys-color-on-primary: #062e6f;
   --md-sys-color-primary-container: #0842a0;
   --md-sys-color-on-primary-container: #d3e3fd;
+  --md-sys-color-secondary: #c2e7ff;
+  --md-sys-color-on-secondary: #003355;
   --md-sys-color-secondary-container: #333537;
   --md-sys-color-on-secondary-container: #e3e3e3;
+  --md-sys-color-tertiary: #7fd5e6;
+  --md-sys-color-on-tertiary: #00363d;
+  --md-sys-color-tertiary-container: #004f58;
+  --md-sys-color-on-tertiary-container: #83eefc;
   --md-sys-color-error: #ffb4ab;
+  --md-sys-color-on-error: #690005;
+  --md-sys-color-error-container: #93000a;
+  --md-sys-color-on-error-container: #ffdad6;
 }
 
 :root[data-theme='light'] {
   --md-sys-color-background: #fdfbff;
   --md-sys-color-on-background: #1b1b1f;
   --md-sys-color-surface: #fdfbff;
+  --md-sys-color-surface-container-low: #f7f4f9;
+  --md-sys-color-surface-container: #f1edf3;
   --md-sys-color-surface-container-high: #eae7ec;
   --md-sys-color-surface-container-highest: #e4e1e6;
   --md-sys-color-on-surface: #1b1b1f;
@@ -44,9 +57,18 @@
   --md-sys-color-on-primary: #ffffff;
   --md-sys-color-primary-container: #d8e2ff;
   --md-sys-color-on-primary-container: #001a41;
+  --md-sys-color-secondary: #00639b;
+  --md-sys-color-on-secondary: #ffffff;
   --md-sys-color-secondary-container: #e4e1e6;
   --md-sys-color-on-secondary-container: #1b1b1f;
+  --md-sys-color-tertiary: #006874;
+  --md-sys-color-on-tertiary: #ffffff;
+  --md-sys-color-tertiary-container: #9eeffd;
+  --md-sys-color-on-tertiary-container: #001f24;
   --md-sys-color-error: #ba1a1a;
+  --md-sys-color-on-error: #ffffff;
+  --md-sys-color-error-container: #ffdad6;
+  --md-sys-color-on-error-container: #410002;
 }
 
 html, body {
