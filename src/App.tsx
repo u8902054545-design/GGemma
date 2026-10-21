@@ -67,6 +67,7 @@ export default function App() {
       if (response.ok) {
         const data = await response.json();
         if (data.country === 'RU') {
+          setShowGeoblockDialog(true);
           setIsBlocked(true);
           return false;
         }
@@ -82,6 +83,7 @@ export default function App() {
     const unblocked = await checkIp();
     if (unblocked) {
       setShowGeoblockDialog(false);
+      setIsBlocked(false);
       window.location.reload();
     }
   }, [checkIp]);
@@ -90,9 +92,9 @@ export default function App() {
     const unblocked = await checkIp();
     if (unblocked) {
       setShowGeoblockDialog(false);
+      setIsBlocked(false);
     } else {
-      setShowGeoblockDialog(false);
-      setIsBlocked(true);
+      setShowGeoblockDialog(true);
     }
   }, [checkIp]);
 
@@ -460,7 +462,7 @@ export default function App() {
 
   if (isBlocked === null || authLoading) return <div className="h-screen w-full bg-[var(--md-sys-color-background)]" />;
 
-  if (isBlocked) return <BlockedScreen onRepeat={handleRepeatCheck} />;
+  if (isBlocked && !showGeoblockDialog) return <BlockedScreen onRepeat={handleRepeatCheck} />;
 
   return (
     <div className="h-screen w-full bg-[var(--md-sys-color-background)] overflow-hidden relative">
@@ -676,16 +678,17 @@ export default function App() {
             onApply={handleApplyEdit}
           />
 
-          <GeoblockDialog
-            isOpen={showGeoblockDialog}
-            onRepeat={handleRepeatModal}
-            onConfirm={() => {
-              setShowGeoblockDialog(false);
-              setIsBlocked(true);
-            }}
-          />
         </>
       )}
+
+      <GeoblockDialog
+        isOpen={showGeoblockDialog}
+        onRepeat={handleRepeatModal}
+        onConfirm={() => {
+          setShowGeoblockDialog(false);
+          setIsBlocked(true);
+        }}
+      />
     </div>
   );
 }

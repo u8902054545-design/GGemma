@@ -39,7 +39,7 @@ export const GeoblockDialog: React.FC<GeoblockDialogProps> = ({ isOpen, onConfir
             <AlertDialog.Content asChild>
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ scale: 1, scale: 1 }}
+                animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.2, ease: mdEasing.standard }}
                 className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[320px] bg-[var(--md-sys-color-surface-container-high)] rounded-[28px] p-6 z-[310] outline-none shadow-xl border border-[var(--md-sys-color-outline-variant)]/20"
