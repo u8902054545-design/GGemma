@@ -282,39 +282,55 @@ export function usePremium() {
         setPremiumUserRecord(null);
       }
 
-      // 2. Load from "Quotas" table
-      const { data: quotasData, error: quotasError } = await supabase
+      // 2. Load from "Quotas" table (with case-insensitive fallback)
+      let quotasData: any[] | null = null;
+      let quotasError: any = null;
+
+      const res1 = await supabase
         .from('Quotas')
         .select('*');
+
+      if (!res1.error && res1.data && res1.data.length > 0) {
+        quotasData = res1.data;
+      } else {
+        quotasError = res1.error;
+        const res2 = await supabase
+          .from('quotas')
+          .select('*');
+        if (!res2.error && res2.data && res2.data.length > 0) {
+          quotasData = res2.data;
+          quotasError = null;
+        } else if (res1.data && Array.isArray(res1.data)) {
+          quotasData = res1.data;
+        }
+      }
 
       if (quotasError) {
         console.warn('Could not query Quotas table:', quotasError.message);
       }
 
       if (quotasData && Array.isArray(quotasData) && quotasData.length > 0) {
-        const dbMap = new Map<string, any>();
-        quotasData.forEach((q: any) => {
-          if (q.model_name) dbMap.set(q.model_name.toLowerCase(), q);
-          if (q.model_id) dbMap.set(q.model_id.toLowerCase(), q);
-        });
-
-        const merged = DEFAULT_QUOTAS.map((def, idx) => {
-          const fromDb = dbMap.get(def.model_name.toLowerCase()) || (def.model_id ? dbMap.get(def.model_id.toLowerCase()) : null);
-          return fromDb ? { id: idx + 1, ...def, ...fromDb } : { id: idx + 1, ...def };
-        });
-
-        // Extra models in DB not in defaults
-        quotasData.forEach((dbItem: any, idx: number) => {
-          const exists = merged.some(m =>
-            m.model_name.toLowerCase() === (dbItem.model_name || '').toLowerCase() ||
-            (m.model_id && dbItem.model_id && m.model_id.toLowerCase() === dbItem.model_id.toLowerCase())
+        // Map database records directly using model_name and is_paid
+        const dbItems: QuotaItem[] = quotasData.map((q: any, idx: number) => {
+          const isPaidBool = q.is_paid === true || String(q.is_paid).toLowerCase() === 'true' || q.is_paid === 1;
+          const matchedDefault = DEFAULT_QUOTAS.find(
+            d => d.model_name.toLowerCase() === (q.model_name || '').toLowerCase()
           );
-          if (!exists) {
-            merged.push({ id: merged.length + idx + 1, ...dbItem });
-          }
+
+          return {
+            id: q.id ?? idx + 1,
+            model_name: q.model_name || `Model ${idx + 1}`,
+            model_id: q.model_id || matchedDefault?.model_id || q.model_name,
+            is_paid: isPaidBool,
+            daily_limit: q.daily_limit !== undefined && q.daily_limit !== null
+              ? Number(q.daily_limit)
+              : (matchedDefault?.daily_limit || (isPaidBool ? 100 : 50)),
+            tier: q.tier || (isPaidBool ? 'paid' : 'free'),
+            description: q.description || matchedDefault?.description || ''
+          };
         });
 
-        setQuotas(merged);
+        setQuotas(dbItems);
       } else {
         setQuotas(DEFAULT_QUOTAS);
       }
@@ -404,8 +420,15 @@ export function usePremium() {
 
     if (quotaMatch) {
       const val = quotaMatch.is_paid ?? quotaMatch.paid ?? quotaMatch.is_premium;
+      if (val === false || String(val).toLowerCase() === 'false' || val === 0) {
+        return false;
+      }
+      if (val === true || String(val).toLowerCase() === 'true' || val === 1) {
+        return true;
+      }
       const tierVal = (quotaMatch.tier || '').toLowerCase();
-      return val === true || String(val).toLowerCase() === 'true' || tierVal === 'paid' || tierVal === 'premium';
+      if (tierVal === 'free') return false;
+      if (tierVal === 'paid' || tierVal === 'premium') return true;
     }
 
     return false;

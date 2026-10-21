@@ -20,11 +20,19 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
 
   const isPaidItem = (item: QuotaItem) => {
     const val = item.is_paid ?? item.paid ?? item.is_premium;
+    if (val === false || String(val).toLowerCase() === 'false' || val === 0) {
+      return false;
+    }
+    if (val === true || String(val).toLowerCase() === 'true' || val === 1) {
+      return true;
+    }
     const tier = (item.tier || '').toLowerCase();
+    if (tier === 'free') return false;
+    if (tier === 'paid' || tier === 'premium') return true;
+
     const name = (item.model_name || '').toLowerCase();
     const id = (item.model_id || '').toLowerCase();
-    return val === true || String(val).toLowerCase() === 'true' || tier === 'paid' || tier === 'premium' ||
-      name.includes('gemini 3.1 pro preview') || id.includes('gemini-3.1-pro-preview') ||
+    return name.includes('gemini 3.1 pro preview') || id.includes('gemini-3.1-pro-preview') ||
       name.includes('gemini 4 argon') || id.includes('gemini-4-argon');
   };
 
@@ -551,6 +559,17 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
                     </div>
                   )}
 
+                  {activeTab === 'paid' && paidQuotas.length === 0 && (
+                    <div className="rounded-[28px] border border-dashed border-[var(--md-sys-color-outline-variant)]/30 p-8 text-center bg-[var(--md-sys-color-surface-container-low)]">
+                      <span className="material-symbols-outlined text-4xl text-[var(--md-sys-color-on-surface-variant)]/50 mb-2">
+                        workspace_premium
+                      </span>
+                      <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">
+                        No paid/flagship models currently configured.
+                      </p>
+                    </div>
+                  )}
+
                   {/* Free Models List */}
                   {(activeTab === 'all' || activeTab === 'free') && freeQuotas.length > 0 && (
                     <div className="space-y-3">
@@ -568,6 +587,17 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                         {freeQuotas.map(renderQuotaCard)}
                       </div>
+                    </div>
+                  )}
+
+                  {activeTab === 'free' && freeQuotas.length === 0 && (
+                    <div className="rounded-[28px] border border-dashed border-[var(--md-sys-color-outline-variant)]/30 p-8 text-center bg-[var(--md-sys-color-surface-container-low)]">
+                      <span className="material-symbols-outlined text-4xl text-[var(--md-sys-color-on-surface-variant)]/50 mb-2">
+                        smart_toy
+                      </span>
+                      <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">
+                        No free models currently configured.
+                      </p>
                     </div>
                   )}
                 </div>
