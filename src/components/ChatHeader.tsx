@@ -7,6 +7,7 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { ShareChatDialog } from '../sharing/ShareChatDialog';
 import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { ChatActionsMenu } from './ChatHeaderParts/ChatActionsMenu';
+import { QuotaAndUsagePage } from './QuotaUsage/QuotaAndUsagePage';
 import { useLanguage } from '../hooks/useLanguage';
 import { useChatHistory } from '../hooks/useChatHistory';
 import '@material/web/iconbutton/icon-button.js';
@@ -33,6 +34,7 @@ interface ChatHeaderProps {
   onTemporaryChatClick?: () => void;
   onNewChat?: () => void;
   onForkChat?: () => void;
+  onUpdatePlanClick?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -40,7 +42,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   setMessages, setChatId, setChatTitle,
   onMenuClick, isSidebarOpen, deleteChatFromDB, togglePin, isTemporary = false,
   setSnackbarMessage, setIsSnackbarOpen, onTemporaryChatClick, onNewChat,
-  onForkChat
+  onForkChat, onUpdatePlanClick
 }) => {
   const isChatStarted = messages.length > 0;
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -48,8 +50,17 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [isQuotaUsageOpen, setIsQuotaUsageOpen] = useState(false);
   const { t } = useLanguage();
   const { isChatHistoryEnabled } = useChatHistory();
+
+  const handleUpdatePlan = () => {
+    if (onUpdatePlanClick) {
+      onUpdatePlanClick();
+    } else {
+      setIsQuotaUsageOpen(true);
+    }
+  };
 
   const showSnackbar = (message: string) => {
     setSnackbarMessage(message);
@@ -100,7 +111,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   return (
     <header className="sticky top-0 z-50 bg-[var(--md-sys-color-background)] h-[64px] flex justify-center">
       <div className="w-full max-w-[1200px] px-4 flex justify-between items-center h-full">
-      <div className="flex items-center gap-2 flex-1 overflow-hidden">
+      <div className="flex items-center gap-2 flex-1 min-w-0">
         <div className="w-10 h-10 flex items-center justify-center shrink-0">
           <AnimatePresence initial={false}>
             {!isSidebarOpen && (
@@ -122,18 +133,38 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
         <button
           onClick={onModelSelectorToggle}
           data-model-selector-button="true"
-          className="flex items-center gap-1 px-3 py-1.5 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors group"
+          className="flex items-center gap-1 px-3 py-1.5 hover:bg-[var(--md-sys-color-on-surface-variant)]/10 rounded-full transition-colors group shrink-0"
         >
-          <span className="text-sm font-medium text-[var(--md-sys-color-on-surface)] truncate max-w-[150px]">
+          <span className="text-sm font-medium text-[var(--md-sys-color-on-surface)] truncate max-w-[120px] sm:max-w-[150px]">
             {selectedModel.name}
           </span>
           <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)]">
             {isModelSelectorOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
           </span>
         </button>
+
+        <AnimatePresence mode="wait">
+          {!isChatStarted && (
+            <motion.button
+              key="update-plan-button"
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.8 }}
+              transition={{ duration: 0.2, ease: mdEasing.standard }}
+              type="button"
+              onClick={handleUpdatePlan}
+              style={{ backgroundColor: '#0000FF' }}
+              className="shrink-0 px-3.5 py-1.5 rounded-full hover:opacity-90 active:scale-95 text-white text-xs sm:text-sm font-medium shadow-sm transition-all duration-200 cursor-pointer flex items-center justify-center select-none whitespace-nowrap"
+              title="Update plan"
+              aria-label="Update plan"
+            >
+              Update plan
+            </motion.button>
+          )}
+        </AnimatePresence>
       </div>
 
-      <div className="flex items-center justify-end min-w-[48px] gap-1">
+      <div className="flex items-center justify-end min-w-[48px] gap-1 shrink-0">
         <AnimatePresence mode="wait">
           {!isChatStarted && isChatHistoryEnabled && (
             <motion.button
@@ -198,6 +229,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       <RenameDialog isOpen={isRenameOpen} onClose={() => setIsRenameOpen(false)} currentTitle={chatTitle} onConfirm={handleRenameConfirm} />
       <DeleteConfirmDialog isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDeleteConfirm} />
       <ShareChatDialog isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} chatId={chatId} chatTitle={chatTitle} showSnackbar={showSnackbar} />
+      <QuotaAndUsagePage isOpen={isQuotaUsageOpen} onClose={() => setIsQuotaUsageOpen(false)} />
       </div>
     </header>
   );
