@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SearchOverlay } from './SearchOverlay';
 import { RenameDialog } from './RenameDialog';
@@ -33,6 +33,7 @@ interface SidebarProps {
   loading?: boolean;
   error?: boolean;
   onRefresh: () => void;
+  onRefreshSilent?: () => void;
   currentChatId: string;
   onChatSelect: (id: string) => void;
   onNewChat: () => void;
@@ -45,7 +46,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  isOpen, onClose, chats, loading, error, onRefresh, currentChatId,
+  isOpen, onClose, chats, loading, error, onRefresh, onRefreshSilent, currentChatId,
   onChatSelect, onNewChat, deleteChatFromDB, setChatTitle, togglePin,
   setSnackbarMessage, setIsSnackbarOpen, onForkChat
 }) => {
@@ -102,12 +103,20 @@ export const Sidebar: React.FC<SidebarProps> = ({
     fetchLayoutSetting();
   }, [fetchLayoutSetting]);
 
-  // Fetch setting upon every sidebar opening
+  const onRefreshSilentRef = useRef(onRefreshSilent);
+  useEffect(() => {
+    onRefreshSilentRef.current = onRefreshSilent;
+  }, [onRefreshSilent]);
+
+  // Fetch setting and background-refresh chats upon every sidebar opening
   useEffect(() => {
     if (isOpen) {
       fetchLayoutSetting();
+      if (isChatHistoryEnabled) {
+        onRefreshSilentRef.current?.();
+      }
     }
-  }, [isOpen, fetchLayoutSetting]);
+  }, [isOpen, fetchLayoutSetting, isChatHistoryEnabled]);
 
   const handleLayoutChange = async (mode: 'list' | 'grid') => {
     setLayoutMode(mode);

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase, SUPABASE_ENDPOINT } from '../config';
 
 export interface Chat {
@@ -23,6 +23,7 @@ export const useUserChats = (userId: string | undefined) => {
   const [chats, setChats] = useState<Chat[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
+  const isFetchingRef = useRef(false);
 
   const fetchChats = useCallback(async (isSilent = false) => {
     if (!userId) {
@@ -30,6 +31,8 @@ export const useUserChats = (userId: string | undefined) => {
       setLoading(false);
       return;
     }
+    if (isFetchingRef.current) return;
+    isFetchingRef.current = true;
     try {
       if (!isSilent) {
         setLoading(true);
@@ -52,8 +55,9 @@ export const useUserChats = (userId: string | undefined) => {
       setChats(data || []);
     } catch (err) {
       console.error('Error fetching chats:', err);
-      setError(true);
+      if (!isSilent) setError(true);
     } finally {
+      isFetchingRef.current = false;
       if (!isSilent) setLoading(false);
     }
   }, [userId]);

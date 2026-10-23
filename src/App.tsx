@@ -524,6 +524,7 @@ export default function App() {
               loading={chatsLoading}
               error={error}
               onRefresh={() => refreshChats(false)}
+              onRefreshSilent={() => refreshChats(true)}
               currentChatId={chatId}
               onChatSelect={(id) => {
                 if (!isChatHistoryEnabled) {
