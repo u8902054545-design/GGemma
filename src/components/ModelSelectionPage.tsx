@@ -100,7 +100,7 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                 onClick={() => setIsQuotaUsageOpen(true)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/25 transition-all"
               >
-                <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-primary)]">
+                <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-on-surface-variant)]">
                   data_usage
                 </span>
                 <span className="hidden sm:inline">Quota and usage</span>

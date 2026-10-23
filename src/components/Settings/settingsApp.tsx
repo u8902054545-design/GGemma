@@ -5,7 +5,6 @@ import { VoiceSelection } from './voiceSelection';
 import { LanguageSelection } from './languageSelection';
 import { ThemeSelection } from './themeSelection';
 import { ChatHistorySelection } from './chatHistorySelection';
-import { QuotaAndUsagePage } from '../QuotaUsage/QuotaAndUsagePage';
 import { useLanguage } from '../../hooks/useLanguage';
 
 interface SettingsAppProps {
@@ -18,7 +17,6 @@ export const SettingsApp: React.FC<SettingsAppProps> = ({ isOpen, onClose }) => 
   const [isLanguageSelectionOpen, setIsLanguageSelectionOpen] = useState(false);
   const [isThemeSelectionOpen, setIsThemeSelectionOpen] = useState(false);
   const [isChatHistorySelectionOpen, setIsChatHistorySelectionOpen] = useState(false);
-  const [isQuotaUsageOpen, setIsQuotaUsageOpen] = useState(false);
   const { t } = useLanguage();
 
   if (!isOpen) return null;
@@ -90,27 +88,10 @@ export const SettingsApp: React.FC<SettingsAppProps> = ({ isOpen, onClose }) => 
               <span className="text-[14px] text-[var(--md-sys-color-on-surface-variant)]">{t('settings.chatHistory.menuDesc')}</span>
             </div>
           </button>
-
-          <button
-            onClick={() => setIsQuotaUsageOpen(true)}
-            className="ripple-container w-full py-4 px-3 flex items-center gap-4 hover:bg-[var(--md-sys-color-on-surface-variant)]/5 rounded-2xl transition-all text-left active:scale-[0.99]"
-          >
-            <span className="material-symbols-outlined text-[24px] text-[var(--md-sys-color-primary)]">data_usage</span>
-            <div className="flex flex-col gap-0.5">
-              <span className="text-[16px] font-medium text-[var(--md-sys-color-on-surface)]">{t('quota.title')}</span>
-              <span className="text-[14px] text-[var(--md-sys-color-on-surface-variant)]">{t('quota.subtitle')}</span>
-            </div>
-          </button>
         </div>
       </main>
 
       <AnimatePresence>
-        {isQuotaUsageOpen && (
-          <QuotaAndUsagePage
-            isOpen={isQuotaUsageOpen}
-            onClose={() => setIsQuotaUsageOpen(false)}
-          />
-        )}
         {isVoiceSelectionOpen && (
           <VoiceSelection
             isOpen={isVoiceSelectionOpen}

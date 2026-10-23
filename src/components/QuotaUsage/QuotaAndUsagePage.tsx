@@ -152,7 +152,7 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
             <span className="material-symbols-outlined text-[24px]">arrow_back</span>
           </button>
           <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-full bg-[var(--md-sys-color-primary-container)]/60 flex items-center justify-center text-[var(--md-sys-color-primary)] shrink-0">
+            <div className="w-9 h-9 rounded-full bg-[var(--md-sys-color-surface-container-high)] flex items-center justify-center text-[var(--md-sys-color-on-surface)] shrink-0">
               <span className="material-symbols-outlined text-[20px]">data_usage</span>
             </div>
             <div>

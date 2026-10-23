@@ -128,7 +128,7 @@ const ProfileDrawerContent = memo(({ isOpen, onClose, user, signOut, t }: any) =
                 disabled={isLoggingOut}
                 className="ripple-container w-full h-12 flex items-center justify-center gap-3 bg-[var(--md-sys-color-surface)] hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/20 rounded-full font-medium transition-all disabled:opacity-50"
               >
-                <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">data_usage</span>
+                <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant)]">data_usage</span>
                 <span>{t('quota.title')}</span>
               </button>
 
