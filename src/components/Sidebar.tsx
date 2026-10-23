@@ -12,6 +12,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { Chat } from '../hooks/chatTypes';
 import { useAuth } from '../hooks/useAuth';
 import { ProfileDrawer } from './UserProfile';
+import { QuotaAndUsagePage } from './QuotaUsage/QuotaAndUsagePage';
 import { SidebarSearch } from './SidebarParts/SidebarSearch';
 import { NewChatButton } from './SidebarParts/NewChatButton';
 import { SidebarProfile } from './SidebarParts/SidebarProfile';
@@ -57,6 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isExportOpen, setIsExportOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isQuotaUsageOpen, setIsQuotaUsageOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isChatHistorySelectionOpen, setIsChatHistorySelectionOpen] = useState(false);
   const [exportMessages, setExportMessages] = useState<any[]>([]);
@@ -347,6 +349,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClose();
             setTimeout(() => setIsProfileOpen(true), 200);
           }}
+          onUpdatePlanClick={() => {
+            onClose();
+            setTimeout(() => setIsQuotaUsageOpen(true), 200);
+          }}
         />
       </aside>
 
@@ -404,6 +410,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <ProfileDrawer 
         isOpen={isProfileOpen} 
         onClose={() => setIsProfileOpen(false)} 
+      />
+
+      <QuotaAndUsagePage
+        isOpen={isQuotaUsageOpen}
+        onClose={() => setIsQuotaUsageOpen(false)}
       />
     </>
   );
