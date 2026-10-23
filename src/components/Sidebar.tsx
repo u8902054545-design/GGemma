@@ -58,9 +58,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isChatHistorySelectionOpen, setIsChatHistorySelectionOpen] = useState(false);
   const [exportMessages, setExportMessages] = useState<any[]>([]);
+  const [layoutMode, setLayoutMode] = useState<'list' | 'grid'>(() => {
+    try {
+      return (localStorage.getItem('chat_history_layout') as 'list' | 'grid') || 'list';
+    } catch {
+      return 'list';
+    }
+  });
   const { t } = useLanguage();
   const { user } = useAuth();
   const { isChatHistoryEnabled } = useChatHistory();
+
+  const handleLayoutChange = (mode: 'list' | 'grid') => {
+    setLayoutMode(mode);
+    try {
+      localStorage.setItem('chat_history_layout', mode);
+    } catch {
+      // ignore
+    }
+  };
 
   React.useEffect(() => {
     if (error) {
@@ -193,8 +209,38 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto px-2 mt-2 custom-scrollbar min-h-0">
-          <div className="px-4 py-2">
+          <div className="flex items-center justify-between px-4 py-2">
             <h2 className="text-[14px] font-medium text-[var(--md-sys-color-on-surface)]">{t('sidebar.chats')}</h2>
+            {isChatHistoryEnabled && (
+              <div className="flex items-center bg-[var(--md-sys-color-surface-container-high)] p-0.5 rounded-full border border-[var(--md-sys-color-outline-variant)]/20">
+                <button
+                  type="button"
+                  onClick={() => handleLayoutChange('list')}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                    layoutMode === 'list'
+                      ? 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface)] shadow-xs'
+                      : 'text-[var(--md-sys-color-on-surface-variant)]/60 hover:text-[var(--md-sys-color-on-surface)]'
+                  }`}
+                  aria-label={t('sidebar.layout_list') || 'List layout'}
+                  title={t('sidebar.layout_list') || 'List layout'}
+                >
+                  <span className="material-symbols-outlined text-[18px]">menu</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleLayoutChange('grid')}
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                    layoutMode === 'grid'
+                      ? 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface)] shadow-xs'
+                      : 'text-[var(--md-sys-color-on-surface-variant)]/60 hover:text-[var(--md-sys-color-on-surface)]'
+                  }`}
+                  aria-label={t('sidebar.layout_grid') || 'Grid layout'}
+                  title={t('sidebar.layout_grid') || 'Grid layout'}
+                >
+                  <span className="material-symbols-outlined text-[18px]">grid_view</span>
+                </button>
+              </div>
+            )}
           </div>
           {!isChatHistoryEnabled ? (
             <div className="flex flex-col items-center justify-center h-[50%] px-4 text-center mt-8">
@@ -220,6 +266,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               currentChatId={currentChatId}
               onChatSelect={(id) => { onChatSelect(id); onClose(); }}
               onLongPress={handleLongPress}
+              layoutMode={layoutMode}
             />
           )}
         </div>

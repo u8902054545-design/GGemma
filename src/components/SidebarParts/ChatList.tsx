@@ -13,6 +13,7 @@ interface ChatListProps {
   currentChatId: string;
   onChatSelect: (id: string) => void;
   onLongPress: (chat: Chat) => void;
+  layoutMode?: 'list' | 'grid';
 }
 
 export const ChatList: React.FC<ChatListProps> = ({
@@ -22,7 +23,8 @@ export const ChatList: React.FC<ChatListProps> = ({
   onRefresh,
   currentChatId,
   onChatSelect,
-  onLongPress
+  onLongPress,
+  layoutMode = 'list'
 }) => {
   const { t } = useLanguage();
 
@@ -58,6 +60,55 @@ export const ChatList: React.FC<ChatListProps> = ({
     );
   }
 
+  if (layoutMode === 'grid') {
+    return (
+      <div className="grid grid-cols-2 gap-2 px-2 pb-4">
+        {chats.map((chat) => {
+          const isActive = currentChatId === chat.id;
+
+          let timer: NodeJS.Timeout;
+          const handleStart = () => {
+            timer = setTimeout(() => onLongPress(chat), 600);
+          };
+          const handleEnd = () => clearTimeout(timer);
+
+          return (
+            <button
+              key={chat.id}
+              onClick={() => onChatSelect(chat.id)}
+              onTouchStart={handleStart}
+              onTouchEnd={handleEnd}
+              onTouchMove={handleEnd}
+              onTouchCancel={handleEnd}
+              onMouseDown={handleStart}
+              onMouseUp={handleEnd}
+              onMouseLeave={handleEnd}
+              className={`group flex flex-col justify-between p-3.5 rounded-2xl text-left transition-all duration-200 select-none min-h-[96px] active:scale-[0.98] cursor-pointer ${
+                isActive
+                  ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] shadow-sm'
+                  : 'bg-[var(--md-sys-color-surface-container-high)] hover:bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface)] border border-[var(--md-sys-color-outline-variant)]/20'
+              }`}
+            >
+              <div className="flex items-center justify-between w-full mb-2">
+                <span className={`material-symbols-outlined text-[18px] ${isActive ? 'text-[var(--md-sys-color-on-primary)]/80' : 'text-[var(--md-sys-color-on-surface-variant)]/70'}`}>
+                  chat_bubble
+                </span>
+                {chat.is_pinned && (
+                  <span className={`material-symbols-outlined text-[16px] ${isActive ? 'text-[var(--md-sys-color-on-primary)]' : 'text-[var(--md-sys-color-primary)]'}`}>
+                    keep
+                  </span>
+                )}
+              </div>
+              <span className={`text-[13px] leading-snug line-clamp-2 break-words flex-1 ${isActive ? 'font-bold' : 'font-medium'}`}>
+                {chat.title || t('sidebar.untitled')}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-1">
       {chats.map((chat) => {
@@ -75,6 +126,8 @@ export const ChatList: React.FC<ChatListProps> = ({
             onClick={() => onChatSelect(chat.id)}
             onTouchStart={handleStart}
             onTouchEnd={handleEnd}
+            onTouchMove={handleEnd}
+            onTouchCancel={handleEnd}
             onMouseDown={handleStart}
             onMouseUp={handleEnd}
             onMouseLeave={handleEnd}

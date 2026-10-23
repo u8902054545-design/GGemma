@@ -66,6 +66,8 @@ export const ru = {
   'sidebar.load_error': 'Не удалось загрузить чаты',
   'sidebar.retry': 'Повторить',
   'sidebar.untitled': 'Чат без названия',
+  'sidebar.layout_list': 'Список',
+  'sidebar.layout_grid': 'Сетка',
   'start.greeting': 'Привет',
   'start.subtitle': 'Чем я могу вам помочь сегодня?',
   'start.suggestion.stranger': 'Write a script for a show like Stranger Things',

@@ -66,6 +66,8 @@ export const en = {
   'sidebar.load_error': 'Failed to load chats',
   'sidebar.retry': 'Repeat',
   'sidebar.untitled': 'Untitled Chat',
+  'sidebar.layout_list': 'List layout',
+  'sidebar.layout_grid': 'Grid layout',
   'start.greeting': 'Hello',
   'start.subtitle': 'How can I help you today?',
   'start.suggestion.stranger': 'Write a script for a show like Stranger Things',
