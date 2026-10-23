@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { pageVariants } from '../../motion/transitions';
 import { useLanguage } from '../../hooks/useLanguage';
 import { usePremium, QuotaItem } from '../../hooks/usePremium';
@@ -15,8 +15,6 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
   const { isPremium, quotas, loading, error, refresh } = usePremium();
   const [activeTab, setActiveTab] = useState<'all' | 'paid' | 'free'>('all');
   const [selectedChartModel, setSelectedChartModel] = useState<QuotaItem | null>(null);
-
-  if (!isOpen) return null;
 
   const isPaidItem = (item: QuotaItem) => {
     const val = item.is_paid ?? item.paid ?? item.is_premium;
@@ -132,14 +130,17 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
   };
 
   return (
-    <motion.div
-      variants={pageVariants}
-      initial="initial"
-      animate="animate"
-      exit="exit"
-      style={{ zIndex: 100000 }}
-      className="fixed inset-0 bg-[var(--md-sys-color-background)] flex flex-col font-sans overflow-hidden text-[var(--md-sys-color-on-background)]"
-    >
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          key="quota-and-usage-page"
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          style={{ zIndex: 100000 }}
+          className="fixed inset-0 bg-[var(--md-sys-color-background)] flex flex-col font-sans overflow-hidden text-[var(--md-sys-color-on-background)]"
+        >
       {/* 1. Top App Bar (Google Material Design 3) with Data Usage icon */}
       <header className="w-full h-16 px-4 border-b border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface)]/95 backdrop-blur-md flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
@@ -606,6 +607,8 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
           </>
         )}
       </main>
-    </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

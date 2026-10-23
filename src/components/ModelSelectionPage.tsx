@@ -153,13 +153,15 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                 </div>
 
                 {/* Active Family Section */}
-                {activeFamily === 'gemma' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.2 }}
-                  >
+                <AnimatePresence mode="wait">
+                  {activeFamily === 'gemma' && (
+                    <motion.div
+                      key="gemma"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2 }}
+                    >
                     {/* Material 3 Auto-Select Toggle Card */}
                     <div className="mb-4 rounded-[28px] border border-[var(--md-sys-color-outline-variant)]/25 bg-[var(--md-sys-color-surface-container-high)] p-5 shadow-sm transition-all">
                       <div className="flex items-center justify-between gap-4">
@@ -299,14 +301,15 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                 )}
 
                 {/* Gemini Models Section */}
-                {activeFamily === 'gemini' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-3"
-                  >
+                  {activeFamily === 'gemini' && (
+                    <motion.div
+                      key="gemini"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-3"
+                    >
                     {geminiModels.map((model) => {
                       const isSelected = selectedModel.id === model.id;
                       const isExhausted = exhaustedModels.includes(model.id);
@@ -378,25 +381,27 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
                 )}
 
                 {/* Antigravity Section */}
-                {activeFamily === 'antigravity' && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.2 }}
-                    className="space-y-3"
-                  >
-                    <div className="flex flex-col items-center justify-center py-12 text-center">
-                      <AntigravityIcon className="h-16 w-16 mb-4 text-[var(--md-sys-color-on-surface-variant)]" />
-                      <h3 className="text-lg font-medium text-[var(--md-sys-color-on-surface)] mb-2">
-                        No models available
-                      </h3>
-                      <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] max-w-[300px]">
-                        Antigravity models will be available soon. Check back later.
-                      </p>
-                    </div>
-                  </motion.div>
-                )}
+                  {activeFamily === 'antigravity' && (
+                    <motion.div
+                      key="antigravity"
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.2 }}
+                      className="space-y-3"
+                    >
+                      <div className="flex flex-col items-center justify-center py-12 text-center">
+                        <AntigravityIcon className="h-16 w-16 mb-4 text-[var(--md-sys-color-on-surface-variant)]" />
+                        <h3 className="text-lg font-medium text-[var(--md-sys-color-on-surface)] mb-2">
+                          No models available
+                        </h3>
+                        <p className="text-sm text-[var(--md-sys-color-on-surface-variant)] max-w-[300px]">
+                          Antigravity models will be available soon. Check back later.
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
               </div>
             </main>
@@ -450,10 +455,14 @@ export const ModelSelectionPage: React.FC<ModelSelectionPageProps> = ({
         )}
       </AnimatePresence>
 
-      <QuotaAndUsagePage
-        isOpen={isQuotaUsageOpen}
-        onClose={() => setIsQuotaUsageOpen(false)}
-      />
+      <AnimatePresence>
+        {isQuotaUsageOpen && (
+          <QuotaAndUsagePage
+            isOpen={isQuotaUsageOpen}
+            onClose={() => setIsQuotaUsageOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };

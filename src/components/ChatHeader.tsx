@@ -7,9 +7,9 @@ import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { ShareChatDialog } from '../sharing/ShareChatDialog';
 import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { ChatActionsMenu } from './ChatHeaderParts/ChatActionsMenu';
-import { QuotaAndUsagePage } from './QuotaUsage/QuotaAndUsagePage';
 import { useLanguage } from '../hooks/useLanguage';
 import { useChatHistory } from '../hooks/useChatHistory';
+import { usePremium } from '../hooks/usePremium';
 import '@material/web/iconbutton/icon-button.js';
 import '@material/web/icon/icon.js';
 
@@ -34,7 +34,6 @@ interface ChatHeaderProps {
   onTemporaryChatClick?: () => void;
   onNewChat?: () => void;
   onForkChat?: () => void;
-  onUpdatePlanClick?: () => void;
 }
 
 export const ChatHeader: React.FC<ChatHeaderProps> = ({
@@ -42,7 +41,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   setMessages, setChatId, setChatTitle,
   onMenuClick, isSidebarOpen, deleteChatFromDB, togglePin, isTemporary = false,
   setSnackbarMessage, setIsSnackbarOpen, onTemporaryChatClick, onNewChat,
-  onForkChat, onUpdatePlanClick
+  onForkChat
 }) => {
   const isChatStarted = messages.length > 0;
   const [isDownloadOpen, setIsDownloadOpen] = useState(false);
@@ -50,17 +49,9 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
   const [isRenameOpen, setIsRenameOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isShareOpen, setIsShareOpen] = useState(false);
-  const [isQuotaUsageOpen, setIsQuotaUsageOpen] = useState(false);
   const { t } = useLanguage();
   const { isChatHistoryEnabled } = useChatHistory();
-
-  const handleUpdatePlan = () => {
-    if (onUpdatePlanClick) {
-      onUpdatePlanClick();
-    } else {
-      setIsQuotaUsageOpen(true);
-    }
-  };
+  const { isPremium } = usePremium();
 
   const showSnackbar = (message: string) => {
     setSnackbarMessage(message);
@@ -142,9 +133,11 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             {isModelSelectorOpen ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
           </span>
         </button>
+      </div>
 
+      <div className="flex items-center justify-end min-w-[48px] gap-2 shrink-0">
         <AnimatePresence mode="wait">
-          {!isChatStarted && (
+          {!isChatStarted && !isPremium && (
             <motion.button
               key="update-plan-button"
               initial={{ opacity: 0, scale: 0.8 }}
@@ -152,7 +145,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
               exit={{ opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.2, ease: mdEasing.standard }}
               type="button"
-              onClick={handleUpdatePlan}
+              onClick={() => {}}
               style={{ backgroundColor: '#0000FF' }}
               className="shrink-0 px-3.5 py-1.5 rounded-full hover:opacity-90 active:scale-95 text-white text-xs sm:text-sm font-medium shadow-sm transition-all duration-200 cursor-pointer flex items-center justify-center select-none whitespace-nowrap"
               title="Update plan"
@@ -162,9 +155,7 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
             </motion.button>
           )}
         </AnimatePresence>
-      </div>
 
-      <div className="flex items-center justify-end min-w-[48px] gap-1 shrink-0">
         <AnimatePresence mode="wait">
           {!isChatStarted && isChatHistoryEnabled && (
             <motion.button
@@ -229,7 +220,6 @@ export const ChatHeader: React.FC<ChatHeaderProps> = ({
       <RenameDialog isOpen={isRenameOpen} onClose={() => setIsRenameOpen(false)} currentTitle={chatTitle} onConfirm={handleRenameConfirm} />
       <DeleteConfirmDialog isOpen={isDeleteOpen} onClose={() => setIsDeleteOpen(false)} onConfirm={handleDeleteConfirm} />
       <ShareChatDialog isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} chatId={chatId} chatTitle={chatTitle} showSnackbar={showSnackbar} />
-      <QuotaAndUsagePage isOpen={isQuotaUsageOpen} onClose={() => setIsQuotaUsageOpen(false)} />
       </div>
     </header>
   );
