@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SearchOverlay } from './SearchOverlay';
 import { RenameDialog } from './RenameDialog';
@@ -17,6 +17,7 @@ import { NewChatButton } from './SidebarParts/NewChatButton';
 import { SidebarProfile } from './SidebarParts/SidebarProfile';
 import { useChatHistory } from '../hooks/useChatHistory';
 import { ChatHistorySelection } from './Settings/chatHistorySelection';
+import { supabase, SUPABASE_ENDPOINT } from '../config';
 import '@material/web/icon/icon.js';
 import '@material/web/iconbutton/icon-button.js';
 
@@ -69,12 +70,71 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const { user } = useAuth();
   const { isChatHistoryEnabled } = useChatHistory();
 
-  const handleLayoutChange = (mode: 'list' | 'grid') => {
+  const fetchLayoutSetting = useCallback(async () => {
+    if (!user) return;
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) return;
+      const response = await fetch(`${SUPABASE_ENDPOINT}?type=settings`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${session.access_token}` }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const serverLayout = data?.chat_layout || data?.chat_history_layout;
+        if (serverLayout) {
+          const normalized = String(serverLayout).toLowerCase() === 'grid' ? 'grid' : 'list';
+          setLayoutMode(normalized);
+          try {
+            localStorage.setItem('chat_history_layout', normalized);
+          } catch {
+            // ignore
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch chat layout setting:', err);
+    }
+  }, [user]);
+
+  // Fetch setting upon entering app (when user is available)
+  useEffect(() => {
+    fetchLayoutSetting();
+  }, [fetchLayoutSetting]);
+
+  // Fetch setting upon every sidebar opening
+  useEffect(() => {
+    if (isOpen) {
+      fetchLayoutSetting();
+    }
+  }, [isOpen, fetchLayoutSetting]);
+
+  const handleLayoutChange = async (mode: 'list' | 'grid') => {
     setLayoutMode(mode);
     try {
       localStorage.setItem('chat_history_layout', mode);
     } catch {
       // ignore
+    }
+
+    if (user) {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          await fetch(SUPABASE_ENDPOINT, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.access_token}`
+            },
+            body: JSON.stringify({
+              settings: { chat_layout: mode }
+            })
+          });
+        }
+      } catch (err) {
+        console.error('Failed to sync chat layout setting to server:', err);
+      }
     }
   };
 
@@ -212,27 +272,27 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="flex items-center justify-between px-4 py-2">
             <h2 className="text-[14px] font-medium text-[var(--md-sys-color-on-surface)]">{t('sidebar.chats')}</h2>
             {isChatHistoryEnabled && (
-              <div className="flex items-center bg-[var(--md-sys-color-surface-container-high)] p-0.5 rounded-full border border-[var(--md-sys-color-outline-variant)]/20">
+              <div className="flex items-center bg-[var(--md-sys-color-surface-container-high)] p-0.5 rounded-full border border-[var(--md-sys-color-outline-variant)]/30 shadow-xs">
                 <button
                   type="button"
                   onClick={() => handleLayoutChange('list')}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
                     layoutMode === 'list'
-                      ? 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface)] shadow-xs'
-                      : 'text-[var(--md-sys-color-on-surface-variant)]/60 hover:text-[var(--md-sys-color-on-surface)]'
+                      ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-xs font-medium'
+                      : 'text-[var(--md-sys-color-on-surface-variant)]/70 hover:text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-container-highest)]/40'
                   }`}
                   aria-label={t('sidebar.layout_list') || 'List layout'}
                   title={t('sidebar.layout_list') || 'List layout'}
                 >
-                  <span className="material-symbols-outlined text-[18px]">menu</span>
+                  <span className="material-symbols-outlined text-[18px]">list</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => handleLayoutChange('grid')}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
                     layoutMode === 'grid'
-                      ? 'bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface)] shadow-xs'
-                      : 'text-[var(--md-sys-color-on-surface-variant)]/60 hover:text-[var(--md-sys-color-on-surface)]'
+                      ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-xs font-medium'
+                      : 'text-[var(--md-sys-color-on-surface-variant)]/70 hover:text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-container-highest)]/40'
                   }`}
                   aria-label={t('sidebar.layout_grid') || 'Grid layout'}
                   title={t('sidebar.layout_grid') || 'Grid layout'}

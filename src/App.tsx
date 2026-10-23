@@ -55,6 +55,15 @@ export default function App() {
         if (data?.user_name) {
           setUserName(data.user_name);
         }
+        const serverLayout = data?.chat_layout || data?.chat_history_layout;
+        if (serverLayout) {
+          const normalized = String(serverLayout).toLowerCase() === 'grid' ? 'grid' : 'list';
+          try {
+            localStorage.setItem('chat_history_layout', normalized);
+          } catch {
+            // ignore
+          }
+        }
       } catch (err) {
         console.error('Failed to load user settings:', err);
       }

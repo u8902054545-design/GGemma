@@ -41,6 +41,15 @@ export const useSettingsSync = ({
           if (data.selected_theme && data.selected_theme !== theme) {
             setTheme(data.selected_theme);
           }
+          const serverLayout = data.chat_layout || data.chat_history_layout;
+          if (serverLayout) {
+            const normalized = String(serverLayout).toLowerCase() === 'grid' ? 'grid' : 'list';
+            try {
+              localStorage.setItem('chat_history_layout', normalized);
+            } catch {
+              // ignore
+            }
+          }
         }
       } catch (err) { 
         console.error('Settings sync error:', err); 
