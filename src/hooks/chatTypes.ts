@@ -30,6 +30,7 @@ export type Message = {
   feedback?: 'like' | 'dislike' | null;
   voice?: string;
   searchUsed?: boolean;
+  youtubeSearchUsed?: boolean;
   isSearching?: boolean;
   isAnalyzingImage?: boolean;
   isAnalyzingVideo?: boolean;

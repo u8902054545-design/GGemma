@@ -32,8 +32,8 @@ export const useChatSender = (
   const { isChatHistoryEnabled } = useChatHistory();
 
   const handleSend = useCallback(async (
-    overrideInput?: string, 
-    isSearchActive: boolean = false, 
+    overrideInput?: string,
+    isSearchActive: boolean = false,
     file?: File,
     codes?: ImportedCode[],
     isEdit?: boolean,
@@ -78,17 +78,17 @@ export const useChatSender = (
       id: crypto.randomUUID(),
       role: 'user',
       content: userText,
-      imageUrl: file 
-        ? (file.type.startsWith('video/') ? undefined : localMediaUrl) 
+      imageUrl: file
+        ? (file.type.startsWith('video/') ? undefined : localMediaUrl)
         : oldUserMsg?.imageUrl,
-      videoUrl: file 
-        ? (file.type.startsWith('video/') ? localMediaUrl : undefined) 
+      videoUrl: file
+        ? (file.type.startsWith('video/') ? localMediaUrl : undefined)
         : oldUserMsg?.videoUrl,
-      base64Image: file 
-        ? (file.type.startsWith('video/') ? undefined : base64Image) 
+      base64Image: file
+        ? (file.type.startsWith('video/') ? undefined : base64Image)
         : oldUserMsg?.base64Image,
-      base64Video: file 
-        ? (file.type.startsWith('video/') ? base64Video : undefined) 
+      base64Video: file
+        ? (file.type.startsWith('video/') ? base64Video : undefined)
         : oldUserMsg?.base64Video,
       codes: codes !== undefined ? codes : oldUserMsg?.codes,
       voice: currentVoice,
@@ -117,11 +117,11 @@ export const useChatSender = (
     });
 
     const aiMsgId = crypto.randomUUID();
-    const newAiMsg: Message = { 
-      id: aiMsgId, 
-      role: 'ai', 
-      content: '', 
-      voice: currentVoice, 
+    const newAiMsg: Message = {
+      id: aiMsgId,
+      role: 'ai',
+      content: '',
+      voice: currentVoice,
       isTranslationActive: !!isTranslationActive,
       translationInputLang,
       translationOutputLang
@@ -165,12 +165,14 @@ export const useChatSender = (
 
       const modelNameFromServer = response.headers.get('x-model-name') || selectedModel.name;
       const searchUsedFromServer = response.headers.get('x-search-used') === 'true';
+      const youtubeSearchUsedFromServer = response.headers.get('x-youtube-search-used') === 'true';
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";
       let searchTriggeredFlag = false;
       let imageAnalysisTriggeredFlag = false;
       let videoAnalysisTriggeredFlag = false;
+      let youtubeSearchUsed = youtubeSearchUsedFromServer;
 
       if (!reader) throw new Error('ReadableStream not supported');
 
@@ -188,6 +190,9 @@ export const useChatSender = (
         }
         if (accumulatedContent.includes("[VIDEO_ANALYSIS_IN_PROGRESS]")) {
           videoAnalysisTriggeredFlag = true;
+        }
+        if (accumulatedContent.includes("[YOUTUBE_SEARCH_USED]")) {
+          youtubeSearchUsed = true;
         }
 
         let displayContent = accumulatedContent;
@@ -218,10 +223,11 @@ export const useChatSender = (
         const cleanText = displayContent
           .replace(/\[SEARCH_SOURCES:[^\]]*\]/g, "")
           .replace(/\[SEARCH_USED\]/g, "")
+          .replace(/\[YOUTUBE_SEARCH_USED\]/g, "")
           .replace(/\[IMAGE_ANALYSIS_IN_PROGRESS\]/g, "")
           .replace(/\[VIDEO_ANALYSIS_IN_PROGRESS\]/g, "")
           .trim();
-          
+
         if (cleanText.length === 0) {
           if (searchTriggeredFlag) isSearching = true;
           if (imageAnalysisTriggeredFlag) isAnalyzingImage = true;
@@ -272,6 +278,11 @@ export const useChatSender = (
           }
         }
 
+        if (displayContent.includes("[YOUTUBE_SEARCH_USED]")) {
+          displayContent = displayContent.replace(/\[YOUTUBE_SEARCH_USED\]/g, "");
+          youtubeSearchUsed = true;
+        }
+
         if (displayContent.endsWith("[SEARCH_USED]")) {
           displayContent = displayContent.slice(0, -13);
           searchUsed = true;
@@ -282,16 +293,17 @@ export const useChatSender = (
           const lastIdx = newMessages.length - 1;
           if (lastIdx >= 0 && newMessages[lastIdx].id === aiMsgId) {
             const existingSources = newMessages[lastIdx].searchSources;
-            newMessages[lastIdx] = { 
-              ...newMessages[lastIdx], 
-              content: displayContent, 
+            newMessages[lastIdx] = {
+              ...newMessages[lastIdx],
+              content: displayContent,
               modelName: modelNameFromServer,
               searchUsed: searchUsed,
+              youtubeSearchUsed: youtubeSearchUsed,
               isSearching: isSearching,
               isAnalyzingImage: isAnalyzingImage,
               isAnalyzingVideo: isAnalyzingVideo,
               searchSources: searchSourcesList || existingSources,
-              searchEnabledBy: searchUsed ? (isSearchActive ? 'user' : 'model') : undefined
+              searchEnabledBy: searchUsed || youtubeSearchUsed ? (isSearchActive ? 'user' : 'model') : undefined
             };
             if (isTemporary) saveTempMessages(newMessages);
           }
@@ -339,10 +351,10 @@ export const useChatSender = (
     const regeneratedAiMsgId = crypto.randomUUID();
     const cleanMessages = messages.slice(0, -1);
 
-    const newAiMsg: Message = { 
-      id: regeneratedAiMsgId, 
-      role: 'ai', 
-      content: '', 
+    const newAiMsg: Message = {
+      id: regeneratedAiMsgId,
+      role: 'ai',
+      content: '',
       voice: currentVoice,
       isTranslationActive: userMsg.isTranslationActive,
       translationInputLang: userMsg.translationInputLang,
@@ -375,7 +387,7 @@ export const useChatSender = (
           video: userMsg.base64Video || null,
           codes: userMsg.codes || null,
           isTemporary: isTemporary || !isChatHistoryEnabled,
-          history: (isTemporary || !isChatHistoryEnabled) 
+          history: (isTemporary || !isChatHistoryEnabled)
             ? cleanMessages.slice(0, -1)
             : undefined,
           voice: currentVoice,
@@ -394,10 +406,12 @@ export const useChatSender = (
 
       const modelNameFromServer = response.headers.get('x-model-name') || modelToUse.name;
       const searchUsedFromServer = response.headers.get('x-search-used') === 'true';
+      const youtubeSearchUsedFromServer = response.headers.get('x-youtube-search-used') === 'true';
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
       let accumulatedContent = "";
       let searchTriggeredFlag = false;
+      let youtubeSearchUsed = youtubeSearchUsedFromServer;
 
       if (!reader) throw new Error('ReadableStream not supported');
 
@@ -410,6 +424,9 @@ export const useChatSender = (
         if (accumulatedContent.includes("[SEARCH_IN_PROGRESS]")) {
           searchTriggeredFlag = true;
         }
+        if (accumulatedContent.includes("[YOUTUBE_SEARCH_USED]")) {
+          youtubeSearchUsed = true;
+        }
 
         let displayContent = accumulatedContent;
         let searchUsed = searchUsedFromServer;
@@ -420,12 +437,13 @@ export const useChatSender = (
           if (index !== -1) {
             displayContent = displayContent.substring(index + 20);
           }
-          
+
           const cleanText = displayContent
             .replace(/\[SEARCH_SOURCES:[^\]]*\]/g, "")
             .replace(/\[SEARCH_USED\]/g, "")
+            .replace(/\[YOUTUBE_SEARCH_USED\]/g, "")
             .trim();
-            
+
           if (cleanText.length === 0) {
             isSearching = true;
           }
@@ -475,6 +493,11 @@ export const useChatSender = (
           }
         }
 
+        if (displayContent.includes("[YOUTUBE_SEARCH_USED]")) {
+          displayContent = displayContent.replace(/\[YOUTUBE_SEARCH_USED\]/g, "");
+          youtubeSearchUsed = true;
+        }
+
         if (displayContent.endsWith("[SEARCH_USED]")) {
           displayContent = displayContent.slice(0, -13);
           searchUsed = true;
@@ -485,14 +508,15 @@ export const useChatSender = (
           const lastIdx = newMessages.length - 1;
           if (lastIdx >= 0 && newMessages[lastIdx].id === regeneratedAiMsgId) {
             const existingSources = newMessages[lastIdx].searchSources;
-            newMessages[lastIdx] = { 
-              ...newMessages[lastIdx], 
-              content: displayContent, 
+            newMessages[lastIdx] = {
+              ...newMessages[lastIdx],
+              content: displayContent,
               modelName: modelNameFromServer,
               searchUsed: searchUsed,
+              youtubeSearchUsed: youtubeSearchUsed,
               isSearching: isSearching,
               searchSources: searchSourcesList || existingSources,
-              searchEnabledBy: searchUsed ? (lastAiMsg.searchEnabledBy || 'model') : undefined
+              searchEnabledBy: searchUsed || youtubeSearchUsed ? (lastAiMsg.searchEnabledBy || 'model') : undefined
             };
             if (isTemporary) saveTempMessages(newMessages);
           }

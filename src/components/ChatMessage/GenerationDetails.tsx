@@ -58,20 +58,7 @@ export const GenerationDetails: React.FC<GenerationDetailsProps> = ({
                   {t('message.generation_details.tools_used')}
                 </h3>
                 <div className="flex flex-col gap-2">
-                  {searchUsed && (
-                    <div className="flex items-center gap-3 py-2.5 px-4 rounded-xl bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)]/60">
-                      <div className="w-8 h-8 rounded-lg bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] flex items-center justify-center flex-shrink-0">
-                        <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">search</span>
-                      </div>
-                      <div className="flex-1">
-                        <span className="text-[var(--md-sys-color-on-surface)] text-sm font-medium">
-                          {t('message.generation_details.web_search')}
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {youtubeSearchUsed && (
+                  {youtubeSearchUsed ? (
                     <div className="flex items-center gap-3 py-2.5 px-4 rounded-xl bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)]/60">
                       <div className="w-8 h-8 rounded-lg bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] flex items-center justify-center flex-shrink-0">
                         <YouTubeIcon className="w-5 h-5" />
@@ -79,6 +66,17 @@ export const GenerationDetails: React.FC<GenerationDetailsProps> = ({
                       <div className="flex-1">
                         <span className="text-[var(--md-sys-color-on-surface)] text-sm font-medium">
                           {t('message.generation_details.youtube_search') || 'YouTube Search'}
+                        </span>
+                      </div>
+                    </div>
+                  ) : searchUsed && (
+                    <div className="flex items-center gap-3 py-2.5 px-4 rounded-xl bg-[var(--md-sys-color-surface-container-high)] border border-[var(--md-sys-color-outline-variant)]/60">
+                      <div className="w-8 h-8 rounded-lg bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] flex items-center justify-center flex-shrink-0">
+                        <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-primary)]">search</span>
+                      </div>
+                      <div className="flex-1">
+                        <span className="text-[var(--md-sys-color-on-surface)] text-sm font-medium">
+                          {t('message.generation_details.web_search')}
                         </span>
                       </div>
                     </div>

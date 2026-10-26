@@ -125,6 +125,7 @@ export const en = {
   'message.generation_details.description': 'The response uses a model "{model}"',
   'message.generation_details.tools_used': 'Tools used',
   'message.generation_details.web_search': 'Web search',
+  'message.generation_details.youtube_search': 'YouTube Search',
   'message.generation_details.image_analysis': 'Image analysis',
   'message.generation_details.video_analysis': 'Video analysis',
   'message.menu.create_branch': 'Create a branch',
@@ -224,4 +225,3 @@ export const en = {
   'quota.error': 'Error loading quota data',
   'model.premium_required': 'Model {model} is only available to Premium users. Upgrade your plan to get access.',
 };
-

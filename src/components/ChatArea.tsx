@@ -29,7 +29,7 @@ interface ChatAreaProps {
 
 export const ChatArea: React.FC<ChatAreaProps> = ({
   messages, isTyping, isTemporary, user, scrollContainerRef, handleScroll,
-  handleSend, handleRegenerate, isSearchActive, handleFeedback, handleImagePreview, setFullscreenImage, 
+  handleSend, handleRegenerate, isSearchActive, handleFeedback, handleImagePreview, setFullscreenImage,
   onVideoClick,
   messagesEndRef,
   onEditClick,
@@ -99,6 +99,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                   onVideoClick={onVideoClick}
                   isTemporary={isTemporary}
                   searchUsed={msg.searchUsed}
+                  youtubeSearchUsed={msg.youtubeSearchUsed}
                   isSearching={msg.isSearching}
                   isAnalyzingImage={msg.isAnalyzingImage}
                   isAnalyzingVideo={msg.isAnalyzingVideo}

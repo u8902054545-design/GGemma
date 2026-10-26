@@ -7,6 +7,7 @@ export type ChatMessageProps = {
   feedback?: 'like' | 'dislike' | null;
   onFeedback?: (id: string, type: 'like' | 'dislike' | null) => void;
   searchUsed?: boolean;
+  youtubeSearchUsed?: boolean;
   isSearching?: boolean;
   isAnalyzingImage?: boolean;
   isAnalyzingVideo?: boolean;

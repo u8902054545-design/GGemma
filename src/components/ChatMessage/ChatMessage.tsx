@@ -29,6 +29,7 @@ interface ExtendedChatMessageProps extends ChatMessageProps {
   videoUrl?: string;
   codes?: ImportedCode[];
   isSearching?: boolean;
+  youtubeSearchUsed?: boolean;
   onRegenerate?: (mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => void;
   isLastUserMessage?: boolean;
   onEditClick?: (messageId: string, content: string) => void;
@@ -55,6 +56,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   onVideoClick,
   isTemporary = false,
   searchUsed,
+  youtubeSearchUsed,
   isSearching,
   isAnalyzingImage,
   isAnalyzingVideo,
@@ -152,8 +154,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
 
   const handlePointerDown = React.useCallback((e: React.PointerEvent) => {
     if (isAI) return;
-    if (e.button !== 0) return; // Only primary clicks
-    
+    if (e.button !== 0) return;
+
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
       if (navigator.vibrate) {
@@ -238,7 +240,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
           )}
         </AnimatePresence>
 
-        <div 
+        <div
           id={`msg-bubble-${messageId}`}
           onContextMenu={handleContextMenu}
           onPointerDown={handlePointerDown}
@@ -252,7 +254,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               : 'max-w-[85%] bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] px-5 py-3 rounded-[24px] rounded-tr-[4px] shadow-sm inline-block active:scale-[0.99] select-none'
           } ${!isContentExpanded && canShowExpand ? 'max-h-[300px] overflow-hidden' : 'max-h-full'}`}
         >
-          <MessageMedia 
+          <MessageMedia
             imageUrl={imageUrl}
             videoUrl={videoUrl}
             onImageClick={() => imageUrl && onImageClick?.(imageUrl)}
@@ -274,7 +276,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
             )}
 
             <ImportedCodes codes={codes || []} />
-            
+
             {isAI && isStopped && <StoppedIndicator />}
           </div>
 
@@ -317,9 +319,9 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
         )}
 
         {canShowExpand && (
-          <ExpandButton 
-            isExpanded={isContentExpanded} 
-            onToggle={() => setIsContentExpanded(!isContentExpanded)} 
+          <ExpandButton
+            isExpanded={isContentExpanded}
+            onToggle={() => setIsContentExpanded(!isContentExpanded)}
           />
         )}
 
@@ -349,6 +351,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               onOpenChange={setIsDetailsOpen}
               modelName={modelName}
               searchUsed={searchUsed}
+              youtubeSearchUsed={youtubeSearchUsed}
               imageUsed={userHasImage}
               videoUsed={userHasVideo}
             />
