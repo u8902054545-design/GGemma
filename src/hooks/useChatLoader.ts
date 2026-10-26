@@ -40,6 +40,7 @@ export const useChatLoader = (
         videoUrl: m.video_url,
         codes: m.codes,
         searchUsed: m.search_used,
+        youtubeSearchUsed: m.youtube_search_used,
         searchSources: m.search_sources,
         searchEnabledBy: m.search_enabled_by,
         isTranslationActive: m.is_translation_active,
@@ -48,7 +49,7 @@ export const useChatLoader = (
       }));
 
       setMessages(formattedMessages);
-      
+
       const lastUserMessage = [...formattedMessages].reverse().find(m => m.role === 'user');
       if (lastUserMessage) {
         setTimeout(() => scrollToMessageTop(lastUserMessage.id), 100);
