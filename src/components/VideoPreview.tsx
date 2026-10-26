@@ -10,6 +10,20 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ url, onClose }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const isYouTubeUrl = url.includes('youtube.com') || url.includes('youtu.be');
+
+  const getYouTubeEmbedUrl = (rawUrl: string) => {
+    let videoId = '';
+    if (rawUrl.includes('youtu.be/')) {
+      videoId = rawUrl.split('youtu.be/')[1]?.split('?')[0];
+    } else if (rawUrl.includes('watch?v=')) {
+      videoId = rawUrl.split('watch?v=')[1]?.split('&')[0];
+    } else if (rawUrl.includes('embed/')) {
+      videoId = rawUrl.split('embed/')[1]?.split('?')[0];
+    }
+    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : rawUrl;
+  };
+
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) {
@@ -23,7 +37,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ url, onClose }) => {
 
   useEffect(() => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || isYouTubeUrl) return;
 
     const handlePlay = () => setIsPlaying(true);
     const handlePause = () => setIsPlaying(false);
@@ -35,7 +49,7 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ url, onClose }) => {
       video.removeEventListener('play', handlePlay);
       video.removeEventListener('pause', handlePause);
     };
-  }, [url]);
+  }, [url, isYouTubeUrl]);
 
   return (
     <motion.div
@@ -46,16 +60,37 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ url, onClose }) => {
       onClick={onClose}
     >
       <div 
-        className="relative max-w-full max-h-full flex items-center justify-center"
+        className="relative w-full max-w-4xl aspect-video flex items-center justify-center"
         onClick={(e) => e.stopPropagation()}
       >
-        <video
-          ref={videoRef}
-          src={url}
-          className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl"
-          controls
-          playsInline
-        />
+        {isYouTubeUrl ? (
+          <iframe
+            src={getYouTubeEmbedUrl(url)}
+            className="w-full h-full rounded-2xl shadow-2xl border-0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <>
+            <video
+              ref={videoRef}
+              src={url}
+              className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl"
+              controls
+              playsInline
+            />
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <button
+                onClick={togglePlay}
+                className={`w-20 h-20 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center backdrop-blur-sm transition-all pointer-events-auto active:scale-90 ${isPlaying ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}
+              >
+                <span className="material-symbols-outlined text-white text-[48px]">
+                  {isPlaying ? 'pause' : 'play_arrow'}
+                </span>
+              </button>
+            </div>
+          </>
+        )}
 
         <button
           onClick={onClose}
@@ -63,17 +98,6 @@ export const VideoPreview: React.FC<VideoPreviewProps> = ({ url, onClose }) => {
         >
           <span className="material-symbols-outlined text-white">close</span>
         </button>
-
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <button
-            onClick={togglePlay}
-            className={`w-20 h-20 rounded-full bg-black/40 hover:bg-black/60 flex items-center justify-center backdrop-blur-sm transition-all pointer-events-auto active:scale-90 ${isPlaying ? 'opacity-0 hover:opacity-100' : 'opacity-100'}`}
-          >
-            <span className="material-symbols-outlined text-white text-[48px]">
-              {isPlaying ? 'pause' : 'play_arrow'}
-            </span>
-          </button>
-        </div>
       </div>
     </motion.div>
   );

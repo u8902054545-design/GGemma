@@ -240,6 +240,18 @@ export const useChatSender = (
           }
         }
 
+        if (displayContent.includes("[YOUTUBE_REQUIRED:")) {
+          const index = displayContent.indexOf("[YOUTUBE_REQUIRED:");
+          const before = displayContent.substring(0, index);
+          const after = displayContent.substring(index);
+          const closingIdx = after.indexOf("]");
+          if (closingIdx !== -1) {
+            displayContent = before + after.substring(closingIdx + 1);
+          } else {
+            displayContent = before;
+          }
+        }
+
         let searchSourcesList = undefined;
         if (displayContent.includes("[SEARCH_SOURCES:")) {
           const index = displayContent.indexOf("[SEARCH_SOURCES:");
@@ -369,7 +381,7 @@ export const useChatSender = (
           voice: currentVoice,
           isRegenerate: true,
           regenerateMode: mode || 'repeat',
-          isTranslationActive: userMsg.isTranslationActive,
+          isTranslationFound: userMsg.isTranslationActive,
           translationInputLang: userMsg.translationInputLang,
           translationOutputLang: userMsg.translationOutputLang
         }),
@@ -421,6 +433,18 @@ export const useChatSender = (
 
         if (displayContent.includes("[SEARCH_REQUIRED:")) {
           const index = displayContent.indexOf("[SEARCH_REQUIRED:");
+          const before = displayContent.substring(0, index);
+          const after = displayContent.substring(index);
+          const closingIdx = after.indexOf("]");
+          if (closingIdx !== -1) {
+            displayContent = before + after.substring(closingIdx + 1);
+          } else {
+            displayContent = before;
+          }
+        }
+
+        if (displayContent.includes("[YOUTUBE_REQUIRED:")) {
+          const index = displayContent.indexOf("[YOUTUBE_REQUIRED:");
           const before = displayContent.substring(0, index);
           const after = displayContent.substring(index);
           const closingIdx = after.indexOf("]");
