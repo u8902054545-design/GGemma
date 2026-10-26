@@ -315,7 +315,7 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
         )}
 
         {isAI && (
-          <SearchSources sources={searchSources} />
+          <SearchSources sources={searchSources} isYouTubeSearch={youtubeSearchUsed} />
         )}
 
         {canShowExpand && (
