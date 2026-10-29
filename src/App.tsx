@@ -61,7 +61,6 @@ export default function App() {
           try {
             localStorage.setItem('chat_history_layout', normalized);
           } catch {
-            // ignore
           }
         }
       } catch (err) {
@@ -125,7 +124,6 @@ export default function App() {
             setShowBlockedDialog(true);
           }
         } catch (e) {
-          // Not JSON or error body doesn't match
         }
       }
       return response;
@@ -135,6 +133,7 @@ export default function App() {
       window.fetch = originalFetch;
     };
   }, [signOut, checkIp]);
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { isSearchActive, toggleSearch, resetSearch } = useSearch();
   const [isTranslationActive, setIsTranslationActive] = useState(false);
@@ -149,7 +148,8 @@ export default function App() {
     messages, setMessages, input, setInput, selectedModel, setSelectedModel,
     isTyping, isLoading, messagesEndRef, scrollContainerRef, handleSend, handleRegenerate, handleFeedback, chatId, setChatId,
     chatTitle, setChatTitle, loadChatMessages, stopRequest, snackbarMessage,
-    isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage, exhaustedModels
+    isSnackbarOpen, setIsSnackbarOpen, models, setSnackbarMessage, exhaustedModels,
+    isAllModelsExhausted
   } = useChat(() => refreshChats(true), isTemporary);
 
   useEffect(() => {
@@ -188,6 +188,7 @@ export default function App() {
     handleCreateNewChat(setMessages, setChatId, setChatTitle, resetSearch, () => {}, () => {});
     setIsTranslationActive(false);
   };
+
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
@@ -203,29 +204,33 @@ export default function App() {
   const [isRegenModelSelectorOpen, setIsRegenModelSelectorOpen] = useState(false);
   const [isRegenAllModelsPageOpen, setIsRegenAllModelsPageOpen] = useState(false);
 
-  // Fallback to non-restricted model if user is not premium but a paid model is selected
-  useEffect(() => {
-    if (!isPremium && (isModelPaid(selectedModel.id) || isModelPaid(selectedModel.name))) {
-      const fallback = models.find(m => !isModelPaid(m.id) && !isModelPaid(m.name) && m.id !== 'auto') || models[0];
-      if (fallback) {
-        setSelectedModel(fallback);
-      }
-    }
-  }, [isPremium, selectedModel, models, isModelPaid, setSelectedModel]);
-
   const handleRegenerateWithModelSelection = useCallback((mode: 'longer' | 'briefly' | 'no_personalization' | 'repeat') => {
     if (mode === 'repeat') {
       setIsRegenModelSelectorOpen(true);
     } else {
+      if (isAllModelsExhausted) {
+        setSnackbarMessage(t('errors.limit.exceeded') || 'Все доступные модели исчерпали лимит запросов.');
+        setIsSnackbarOpen(true);
+        return;
+      }
       const isPaid = isModelPaid(selectedModel.id) || isModelPaid(selectedModel.name);
       if (isPaid && !isPremium) {
         setSnackbarMessage(t('model.premium_required', { model: selectedModel.name }));
         setIsSnackbarOpen(true);
         return;
       }
+      const isExhausted = exhaustedModels.some(m => 
+        m.toLowerCase().trim() === selectedModel.id.toLowerCase().trim() ||
+        m.toLowerCase().trim() === selectedModel.name.toLowerCase().trim()
+      );
+      if (isExhausted) {
+        setSnackbarMessage(t('errors.limit.exceeded') || 'Лимит запросов для этой модели исчерпан.');
+        setIsSnackbarOpen(true);
+        return;
+      }
       handleRegenerate(mode);
     }
-  }, [handleRegenerate, isModelPaid, isPremium, selectedModel, setSnackbarMessage, setIsSnackbarOpen, t]);
+  }, [handleRegenerate, isModelPaid, isPremium, selectedModel, setSnackbarMessage, setIsSnackbarOpen, t, isAllModelsExhausted, exhaustedModels]);
 
   const { isChatHistoryEnabled } = useChatHistory();
   const [editingMessage, setEditingMessage] = useState<{ id: string; content: string } | null>(null);
@@ -463,9 +468,25 @@ export default function App() {
     inLang?: string,
     outLang?: string
   ) => {
+    if (isAllModelsExhausted) {
+      setSnackbarMessage(t('errors.limit.exceeded') || 'Все доступные модели исчерпали лимит запросов.');
+      setIsSnackbarOpen(true);
+      return;
+    }
+
     const isPaid = isModelPaid(selectedModel.id) || isModelPaid(selectedModel.name);
     if (isPaid && !isPremium) {
       setSnackbarMessage(t('model.premium_required', { model: selectedModel.name }));
+      setIsSnackbarOpen(true);
+      return;
+    }
+
+    const isExhausted = exhaustedModels.some(m => 
+      m.toLowerCase().trim() === selectedModel.id.toLowerCase().trim() ||
+      m.toLowerCase().trim() === selectedModel.name.toLowerCase().trim()
+    );
+    if (isExhausted) {
+      setSnackbarMessage(t('errors.limit.exceeded') || 'Лимит запросов для этой модели исчерпан.');
       setIsSnackbarOpen(true);
       return;
     }

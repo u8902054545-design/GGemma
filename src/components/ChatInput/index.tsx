@@ -11,7 +11,8 @@ import { VoiceInput } from './VoiceInput';
 import { GemmaLive } from './GemmaLive';
 import { playLiveOpenSound, playLiveCloseSound } from './sounds';
 import { initLiveAudioContext } from './liveTTS';
-
+import { usePremium } from '../../hooks/usePremium';
+import { supabase, SUPABASE_ENDPOINT } from '../../config';
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
   input, setInput, handleSend, stopRequest,
@@ -39,6 +40,42 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   const videoInputRef = useRef<HTMLInputElement>(null);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [previewVideoUrl, setPreviewVideoUrl] = useState<string | null>(null);
+  const [exhaustedModels, setExhaustedModels] = useState<string[]>([]);
+  const { isPremium, isModelPaid } = usePremium();
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLimits = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const res = await fetch(`${SUPABASE_ENDPOINT}?type=limits`, {
+          headers: { 'Authorization': `Bearer ${session.access_token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (isMounted) {
+            setExhaustedModels(data.exhausted || []);
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    fetchLimits();
+    return () => {
+      isMounted = false;
+    };
+  }, [messages.length]);
+
+  const isCurrentModelPaid = Boolean(!isPremium && selectedModel && (isModelPaid(selectedModel.id) || isModelPaid(selectedModel.name)));
+
+  const isCurrentModelExhausted = Boolean(selectedModel && exhaustedModels.some(
+    m => m.toLowerCase().trim() === selectedModel.id.toLowerCase().trim() ||
+         m.toLowerCase().trim() === selectedModel.name.toLowerCase().trim()
+  ));
+
+  const isModelUnavailable = isCurrentModelPaid || isCurrentModelExhausted;
 
   const isImageDisabled = selectedModel.id === 'Gemma 2 27B' || selectedModel.id === 'Gemma 3n E4B';
   const isVideoDisabled = !(
@@ -59,7 +96,6 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
 
   const [isVoiceInputActive, setIsVoiceInputActive] = useState(false);
   const [isLiveActive, setIsLiveActive] = useState(false);
-
 
   useEffect(() => {
     if (isImageDisabled && selectedFile) {
@@ -82,6 +118,11 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   };
 
   const handleWrappedSend = () => {
+    if (isModelUnavailable) {
+      setSnackbarMessage?.('Все доступные модели исчерпали лимит запросов.');
+      setIsSnackbarOpen?.(true);
+      return;
+    }
     if (!input.trim() && !selectedFile && importedCodes.length === 0) return;
     handleSend(
       undefined, 
@@ -115,7 +156,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
     }
   };
 
-  const isSendDisabled = !input.trim() && !selectedFile && importedCodes.length === 0;
+  const isSendDisabled = isModelUnavailable || (!input.trim() && !selectedFile && importedCodes.length === 0);
 
   return (
     <footer className="w-full max-w-[1200px] mx-auto z-50 relative pb-8 px-2">
@@ -189,7 +230,7 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                     stopRequest={stopRequest}
                     handleWrappedSend={handleWrappedSend}
                     isSendDisabled={isSendDisabled}
-                    showVoiceChat={!input.trim() && !selectedFile && importedCodes.length === 0}
+                    showVoiceChat={!isModelUnavailable && !input.trim() && !selectedFile && importedCodes.length === 0}
                     onVoiceChatClick={() => {
                       initLiveAudioContext();
                       playLiveOpenSound();
