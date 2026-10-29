@@ -13,7 +13,16 @@ export const TypingIndicator: React.FC = () => {
       className="flex flex-col items-start mb-8"
     >
       <div className="relative flex items-center justify-center w-12 h-12">
-        <div className="google-spinner" />
+        <svg className="google-spinner" viewBox="0 0 50 50">
+          <circle
+            className="google-spinner-circle"
+            cx="25"
+            cy="25"
+            r="20"
+            fill="none"
+            strokeWidth="3.5"
+          />
+        </svg>
         <div className="z-10 flex items-center justify-center">
           <GemmaIcon className="w-9 h-9" />
         </div>

@@ -5,6 +5,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { getAllUserShares, deleteShareById, deleteAllUserShares, SharedChat } from './shareUtils';
 import Snackbar from '../components/Snackbar';
 import { DeleteAllSharesDialog } from './DeleteAllSharesDialog';
+import { GoogleSpinner } from '../components/GoogleSpinner';
 
 interface SharesPageProps {
   isOpen: boolean;
@@ -123,7 +124,7 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
 
         {isLoading ? (
           <div className="w-full flex justify-center py-12">
-            <span className="material-symbols-outlined animate-spin text-[36px] text-[var(--md-sys-color-primary)]">progress_activity</span>
+            <GoogleSpinner size={36} strokeWidth={4} />
           </div>
         ) : shares.length === 0 ? (
           <div className="w-full flex flex-col items-center justify-center py-16 text-center">
@@ -190,7 +191,6 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
         )}
       </main>
 
-      {/* Delete All Sticky Footer */}
       <div className="w-full p-6 shrink-0 border-t border-[var(--md-sys-color-outline-variant)]/10 bg-[var(--md-sys-color-background)] flex justify-center">
         <button
           onClick={() => setIsDeleteAllOpen(true)}

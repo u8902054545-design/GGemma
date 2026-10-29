@@ -6,6 +6,7 @@ import { SUPABASE_ENDPOINT, supabase } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
 import { useLanguage } from '../../hooks/useLanguage';
 import { voiceDescriptions } from './voiceDescriptions';
+import { GoogleSpinner } from '../GoogleSpinner';
 
 const previewAudioCache: Record<string, ArrayBuffer> = {};
 
@@ -247,10 +248,8 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
                 >
                   {loadingVoice === voice ? (
                     <>
-                      <span className="absolute inset-0 flex items-center justify-center">
-                        <span className="material-symbols-outlined animate-spin text-[24px] text-[var(--md-sys-color-primary)]">
-                          progress_activity
-                        </span>
+                      <span className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                        <GoogleSpinner size={24} strokeWidth={4} />
                       </span>
                       <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-primary)]/50 z-10">
                         pause

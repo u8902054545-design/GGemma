@@ -9,20 +9,42 @@
 }
 
 .google-spinner {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
   position: absolute;
-  background: conic-gradient(var(--gemma-blue-deep), var(--gemma-blue-bright), var(--gemma-blue-light), var(--gemma-blue-deep));
-  -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 100%);
-  mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #fff 100%);
-  animation: spin 1.5s linear infinite;
+  inset: 0;
+  margin: auto;
+  width: 44px;
+  height: 44px;
+  animation: google-spinner-rotate 2s linear infinite;
+  transform-origin: center center;
   will-change: transform;
 }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+.google-spinner-circle {
+  stroke: #0000FF;
+  stroke-linecap: round;
+  animation: google-spinner-dash 1.5s ease-in-out infinite;
+  will-change: stroke-dasharray, stroke-dashoffset;
+}
+
+@keyframes google-spinner-rotate {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes google-spinner-dash {
+  0% {
+    stroke-dasharray: 1, 200;
+    stroke-dashoffset: 0;
+  }
+  50% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -35px;
+  }
+  100% {
+    stroke-dasharray: 89, 200;
+    stroke-dashoffset: -124px;
+  }
 }
 
 .animate-gradient {

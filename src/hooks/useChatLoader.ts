@@ -11,7 +11,7 @@ export const useChatLoader = (
 ) => {
   const loadChatMessages = async (id: string) => {
     try {
-      setMessages([{ id: 'loading-skeleton', role: 'ai', content: '' }]);
+      setMessages([]);
       setIsLoading(true);
       setChatId(id);
 

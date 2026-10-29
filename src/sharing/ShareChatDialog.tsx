@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../hooks/useLanguage';
 import { createChatShare, getChatShareCount, SharedChat } from './shareUtils';
 import { fetchChatMessages } from '../components/chatHeaderFunctions';
+import { GoogleSpinner } from '../components/GoogleSpinner';
 
 interface ShareChatDialogProps {
   isOpen: boolean;
@@ -64,13 +65,11 @@ export const ShareChatDialog: React.FC<ShareChatDialogProps> = ({
     if (!chatId) return;
     setIsOperating(true);
     try {
-      // 1. Fetch latest messages from database
       const messages = await fetchChatMessages(chatId);
       if (messages.length === 0) {
         throw new Error('Cannot share an empty chat');
       }
 
-      // 2. Insert the shared chat snapshot
       const result = await createChatShare(chatId, chatTitle || '', messages);
       
       if (mountedRef.current) {
@@ -148,7 +147,7 @@ export const ShareChatDialog: React.FC<ShareChatDialogProps> = ({
 
                   {isLoadingCount ? (
                     <div className="w-full flex justify-center py-4">
-                      <span className="material-symbols-outlined animate-spin text-[24px] text-[var(--md-sys-color-primary)]">progress_activity</span>
+                      <GoogleSpinner size={24} strokeWidth={4} />
                     </div>
                   ) : sharedInfo ? (
                     <div className="space-y-4 mt-2">
@@ -209,7 +208,7 @@ export const ShareChatDialog: React.FC<ShareChatDialogProps> = ({
                         className="px-5 py-2 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full text-sm font-medium hover:shadow-md transition-all active:scale-95 disabled:opacity-50 flex items-center gap-1.5"
                       >
                         {isOperating ? (
-                          <span className="material-symbols-outlined animate-spin text-[16px]">progress_activity</span>
+                          <GoogleSpinner size={16} strokeWidth={4} />
                         ) : (
                           <span className="material-symbols-outlined text-[16px]">link</span>
                         )}

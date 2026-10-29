@@ -610,7 +610,8 @@ export default function App() {
               <div className="flex-1 relative overflow-hidden flex flex-col">
                 <ChatArea
                   messages={messages}
-                  isTyping={isTyping || isLoading}
+                  isTyping={isTyping}
+                  isLoading={isLoading}
                   isTemporary={isTemporary}
                   user={user}
                   scrollContainerRef={scrollContainerRef}

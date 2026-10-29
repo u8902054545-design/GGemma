@@ -5,6 +5,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { useChatHistory } from '../hooks/useChatHistory';
 import { useAuth } from '../hooks/useAuth';
 import { useUserChats } from '../hooks/useUserChats';
+import { GoogleSpinner } from './GoogleSpinner';
 
 interface SearchResult {
   chat_id: string;
@@ -100,7 +101,7 @@ export const SearchOverlay: React.FC<SearchOverlayProps> = ({ isOpen, onClose, o
 
             {loading && (
               <div className="flex justify-center p-8">
-                <div className="w-5 h-5 border-2 border-[#c2e7ff] border-t-transparent rounded-full animate-spin"></div>
+                <GoogleSpinner size={24} strokeWidth={4} />
               </div>
             )}
 

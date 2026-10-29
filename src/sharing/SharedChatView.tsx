@@ -5,6 +5,7 @@ import { supabase } from '../config';
 import { useLanguage } from '../hooks/useLanguage';
 import { useAuth } from '../hooks/useAuth';
 import { GemmaIcon } from '../components/IconsApp/GemmaIcon';
+import { GoogleSpinner } from '../components/GoogleSpinner';
 
 interface SharedChatViewProps {
   shareId: string;
@@ -47,7 +48,6 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
     if (!sharedChat) return;
 
     if (!user) {
-      // If not logged in, redirect to login page (main app root)
       window.location.href = '/';
       return;
     }
@@ -56,7 +56,6 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
     try {
       const newChatId = crypto.randomUUID();
 
-      // 1. Create a new chat row
       const { error: chatError } = await supabase
         .from('chats')
         .insert({
@@ -69,12 +68,10 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
 
       if (chatError) throw chatError;
 
-      // 2. Process and copy media files to the new user's storage
       const messagesToInsert = await Promise.all(sharedChat.messages.map(async (m: any, idx: number) => {
         let copiedImageUrl = m.image_url || m.imageUrl || null;
         let copiedVideoUrl = m.video_url || m.videoUrl || null;
 
-        // Copy Image
         if (copiedImageUrl) {
           try {
             const response = await fetch(copiedImageUrl);
@@ -98,7 +95,6 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
           }
         }
 
-        // Copy Video
         if (copiedVideoUrl) {
           try {
             const response = await fetch(copiedVideoUrl);
@@ -126,7 +122,7 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
           id: crypto.randomUUID(),
           chat_id: newChatId,
           user_id: user.id,
-          role: m.role === 'ai' ? 'model' : 'user', // database column role is 'model' or 'user'
+          role: m.role === 'ai' ? 'model' : 'user',
           content: m.content,
           image_url: copiedImageUrl,
           video_url: copiedVideoUrl,
@@ -152,7 +148,7 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
   if (loading) {
     return (
       <div className="h-screen w-full flex flex-col items-center justify-center bg-[var(--md-sys-color-background)]">
-        <span className="material-symbols-outlined animate-spin text-[48px] text-[var(--md-sys-color-primary)]">progress_activity</span>
+        <GoogleSpinner size={48} strokeWidth={4} />
       </div>
     );
   }
@@ -174,7 +170,6 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
 
   return (
     <div className="h-screen w-full flex flex-col bg-[var(--md-sys-color-background)] text-[var(--md-sys-color-on-surface)] overflow-hidden">
-      {/* Shared Header */}
       <header className="h-[64px] border-b border-[var(--md-sys-color-outline-variant)]/10 px-4 md:px-6 flex items-center justify-between bg-[var(--md-sys-color-surface)] z-10 shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <button
@@ -190,14 +185,13 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Import Button */}
           <button
             onClick={handleImport}
             disabled={isImporting}
             className="px-5 py-2.5 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full text-sm font-semibold hover:shadow-md transition-all active:scale-95 disabled:opacity-50 flex items-center gap-2"
           >
             {isImporting ? (
-              <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+              <GoogleSpinner size={18} strokeWidth={4} />
             ) : (
               <span className="material-symbols-outlined text-[18px]">{user ? 'content_copy' : 'login'}</span>
             )}
@@ -209,13 +203,11 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
         </div>
       </header>
 
-      {/* Shared Content */}
       <div 
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto w-full mx-auto flex flex-col p-4 md:p-6 pb-20 max-w-[1200px]"
       >
         <div className="flex-1 flex flex-col">
-          {/* Chat Title and Public Link */}
           <div className="mb-8 border-b border-[var(--md-sys-color-outline-variant)]/10 pb-6">
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-[var(--md-sys-color-on-background)] mb-3">
               {sharedChat.title}
@@ -252,7 +244,6 @@ export const SharedChatView: React.FC<SharedChatViewProps> = ({ shareId, onImpor
                 isGenerating={false}
                 isLast={index === sharedChat.messages.length - 1}
                 onImageClick={(url) => {
-                  // If there's an image click handler in the app, we can just open it in a new window or ignore
                   window.open(url, '_blank');
                 }}
                 onVideoClick={(url) => {

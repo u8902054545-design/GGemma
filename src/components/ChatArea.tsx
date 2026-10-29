@@ -5,10 +5,12 @@ import { TemporaryChatPage } from '../TemporaryChat/TemporaryChatPage';
 import { StartScreen } from './MainScreen/StartScreen';
 import { pageVariants } from '../motion/transitions';
 import { SelectedModel } from '../hooks/chatTypes';
+import { GoogleSpinner } from './GoogleSpinner';
 
 interface ChatAreaProps {
   messages: any[];
   isTyping: boolean;
+  isLoading?: boolean;
   isTemporary: boolean;
   user: any;
   scrollContainerRef: React.RefObject<HTMLDivElement | null>;
@@ -25,26 +27,22 @@ interface ChatAreaProps {
   parentChatTitle?: string;
   onCreateBranch?: (messageId: string) => void;
   selectedModel: SelectedModel;
+  userName?: string | null;
 }
 
 export const ChatArea: React.FC<ChatAreaProps> = ({
-  messages, isTyping, isTemporary, user, scrollContainerRef, handleScroll,
+  messages, isTyping, isLoading = false, isTemporary, user, scrollContainerRef, handleScroll,
   handleSend, handleRegenerate, isSearchActive, handleFeedback, handleImagePreview, setFullscreenImage,
   onVideoClick,
   messagesEndRef,
   onEditClick,
   parentChatTitle,
   onCreateBranch,
-  selectedModel
+  selectedModel,
+  userName
 }) => {
   const lastUserMsg = [...messages].reverse().find(msg => msg.role === 'user');
   const lastUserMsgId = lastUserMsg ? lastUserMsg.id : null;
-
-  const handleScrollToBottom = () => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <main
@@ -53,7 +51,17 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
       className="flex-1 overflow-y-auto w-full mx-auto flex flex-col scroll-smooth"
     >
       <AnimatePresence mode="wait">
-        {isTemporary && messages.length === 0 ? (
+        {isLoading && messages.length === 0 ? (
+          <motion.div
+            key="chat-loader-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none"
+          >
+            <GoogleSpinner size={44} strokeWidth={4} />
+          </motion.div>
+        ) : isTemporary && messages.length === 0 ? (
           <TemporaryChatPage key="temp-page" />
         ) : messages.length === 0 ? (
           <motion.div
@@ -65,7 +73,7 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
             className="absolute inset-0 flex flex-col"
           >
             <StartScreen
-              userName={user.user_metadata?.full_name || user.email}
+              userName={userName || user?.user_metadata?.full_name || user?.email}
               selectedModel={selectedModel}
             />
           </motion.div>

@@ -3,6 +3,7 @@ import * as AlertDialog from '@radix-ui/react-alert-dialog';
 import { motion, AnimatePresence } from 'motion/react';
 import { mdEasing } from '../motion/transitions';
 import { useLanguage } from '../hooks/useLanguage';
+import { GoogleSpinner } from '../components/GoogleSpinner';
 
 interface DeleteAllSharesDialogProps {
   isOpen: boolean;
@@ -69,7 +70,7 @@ export const DeleteAllSharesDialog: React.FC<DeleteAllSharesDialogProps> = ({ is
                     className="px-4 py-2 text-[var(--md-sys-color-error)] font-medium hover:bg-[var(--md-sys-color-error)]/10 rounded-full transition-colors active:bg-[var(--md-sys-color-error)]/20 disabled:opacity-50 flex items-center gap-2 min-w-[80px] justify-center text-sm bg-transparent border-none"
                   >
                     {isLoading ? (
-                      <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                      <GoogleSpinner size={18} strokeWidth={4} />
                     ) : (
                       t('dialog.delete.confirm')
                     )}
