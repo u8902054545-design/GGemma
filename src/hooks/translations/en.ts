@@ -24,6 +24,7 @@ export const en = {
   'chat.add.photo': 'Photo',
   'chat.add.camera': 'Open the camera',
   'chat.add.search': 'Web search',
+  'chat.add.youtube_search': 'YouTube Search',
   'chat.add.translation': 'Translation',
   'chat.translation.input_lang': 'Input Language',
   'chat.translation.output_lang': 'Translated Output',

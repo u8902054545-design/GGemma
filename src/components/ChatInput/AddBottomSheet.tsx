@@ -1,6 +1,7 @@
 import React from 'react';
 import { Drawer } from 'vaul';
 import { useLanguage } from '../../hooks/useLanguage';
+import { YouTubeIcon } from '../IconsApp/YouTubeIcon';
 import '@material/web/list/list.js';
 import '@material/web/list/list-item.js';
 import '@material/web/icon/icon.js';
@@ -14,6 +15,8 @@ interface AddBottomSheetProps {
   onVideoClick: () => void;
   isSearchActive: boolean;
   onSearchToggle: () => void;
+  isYouTubeSearchActive?: boolean;
+  onYouTubeSearchToggle?: () => void;
   onCodeImportClick: () => void;
   isImageDisabled?: boolean;
   isVideoDisabled?: boolean;
@@ -29,6 +32,8 @@ export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
   onVideoClick,
   isSearchActive,
   onSearchToggle,
+  isYouTubeSearchActive = false,
+  onYouTubeSearchToggle = () => {},
   onCodeImportClick,
   isImageDisabled = false,
   isVideoDisabled = false,
@@ -129,6 +134,25 @@ export const AddBottomSheet: React.FC<AddBottomSheetProps> = ({
                   search
                 </md-icon>
                 {isSearchActive && (
+                   <md-icon slot="end" style={{ color: 'var(--md-sys-color-primary)' }}>check</md-icon>
+                )}
+              </md-list-item>
+
+              <md-list-item
+                type="button"
+                onClick={() => { onYouTubeSearchToggle(); onClose(); }}
+                style={{
+                  '--md-list-item-label-text-color': isYouTubeSearchActive ? 'var(--md-sys-color-primary)' : 'var(--md-sys-color-on-surface)',
+                  '--md-list-item-container-color': isYouTubeSearchActive ? 'var(--md-sys-color-primary-container)' : 'transparent',
+                  'border-radius': '16px',
+                  'margin': '8px 8px 0 8px'
+                }}
+              >
+                <div slot="headline">{t('chat.add.youtube_search') || t('message.generation_details.youtube_search') || 'YouTube Search'}</div>
+                <div slot="start" className="flex items-center justify-center w-6 h-6">
+                  <YouTubeIcon className="w-5 h-5" />
+                </div>
+                {isYouTubeSearchActive && (
                    <md-icon slot="end" style={{ color: 'var(--md-sys-color-primary)' }}>check</md-icon>
                 )}
               </md-list-item>

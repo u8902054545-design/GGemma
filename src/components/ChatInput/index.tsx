@@ -19,7 +19,9 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
   selectedModel,
   isTyping,
   isSearchActive = false,
+  isYouTubeSearchActive = false,
   onSearchClick,
+  onYouTubeSearchClick,
   onCodeImportClick,
   onImageClick,
   importedCodes = [],
@@ -133,7 +135,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
       undefined, 
       isTranslationActive, 
       translationInputLang, 
-      translationOutputLang
+      translationOutputLang,
+      isYouTubeSearchActive
     );
     clearSelection();
   };
@@ -216,6 +219,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                     isSearchActive={isSearchActive}
                     isSearchDisabled={isSearchDisabled}
                     onSearchClick={onSearchClick}
+                    isYouTubeSearchActive={isYouTubeSearchActive}
+                    onYouTubeSearchClick={onYouTubeSearchClick}
                     isListening={false}
                     toggleListening={() => setIsVoiceInputActive(true)}
                     isTranslationActive={isTranslationActive}
@@ -224,7 +229,6 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                     onTranslationToggle={onTranslationToggle}
                     onChangeInputLang={onChangeInputLang}
                     onChangeOutputLang={onChangeOutputLang}
-                    
                     onAddClick={() => setIsBottomSheetOpen(true)}
                     isTyping={isTyping}
                     stopRequest={stopRequest}
@@ -255,7 +259,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
                           undefined, 
                           isTranslationActive, 
                           translationInputLang, 
-                          translationOutputLang
+                          translationOutputLang,
+                          isYouTubeSearchActive
                         );
                         clearSelection();
                       } else {
@@ -293,6 +298,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
         onVideoClick={() => !isVideoDisabled && videoInputRef.current?.click()}
         isSearchActive={isSearchActive}
         onSearchToggle={onSearchClick || (() => {})}
+        isYouTubeSearchActive={isYouTubeSearchActive}
+        onYouTubeSearchToggle={onYouTubeSearchClick || (() => {})}
         onCodeImportClick={onCodeImportClick || (() => {})}
         isImageDisabled={isImageDisabled}
         isVideoDisabled={isVideoDisabled}

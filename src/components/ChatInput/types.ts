@@ -19,13 +19,16 @@ export interface ChatInputProps {
     editMessageId?: string,
     isTranslationActive?: boolean,
     translationInputLang?: string,
-    translationOutputLang?: string
+    translationOutputLang?: string,
+    isYouTubeSearch?: boolean
   ) => void;
   stopRequest: () => void;
   selectedModel: { id: string; name: string };
   isTyping: boolean;
   isSearchActive?: boolean;
+  isYouTubeSearchActive?: boolean;
   onSearchClick?: () => void;
+  onYouTubeSearchClick?: () => void;
   onCodeImportClick?: () => void;
   onImageClick?: (url: string) => void;
   importedCodes?: ImportedCode[];
@@ -40,5 +43,3 @@ export interface ChatInputProps {
   onChangeInputLang?: (lang: string) => void;
   onChangeOutputLang?: (lang: string) => void;
 }
-
-

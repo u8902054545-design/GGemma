@@ -135,7 +135,7 @@ export default function App() {
   }, [signOut, checkIp]);
 
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { isSearchActive, toggleSearch, resetSearch } = useSearch();
+  const { isSearchActive, isYouTubeSearchActive, toggleSearch, toggleYouTubeSearch, resetSearch } = useSearch();
   const [isTranslationActive, setIsTranslationActive] = useState(false);
   const [isTranslationNewChatDialogOpen, setIsTranslationNewChatDialogOpen] = useState(false);
   const [translationInputLang, setTranslationInputLang] = useState('');
@@ -296,6 +296,7 @@ export default function App() {
             content: aiMsg.content,
             model_name: aiMsg.modelName,
             search_used: aiMsg.searchUsed,
+            youtube_search_used: aiMsg.youtubeSearchUsed,
             search_sources: aiMsg.searchSources,
             search_enabled_by: aiMsg.searchEnabledBy
           }
@@ -417,7 +418,8 @@ export default function App() {
     codes?: any[],
     isTranslation?: boolean,
     inLang?: string,
-    outLang?: string
+    outLang?: string,
+    isYouTubeSearch?: boolean
   ) => {
     let finalInput = text || input;
     const targetCodes = codes !== undefined ? codes : importedCodes;
@@ -434,13 +436,14 @@ export default function App() {
       undefined, 
       isTranslation !== undefined ? isTranslation : isTranslationActive,
       inLang !== undefined ? inLang : translationInputLang,
-      outLang !== undefined ? outLang : translationOutputLang
+      outLang !== undefined ? outLang : translationOutputLang,
+      isYouTubeSearch !== undefined ? isYouTubeSearch : isYouTubeSearchActive
     );
     setImportedCodes([]);
-    if (isSearch) {
+    if (isSearch || isYouTubeSearch || isYouTubeSearchActive) {
       resetSearch();
     }
-  }, [input, handleSend, resetSearch, importedCodes, isTranslationActive, translationInputLang, translationOutputLang]);
+  }, [input, handleSend, resetSearch, importedCodes, isTranslationActive, translationInputLang, translationOutputLang, isYouTubeSearchActive]);
 
   const {
     isOpen: isSearchConfirmOpen,
@@ -466,7 +469,8 @@ export default function App() {
     editMessageId?: string,
     isTranslation?: boolean,
     inLang?: string,
-    outLang?: string
+    outLang?: string,
+    isYouTubeSearch?: boolean
   ) => {
     if (isAllModelsExhausted) {
       setSnackbarMessage(t('errors.limit.exceeded') || 'Все доступные модели исчерпали лимит запросов.');
@@ -494,6 +498,11 @@ export default function App() {
     if (!isChatHistoryEnabled && chats.some(c => c.id === chatId)) {
       setSnackbarMessage(t('errors.historyDisabled.send'));
       setIsSnackbarOpen(true);
+      return;
+    }
+
+    if (isYouTubeSearch) {
+      await executeSend(text, false, file, codes, isTranslation, inLang, outLang, true);
       return;
     }
 
@@ -634,7 +643,9 @@ export default function App() {
                 selectedModel={selectedModel}
                 isTyping={isTyping}
                 isSearchActive={isSearchActive}
+                isYouTubeSearchActive={isYouTubeSearchActive}
                 onSearchClick={toggleSearch}
+                onYouTubeSearchClick={toggleYouTubeSearch}
                 onCodeImportClick={() => setIsCodeImportOpen(true)}
                 onImageClick={(url) => handleImagePreview(url, setFullscreenImage)}
                 importedCodes={importedCodes}

@@ -40,7 +40,8 @@ export const useChatSender = (
     editMessageId?: string,
     isTranslationActive?: boolean,
     translationInputLang?: string,
-    translationOutputLang?: string
+    translationOutputLang?: string,
+    isYouTubeSearchActive: boolean = false
   ) => {
     const textToSend = typeof overrideInput === 'string' ? overrideInput : input;
     if ((!textToSend.trim() && !file && (!codes || codes.length === 0)) && !isEdit || isTyping) return;
@@ -144,6 +145,7 @@ export const useChatSender = (
           publicModelName: selectedModel.name,
           chat_id: isTemporary ? `temp_${chatId}` : chatId,
           isSearchActive: isSearchActive,
+          isYouTubeSearchActive: isYouTubeSearchActive,
           image: newUserMsg.base64Image || null,
           video: newUserMsg.base64Video || null,
           codes: newUserMsg.codes || null,
@@ -303,7 +305,7 @@ export const useChatSender = (
               isAnalyzingImage: isAnalyzingImage,
               isAnalyzingVideo: isAnalyzingVideo,
               searchSources: searchSourcesList || existingSources,
-              searchEnabledBy: searchUsed || youtubeSearchUsed ? (isSearchActive ? 'user' : 'model') : undefined
+              searchEnabledBy: searchUsed || youtubeSearchUsed ? ((isSearchActive || isYouTubeSearchActive) ? 'user' : 'model') : undefined
             };
             if (isTemporary) saveTempMessages(newMessages);
           }
@@ -382,7 +384,8 @@ export const useChatSender = (
           message: userMsg.content,
           publicModelName: modelToUse.name,
           chat_id: isTemporary ? `temp_${chatId}` : chatId,
-          isSearchActive: lastAiMsg.searchEnabledBy === 'user',
+          isSearchActive: lastAiMsg.searchEnabledBy === 'user' && !lastAiMsg.youtubeSearchUsed,
+          isYouTubeSearchActive: lastAiMsg.searchEnabledBy === 'user' && !!lastAiMsg.youtubeSearchUsed,
           image: userMsg.base64Image || null,
           video: userMsg.base64Video || null,
           codes: userMsg.codes || null,

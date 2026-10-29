@@ -1,8 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ImagePreview } from '../ImagePreview';
-import { searchButtonVariants, searchTextVariants } from '../../motion/searchTransition';
-
+import { YouTubeIcon } from '../IconsApp/YouTubeIcon';
 import { useLanguage } from '../../hooks/useLanguage';
 
 const TRANSLATION_LANGUAGES = [
@@ -33,6 +32,8 @@ interface InputAreaProps {
   isSearchActive: boolean;
   isSearchDisabled: boolean;
   onSearchClick?: () => void;
+  isYouTubeSearchActive?: boolean;
+  onYouTubeSearchClick?: () => void;
   isListening: boolean;
   toggleListening: () => void;
   isTranslationActive?: boolean;
@@ -41,8 +42,6 @@ interface InputAreaProps {
   onTranslationToggle?: () => void;
   onChangeInputLang?: (lang: string) => void;
   onChangeOutputLang?: (lang: string) => void;
-  
-  // Integrated actions props
   onAddClick: () => void;
   isTyping: boolean;
   stopRequest: () => void;
@@ -64,6 +63,8 @@ export const InputArea: React.FC<InputAreaProps> = ({
   isSearchActive,
   isSearchDisabled,
   onSearchClick,
+  isYouTubeSearchActive = false,
+  onYouTubeSearchClick,
   isListening,
   toggleListening,
   isTranslationActive = false,
@@ -72,7 +73,6 @@ export const InputArea: React.FC<InputAreaProps> = ({
   onTranslationToggle,
   onChangeInputLang,
   onChangeOutputLang,
-  
   onAddClick,
   isTyping,
   stopRequest,
@@ -100,26 +100,46 @@ export const InputArea: React.FC<InputAreaProps> = ({
       )}
 
       <AnimatePresence>
-        {isSearchActive && (
+        {(isYouTubeSearchActive || isSearchActive) && (
           <motion.div 
             initial={{ height: 0, opacity: 0, marginTop: 0 }}
             animate={{ height: 'auto', opacity: 1, marginTop: 12 }}
             exit={{ height: 0, opacity: 0, marginTop: 0 }}
             className="px-5 overflow-hidden"
           >
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--md-sys-color-primary-container)] border border-[var(--md-sys-color-primary)]/20 shadow-sm">
-               <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-primary)]">search</span>
-               <span className="text-[13px] font-medium text-[var(--md-sys-color-on-primary-container)]">{t('chat.add.search')}</span>
-               <button 
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onSearchClick?.();
-                }}
-                className="flex items-center justify-center ml-1 hover:bg-[var(--md-sys-color-on-primary-container)]/10 rounded-full transition-colors"
-               >
-                 <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-on-primary-container)]">close</span>
-               </button>
-            </div>
+            {isYouTubeSearchActive ? (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--md-sys-color-primary-container)] border border-[var(--md-sys-color-primary)]/20 shadow-sm">
+                <div className="w-[18px] h-[18px] flex items-center justify-center">
+                  <YouTubeIcon className="w-[18px] h-[18px]" />
+                </div>
+                <span className="text-[13px] font-medium text-[var(--md-sys-color-on-primary-container)]">
+                  {t('chat.add.youtube_search') || t('message.generation_details.youtube_search') || 'YouTube Search'}
+                </span>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onYouTubeSearchClick?.();
+                  }}
+                  className="flex items-center justify-center ml-1 hover:bg-[var(--md-sys-color-on-primary-container)]/10 rounded-full transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-on-primary-container)]">close</span>
+                </button>
+              </div>
+            ) : (
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[var(--md-sys-color-primary-container)] border border-[var(--md-sys-color-primary)]/20 shadow-sm">
+                <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-primary)]">search</span>
+                <span className="text-[13px] font-medium text-[var(--md-sys-color-on-primary-container)]">{t('chat.add.search')}</span>
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSearchClick?.();
+                  }}
+                  className="flex items-center justify-center ml-1 hover:bg-[var(--md-sys-color-on-primary-container)]/10 rounded-full transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[16px] text-[var(--md-sys-color-on-primary-container)]">close</span>
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -188,7 +208,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
           </motion.div>
         )}
       </AnimatePresence>
-      {/* Textarea at the top */}
+
       <textarea
         ref={textareaRef}
         value={input}
@@ -199,9 +219,7 @@ export const InputArea: React.FC<InputAreaProps> = ({
         rows={1}
       />
 
-      {/* Action buttons row at the bottom */}
       <div className="flex items-center justify-between px-3 pb-3 pt-1.5 w-full">
-        {/* Left actions: Add button */}
         <div className="flex items-center">
           <button
             type="button"
@@ -212,7 +230,6 @@ export const InputArea: React.FC<InputAreaProps> = ({
           </button>
         </div>
 
-        {/* Right actions: Mic & Send/Live */}
         <div className="flex items-center gap-1.5">
           <button
             type="button"
