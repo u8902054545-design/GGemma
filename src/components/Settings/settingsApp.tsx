@@ -27,7 +27,7 @@ export const SettingsApp: React.FC<SettingsAppProps> = ({ isOpen, onClose }) => 
       initial="initial"
       animate="animate"
       exit="exit"
-      style={{ zIndex: 100000 }}
+      style={{ zIndex: 100005 }}
       className="fixed inset-0 bg-[var(--md-sys-color-background)] flex flex-col font-sans overflow-hidden"
     >
       <header className="w-full p-4 flex items-center justify-start">
@@ -41,7 +41,7 @@ export const SettingsApp: React.FC<SettingsAppProps> = ({ isOpen, onClose }) => 
 
       <main className="flex-1 flex flex-col items-start justify-start px-6 pb-8 overflow-y-auto w-full max-w-[600px] mx-auto">
         <h1 className="text-[32px] font-normal text-[var(--md-sys-color-on-surface)] mt-2 mb-8 tracking-tight align-left w-full">
-          {t('settings.title')}
+          {t('settings.account_settings') || 'Account settings'}
         </h1>
 
         <div className="w-full flex flex-col gap-1">
