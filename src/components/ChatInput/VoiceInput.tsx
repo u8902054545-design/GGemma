@@ -31,7 +31,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
   const speakingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const shouldSendOnConfirmRef = useRef(false);
 
-  // Online recording refs
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const audioChunksRef = useRef<Blob[]>([]);
   const streamRef = useRef<MediaStream | null>(null);
@@ -40,7 +39,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
   const animationFrameRef = useRef<number | null>(null);
   const mimeTypeRef = useRef<string>('audio/webm');
 
-  // Monitor network status
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
     const handleOffline = () => setIsOnline(false);
@@ -52,7 +50,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
     };
   }, []);
 
-  // Listen for Escape key to cancel
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
@@ -72,7 +69,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
     }
   };
 
-  // Clean up function for audio recording
   const cleanupRecording = () => {
     if (animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current);
@@ -93,7 +89,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
 
   useEffect(() => {
     if (isOnline) {
-      // ONLINE MODE: MediaRecorder & OpenRouter Chirp-3
       let isComponentMounted = true;
 
       const startRecording = async () => {
@@ -106,7 +101,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
           }
           streamRef.current = stream;
 
-          // Set up Web Audio API visualizer
           const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
           if (AudioContextClass) {
             try {
@@ -137,7 +131,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
             }
           }
 
-          // Choose supported mimeType
           let mimeType = 'audio/webm';
           let options: MediaRecorderOptions = {};
           if (typeof MediaRecorder !== 'undefined') {
@@ -205,7 +198,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
         }
       };
     } else {
-      // OFFLINE MODE: Fallback to Browser SpeechRecognition
       const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
       if (!SpeechRecognition) {
         console.warn("Speech recognition not supported in this browser.");
@@ -341,7 +333,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
       const text = result.text || '';
       onConfirm(text, shouldSendOnConfirmRef.current);
     } catch (err: any) {
-      console.error("OpenRouter chirp-3 transcription error:", err);
+      console.error("Gemini 3.5 Transcribe error:", err);
       showError(language === 'ru' ? 'Не удалось расшифровать аудио.' : 'Could not transcribe audio.');
       setIsTranscribing(false);
     }
@@ -404,7 +396,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
       exit="exit"
       className="flex-1 flex flex-col justify-between bg-[var(--md-sys-color-surface-container-high)] rounded-[32px] p-4 min-h-[96px] border border-[var(--md-sys-color-primary)]/10 shadow-lg relative overflow-hidden min-w-0 gap-3"
     >
-      {/* Visual background ripple/pulse when listening */}
       <AnimatePresence>
         {isListening && !isTranscribing && (
           <motion.div
@@ -415,7 +406,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
         )}
       </AnimatePresence>
 
-      {/* Top area: Linear segment-based waveform audio stream indicator */}
       <div className="w-full flex-1 flex items-center justify-between min-h-[48px] relative px-1">
         <AnimatePresence>
           {isListening && !isTranscribing && (
@@ -448,7 +438,6 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
         </AnimatePresence>
       </div>
 
-      {/* Bottom Area: Transcribing text (left) and Buttons (right) */}
       <div className="flex justify-between items-center w-full mt-auto">
         <div className="flex items-center min-w-0 pr-4">
           {isTranscribing && (
