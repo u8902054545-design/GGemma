@@ -22,7 +22,6 @@ export interface PremiumUserRecord {
   [key: string]: any;
 }
 
-// Built-in restricted models per user requirement
 export const RESTRICTED_MODELS = [
   'Gemini 3.1 Pro Preview',
   'google/gemini-3.1-pro-preview',
@@ -31,7 +30,6 @@ export const RESTRICTED_MODELS = [
 ];
 
 export const DEFAULT_QUOTAS: QuotaItem[] = [
-  // Paid flagship models
   {
     id: 1,
     model_name: 'Gemini 3.1 Pro Preview',
@@ -50,7 +48,6 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     tier: 'paid',
     description: 'Next-generation high-precision model. Available exclusively to Premium users.'
   },
-  // Free models
   {
     id: 3,
     model_name: 'Gemma 4 31B',
@@ -62,7 +59,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
   },
   {
     id: 4,
-    model_name: 'Gemma 4 26B',
+    model_name: 'Gemma 4 26B A4B',
     model_id: 'google/gemma-4-26b-a4b-it',
     is_paid: false,
     daily_limit: 10,
@@ -116,15 +113,6 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
   },
   {
     id: 10,
-    model_name: 'Gemma 3n E4B',
-    model_id: 'google/gemma-3n-e4b-it',
-    is_paid: false,
-    daily_limit: 100,
-    tier: 'free',
-    description: 'Experimental low-latency model for quick tasks.'
-  },
-  {
-    id: 11,
     model_name: 'Gemma 2 27B',
     model_id: 'google/gemma-2-27b-it',
     is_paid: false,
@@ -133,7 +121,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Legacy 2nd generation model.'
   },
   {
-    id: 12,
+    id: 11,
     model_name: 'Gemini 3.8 Flash',
     model_id: 'google/gemini-3.8-flash',
     is_paid: false,
@@ -142,7 +130,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Latest ultra-fast Flash 3.8 model.'
   },
   {
-    id: 13,
+    id: 12,
     model_name: 'Gemini 3.7 Flash',
     model_id: 'google/gemini-3.7-flash',
     is_paid: false,
@@ -151,7 +139,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Fast and precise Flash 3.7 model.'
   },
   {
-    id: 14,
+    id: 13,
     model_name: 'Gemini 3.6 Flash',
     model_id: 'google/gemini-3.6-flash',
     is_paid: false,
@@ -160,7 +148,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Stable and performant Flash 3.6.'
   },
   {
-    id: 15,
+    id: 14,
     model_name: 'Gemini 3.5 Flash',
     model_id: 'google/gemini-3.5-flash',
     is_paid: false,
@@ -169,7 +157,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Standard Flash 3.5 model.'
   },
   {
-    id: 16,
+    id: 15,
     model_name: 'Gemini 3.5 Flash Lite',
     model_id: 'google/gemini-3.5-flash-lite',
     is_paid: false,
@@ -178,7 +166,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Lightweight Flash Lite 3.5.'
   },
   {
-    id: 17,
+    id: 16,
     model_name: 'Gemini 3 Flash Preview',
     model_id: 'google/gemini-3-flash-preview',
     is_paid: false,
@@ -187,7 +175,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Preview release of Gemini 3 Flash.'
   },
   {
-    id: 18,
+    id: 17,
     model_name: 'Gemini 3.1 Flash Lite',
     model_id: 'google/gemini-3.1-flash-lite',
     is_paid: false,
@@ -196,7 +184,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Efficient Flash Lite 3.1.'
   },
   {
-    id: 19,
+    id: 18,
     model_name: 'Gemini 3.1 Flash Lite Preview',
     model_id: 'google/gemini-3.1-flash-lite-preview',
     is_paid: false,
@@ -205,7 +193,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Preview version of Flash Lite 3.1.'
   },
   {
-    id: 20,
+    id: 19,
     model_name: 'Gemini 2.5 Flash',
     model_id: 'google/gemini-2.5-flash',
     is_paid: false,
@@ -214,7 +202,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Balanced speed and quality for multimodal tasks.'
   },
   {
-    id: 21,
+    id: 20,
     model_name: 'Gemini 2.5 Flash Lite',
     model_id: 'google/gemini-2.5-flash-lite',
     is_paid: false,
@@ -223,7 +211,7 @@ export const DEFAULT_QUOTAS: QuotaItem[] = [
     description: 'Efficient and fast model for general tasks.'
   },
   {
-    id: 22,
+    id: 21,
     model_name: 'Gemini 2.5 Pro',
     model_id: 'google/gemini-2.5-pro',
     is_paid: false,
@@ -249,7 +237,6 @@ export function usePremium() {
 
     try {
       if (user) {
-        // 1. Load from "Premium_User" table
         let premiumData: any = null;
         const { data: pData1, error: pErr1 } = await supabase
           .from('Premium_User')
@@ -282,7 +269,6 @@ export function usePremium() {
         setPremiumUserRecord(null);
       }
 
-      // 2. Load from "Quotas" table (with case-insensitive fallback)
       let quotasData: any[] | null = null;
       let quotasError: any = null;
 
@@ -310,7 +296,6 @@ export function usePremium() {
       }
 
       if (quotasData && Array.isArray(quotasData) && quotasData.length > 0) {
-        // Map database records directly using model_name and is_paid
         const dbItems: QuotaItem[] = quotasData.map((q: any, idx: number) => {
           const isPaidBool = q.is_paid === true || String(q.is_paid).toLowerCase() === 'true' || q.is_paid === 1;
           const matchedDefault = DEFAULT_QUOTAS.find(
@@ -347,16 +332,13 @@ export function usePremium() {
     }
   }, [user]);
 
-  // Initial fetch and automatic background synchronization
   useEffect(() => {
     fetchQuotaAndPremiumData(false);
 
-    // Background auto-refresh every 20 seconds
     const interval = setInterval(() => {
       fetchQuotaAndPremiumData(true);
     }, 20000);
 
-    // Background refresh on tab focus / document visibility change
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         fetchQuotaAndPremiumData(true);
@@ -369,7 +351,6 @@ export function usePremium() {
     window.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleFocus);
 
-    // Realtime Supabase channel synchronization
     let channel: any = null;
     try {
       channel = supabase
@@ -395,23 +376,16 @@ export function usePremium() {
     };
   }, [fetchQuotaAndPremiumData]);
 
-  /**
-   * Checks whether a model is restricted (paid).
-   * Checks hardcoded requirement (Gemini 3.1 Pro Preview, Gemini 4 Argon)
-   * as well as the dynamic Quotas table.
-   */
   const isModelPaid = useCallback((modelIdOrName: string): boolean => {
     if (!modelIdOrName) return false;
     const target = modelIdOrName.trim().toLowerCase();
 
-    // Check hardcoded restricted models
     for (const model of RESTRICTED_MODELS) {
       if (model.toLowerCase() === target) {
         return true;
       }
     }
 
-    // Check in loaded Quotas table
     const quotaMatch = quotas.find(q => {
       const qName = (q.model_name || '').trim().toLowerCase();
       const qId = (q.model_id || '').trim().toLowerCase();
@@ -434,10 +408,6 @@ export function usePremium() {
     return false;
   }, [quotas]);
 
-  /**
-   * Checks whether the current user is restricted from using this model.
-   * If model is paid and user is not premium -> restricted (true).
-   */
   const isModelRestricted = useCallback((modelIdOrName: string): boolean => {
     if (isPremium) return false;
     return isModelPaid(modelIdOrName);

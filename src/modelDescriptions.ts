@@ -3,7 +3,7 @@ export const modelDescriptions: Record<string, { en: string; ru: string }> = {
     en: 'Most powerful model for complex reasoning and logic',
     ru: 'Самая мощная модель для сложных задач и логики'
   },
-  'Gemma 4 26B': {
+  'Gemma 4 26B A4B': {
     en: 'High performance, great balance of speed and capability',
     ru: 'Высокая производительность, отличный баланс скорости и возможностей'
   },
@@ -26,10 +26,6 @@ export const modelDescriptions: Record<string, { en: string; ru: string }> = {
   'Gemma 3 4B': {
     en: 'Lightweight model optimized for speed',
     ru: 'Легковесная модель, оптимизированная для скорости'
-  },
-  'Gemma 3n E4B': {
-    en: 'Experimental low-latency model for quick tasks',
-    ru: 'Экспериментальная модель с низкой задержкой для быстрых задач'
   },
   'Gemma 2 27B': {
     en: 'Legacy 2nd generation model',
