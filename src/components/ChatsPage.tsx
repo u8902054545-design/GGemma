@@ -278,8 +278,8 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
               <div className="w-11 h-11" aria-hidden="true" />
             </header>
 
-            <Refresh onRefresh={handleRefresh} className="flex-1 min-h-0">
-              <main className="flex-1 flex flex-col px-4 pt-3 pb-32">
+            <Refresh onRefresh={handleRefresh} className="flex-1 min-h-0 flex flex-col">
+              <main className="flex-1 min-h-[calc(100dvh-4rem)] flex flex-col px-4 pt-3 pb-32">
                 <div className="w-full">
                   <button
                     type="button"
@@ -338,6 +338,9 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
                     <h2 className="text-[20px] font-normal text-[#E3E3E3] tracking-tight">
                       {isRu ? 'Чаты не найдены' : 'No chats found'}
                     </h2>
+                    <p className="mt-2 text-[14px] text-[#9AA0A6] max-w-xs leading-relaxed">
+                      Ask Gemma anything. Your chats will appear here
+                    </p>
                   </div>
                 ) : viewMode === 'list' ? (
                   <div className="divide-y divide-[#1E1F20] -mx-2">
