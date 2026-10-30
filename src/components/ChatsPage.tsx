@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { Chat } from '../hooks/chatTypes';
 import { useLanguage } from '../hooks/useLanguage';
 import { supabase, SUPABASE_ENDPOINT } from '../config';
+import { Refresh } from './Refresh';
 
 interface MaterialSymbolProps {
   name: string;
@@ -162,6 +163,7 @@ interface ChatsPageProps {
   onNewChat: () => void;
   onLongPress?: (chat: Chat) => void;
   onOpenSearch?: () => void;
+  onRefresh?: () => Promise<void>;
 }
 
 export const ChatsPage: React.FC<ChatsPageProps> = ({
@@ -172,7 +174,8 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
   onChatSelect,
   onNewChat,
   onLongPress,
-  onOpenSearch
+  onOpenSearch,
+  onRefresh
 }) => {
   const [viewMode, setViewMode] = useState<'list' | 'grid'>(() => {
     try {
@@ -219,6 +222,12 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
     }
   };
 
+  const handleRefresh = async () => {
+    if (onRefresh) {
+      await onRefresh();
+    }
+  };
+
   const createLongPressHandlers = (chat: Chat) => {
     let timer: NodeJS.Timeout;
     const start = () => {
@@ -246,13 +255,13 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ duration: 0.35, ease: [0.2, 0, 0, 1] }}
-          className="fixed inset-0 z-[150] bg-[#000000] text-[#E3E3E3] flex flex-col select-none overflow-y-auto"
+          className="fixed inset-0 z-[150] bg-[#000000] text-[#E3E3E3] flex flex-col select-none overflow-hidden"
           style={{
             fontFamily: 'Roboto, "Google Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
           }}
         >
-          <div className="w-full max-w-3xl mx-auto flex-1 flex flex-col min-h-screen bg-[#000000] sm:border-x sm:border-[#1E1F20] relative pb-32">
-            <header className="sticky top-0 z-20 bg-[#000000]/95 backdrop-blur-md px-2 h-16 flex items-center justify-between border-b border-[#1E1F20]">
+          <div className="w-full max-w-3xl mx-auto flex-1 flex flex-col h-full bg-[#000000] sm:border-x sm:border-[#1E1F20] relative">
+            <header className="shrink-0 z-20 bg-[#000000]/95 backdrop-blur-md px-2 h-16 flex items-center justify-between border-b border-[#1E1F20]">
               <button
                 type="button"
                 onClick={onClose}
@@ -269,183 +278,185 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
               <div className="w-11 h-11" aria-hidden="true" />
             </header>
 
-            <main className="flex-1 flex flex-col px-4 pt-3">
-              <div className="w-full">
-                <button
-                  type="button"
-                  onClick={onOpenSearch}
-                  aria-label={isRu ? 'Поиск по чатам' : 'Search in chats'}
-                  className="flex items-center w-full h-12 rounded-full bg-[#1E1F20] hover:bg-[#282A2C] active:bg-[#303236] transition-all px-4 text-left cursor-pointer group"
-                >
-                  <MaterialSymbol name="search" className="w-5 h-5 text-[#9AA0A6] shrink-0 group-hover:text-white transition-colors" />
-                  <span className="pl-3 text-[16px] text-[#9AA0A6] group-hover:text-[#C4C7C5] transition-colors select-none">
-                    {isRu ? 'Поиск по чатам' : 'Search in chats'}
-                  </span>
-                </button>
-              </div>
-
-              <div className="flex items-center justify-end mt-3 mb-2">
-                <div
-                  role="group"
-                  aria-label="View mode switch"
-                  className="relative inline-grid grid-cols-2 items-center p-1 rounded-full bg-[#16171D] border border-[#2A2C38]"
-                >
-                  <span
-                    aria-hidden="true"
-                    style={{ backgroundColor: '#0000FF' }}
-                    className={`pointer-events-none absolute top-1 bottom-1 left-1 w-12 rounded-full shadow-md shadow-[#0000FF]/40 transition-transform duration-300 ease-[cubic-bezier(0.2,0,0,1)] ${
-                      viewMode === 'grid' ? 'translate-x-12' : 'translate-x-0'
-                    }`}
-                  />
-
+            <Refresh onRefresh={handleRefresh} className="flex-1 min-h-0">
+              <main className="flex-1 flex flex-col px-4 pt-3 pb-32">
+                <div className="w-full">
                   <button
                     type="button"
-                    onClick={() => handleViewModeChange('list')}
-                    aria-pressed={viewMode === 'list'}
-                    className={`relative z-10 h-9 w-12 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
-                      viewMode === 'list' ? 'text-white scale-105' : 'text-[#9AA0A6] hover:text-white scale-100'
-                    }`}
+                    onClick={onOpenSearch}
+                    aria-label={isRu ? 'Поиск по чатам' : 'Search in chats'}
+                    className="flex items-center w-full h-12 rounded-full bg-[#1E1F20] hover:bg-[#282A2C] active:bg-[#303236] transition-all px-4 text-left cursor-pointer group"
                   >
-                    <MaterialSymbol name="format_list_bulleted" className="w-[21px] h-[21px]" />
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleViewModeChange('grid')}
-                    aria-pressed={viewMode === 'grid'}
-                    className={`relative z-10 h-9 w-12 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
-                      viewMode === 'grid' ? 'text-white scale-105' : 'text-[#9AA0A6] hover:text-white scale-100'
-                    }`}
-                  >
-                    <MaterialSymbol name="grid_view" className="w-[21px] h-[21px]" />
+                    <MaterialSymbol name="search" className="w-5 h-5 text-[#9AA0A6] shrink-0 group-hover:text-white transition-colors" />
+                    <span className="pl-3 text-[16px] text-[#9AA0A6] group-hover:text-[#C4C7C5] transition-colors select-none">
+                      {isRu ? 'Поиск по чатам' : 'Search in chats'}
+                    </span>
                   </button>
                 </div>
-              </div>
 
-              {chats.length === 0 ? (
-                <div className="flex-1 flex flex-col items-center justify-center py-12 text-center">
-                  <GoogleEmptyChatsIllustration />
-                  <h2 className="text-[20px] font-normal text-[#E3E3E3] tracking-tight">
-                    {isRu ? 'Чаты не найдены' : 'No chats found'}
-                  </h2>
+                <div className="flex items-center justify-end mt-3 mb-2">
+                  <div
+                    role="group"
+                    aria-label="View mode switch"
+                    className="relative inline-grid grid-cols-2 items-center p-1 rounded-full bg-[#16171D] border border-[#2A2C38]"
+                  >
+                    <span
+                      aria-hidden="true"
+                      style={{ backgroundColor: '#0000FF' }}
+                      className={`pointer-events-none absolute top-1 bottom-1 left-1 w-12 rounded-full shadow-md shadow-[#0000FF]/40 transition-transform duration-300 ease-[cubic-bezier(0.2,0,0,1)] ${
+                        viewMode === 'grid' ? 'translate-x-12' : 'translate-x-0'
+                      }`}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => handleViewModeChange('list')}
+                      aria-pressed={viewMode === 'list'}
+                      className={`relative z-10 h-9 w-12 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
+                        viewMode === 'list' ? 'text-white scale-105' : 'text-[#9AA0A6] hover:text-white scale-100'
+                      }`}
+                    >
+                      <MaterialSymbol name="format_list_bulleted" className="w-[21px] h-[21px]" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleViewModeChange('grid')}
+                      aria-pressed={viewMode === 'grid'}
+                      className={`relative z-10 h-9 w-12 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer ${
+                        viewMode === 'grid' ? 'text-white scale-105' : 'text-[#9AA0A6] hover:text-white scale-100'
+                      }`}
+                    >
+                      <MaterialSymbol name="grid_view" className="w-[21px] h-[21px]" />
+                    </button>
+                  </div>
                 </div>
-              ) : viewMode === 'list' ? (
-                <div className="divide-y divide-[#1E1F20] -mx-2">
-                  {chats.map((chat) => {
-                    const isActive = currentChatId === chat.id;
-                    const avatarTheme = getAvatarTheme(chat.id);
-                    const dateStr = formatChatDate(chat.created_at, isRu);
-                    const pressHandlers = createLongPressHandlers(chat);
 
-                    return (
-                      <button
-                        key={chat.id}
-                        type="button"
-                        onClick={() => {
-                          onChatSelect(chat.id);
-                          onClose();
-                        }}
-                        {...pressHandlers}
-                        className={`w-full flex items-center gap-4 px-3 py-3.5 rounded-2xl transition-colors text-left cursor-pointer group ${
-                          isActive ? 'bg-[#1E2026]' : 'hover:bg-[#16171A] active:bg-[#1E2026]'
-                        }`}
-                      >
-                        <div className="relative shrink-0">
-                          <div
-                            style={{
-                              backgroundColor: avatarTheme.bg,
-                              color: avatarTheme.text
-                            }}
-                            className="w-12 h-12 rounded-full flex items-center justify-center font-medium text-base"
-                          >
-                            {getInitials(chat.title)}
-                          </div>
-                        </div>
+                {chats.length === 0 ? (
+                  <div className="flex-1 flex flex-col items-center justify-center py-12 text-center">
+                    <GoogleEmptyChatsIllustration />
+                    <h2 className="text-[20px] font-normal text-[#E3E3E3] tracking-tight">
+                      {isRu ? 'Чаты не найдены' : 'No chats found'}
+                    </h2>
+                  </div>
+                ) : viewMode === 'list' ? (
+                  <div className="divide-y divide-[#1E1F20] -mx-2">
+                    {chats.map((chat) => {
+                      const isActive = currentChatId === chat.id;
+                      const avatarTheme = getAvatarTheme(chat.id);
+                      const dateStr = formatChatDate(chat.created_at, isRu);
+                      const pressHandlers = createLongPressHandlers(chat);
 
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className={`text-[16px] truncate ${isActive ? 'font-bold text-white' : 'font-medium text-[#E3E3E3]'}`}>
-                              {chat.title || t('sidebar.untitled') || (isRu ? 'Без названия' : 'Untitled')}
-                            </span>
-                            {dateStr && (
-                              <span className="text-xs text-[#9AA0A6] shrink-0">
-                                {dateStr}
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center justify-between gap-2 mt-0.5">
-                            <p className="text-sm text-[#9AA0A6] truncate flex items-center gap-1">
-                              {chat.parent_chat_title
-                                ? `${isRu ? 'Ветвь' : 'Branch'}: ${chat.parent_chat_title}`
-                                : (isRu ? 'Чат' : 'Chat')}
-                            </p>
-                            {chat.is_pinned && (
-                              <MaterialSymbol name="push_pin" className="w-4 h-4 text-[#0000FF] shrink-0" />
-                            )}
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : (
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
-                  {chats.map((chat) => {
-                    const isActive = currentChatId === chat.id;
-                    const avatarTheme = getAvatarTheme(chat.id);
-                    const dateStr = formatChatDate(chat.created_at, isRu);
-                    const pressHandlers = createLongPressHandlers(chat);
-
-                    return (
-                      <button
-                        key={chat.id}
-                        type="button"
-                        onClick={() => {
-                          onChatSelect(chat.id);
-                          onClose();
-                        }}
-                        {...pressHandlers}
-                        className={`flex flex-col justify-between p-4 rounded-2xl border transition-all text-left cursor-pointer ${
-                          isActive
-                            ? 'border-[#0000FF] bg-[#181920]'
-                            : 'border-[#282A2C] bg-[#131314] hover:border-[#0000FF] hover:bg-[#181920]'
-                        }`}
-                      >
-                        <div>
-                          <div className="flex items-start justify-between gap-2">
+                      return (
+                        <button
+                          key={chat.id}
+                          type="button"
+                          onClick={() => {
+                            onChatSelect(chat.id);
+                            onClose();
+                          }}
+                          {...pressHandlers}
+                          className={`w-full flex items-center gap-4 px-3 py-3.5 rounded-2xl transition-colors text-left cursor-pointer group ${
+                            isActive ? 'bg-[#1E2026]' : 'hover:bg-[#16171A] active:bg-[#1E2026]'
+                          }`}
+                        >
+                          <div className="relative shrink-0">
                             <div
                               style={{
                                 backgroundColor: avatarTheme.bg,
                                 color: avatarTheme.text
                               }}
-                              className="w-11 h-11 rounded-full flex items-center justify-center font-medium text-sm"
+                              className="w-12 h-12 rounded-full flex items-center justify-center font-medium text-base"
                             >
                               {getInitials(chat.title)}
                             </div>
-                            {chat.is_pinned && (
-                              <MaterialSymbol name="push_pin" className="w-4 h-4 text-[#0000FF] shrink-0" />
-                            )}
                           </div>
 
-                          <h3 className={`mt-3 text-[15px] truncate ${isActive ? 'font-bold text-white' : 'font-medium text-[#E3E3E3]'}`}>
-                            {chat.title || t('sidebar.untitled') || (isRu ? 'Без названия' : 'Untitled')}
-                          </h3>
-                          <p className="mt-1 text-xs text-[#9AA0A6] line-clamp-2 leading-relaxed">
-                            {chat.parent_chat_title ? `${isRu ? 'Ветвь' : 'Branch'}: ${chat.parent_chat_title}` : ''}
-                          </p>
-                        </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <span className={`text-[16px] truncate ${isActive ? 'font-bold text-white' : 'font-medium text-[#E3E3E3]'}`}>
+                                {chat.title || t('sidebar.untitled') || (isRu ? 'Без названия' : 'Untitled')}
+                              </span>
+                              {dateStr && (
+                                <span className="text-xs text-[#9AA0A6] shrink-0">
+                                  {dateStr}
+                                </span>
+                              )}
+                            </div>
 
-                        <div className="mt-3 pt-2 border-t border-[#282A2C] flex items-center justify-between text-[11px] text-[#9AA0A6]">
-                          <span>{dateStr}</span>
-                          <span className="text-[#4D5BFF] font-medium">{isRu ? 'Открыть' : 'Open'}</span>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </main>
+                            <div className="flex items-center justify-between gap-2 mt-0.5">
+                              <p className="text-sm text-[#9AA0A6] truncate flex items-center gap-1">
+                                {chat.parent_chat_title
+                                  ? `${isRu ? 'Ветвь' : 'Branch'}: ${chat.parent_chat_title}`
+                                  : (isRu ? 'Чат' : 'Chat')}
+                              </p>
+                              {chat.is_pinned && (
+                                <MaterialSymbol name="push_pin" className="w-4 h-4 text-[#0000FF] shrink-0" />
+                              )}
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-1">
+                    {chats.map((chat) => {
+                      const isActive = currentChatId === chat.id;
+                      const avatarTheme = getAvatarTheme(chat.id);
+                      const dateStr = formatChatDate(chat.created_at, isRu);
+                      const pressHandlers = createLongPressHandlers(chat);
+
+                      return (
+                        <button
+                          key={chat.id}
+                          type="button"
+                          onClick={() => {
+                            onChatSelect(chat.id);
+                            onClose();
+                          }}
+                          {...pressHandlers}
+                          className={`flex flex-col justify-between p-4 rounded-2xl border transition-all text-left cursor-pointer ${
+                            isActive
+                              ? 'border-[#0000FF] bg-[#181920]'
+                              : 'border-[#282A2C] bg-[#131314] hover:border-[#0000FF] hover:bg-[#181920]'
+                          }`}
+                        >
+                          <div>
+                            <div className="flex items-start justify-between gap-2">
+                              <div
+                                style={{
+                                  backgroundColor: avatarTheme.bg,
+                                  color: avatarTheme.text
+                                }}
+                                className="w-11 h-11 rounded-full flex items-center justify-center font-medium text-sm"
+                              >
+                                {getInitials(chat.title)}
+                              </div>
+                              {chat.is_pinned && (
+                                <MaterialSymbol name="push_pin" className="w-4 h-4 text-[#0000FF] shrink-0" />
+                              )}
+                            </div>
+
+                            <h3 className={`mt-3 text-[15px] truncate ${isActive ? 'font-bold text-white' : 'font-medium text-[#E3E3E3]'}`}>
+                              {chat.title || t('sidebar.untitled') || (isRu ? 'Без названия' : 'Untitled')}
+                            </h3>
+                            <p className="mt-1 text-xs text-[#9AA0A6] line-clamp-2 leading-relaxed">
+                              {chat.parent_chat_title ? `${isRu ? 'Ветвь' : 'Branch'}: ${chat.parent_chat_title}` : ''}
+                            </p>
+                          </div>
+
+                          <div className="mt-3 pt-2 border-t border-[#282A2C] flex items-center justify-between text-[11px] text-[#9AA0A6]">
+                            <span>{dateStr}</span>
+                            <span className="text-[#4D5BFF] font-medium">{isRu ? 'Открыть' : 'Open'}</span>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </main>
+            </Refresh>
 
             <div
               className="fixed right-6 z-30"

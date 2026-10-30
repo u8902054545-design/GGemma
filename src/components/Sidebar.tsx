@@ -30,8 +30,8 @@ interface SidebarProps {
   chats: Chat[];
   loading?: boolean;
   error?: boolean;
-  onRefresh: () => void;
-  onRefreshSilent?: () => void;
+  onRefresh: () => void | Promise<void>;
+  onRefreshSilent?: () => void | Promise<void>;
   currentChatId: string;
   onChatSelect: (id: string) => void;
   onNewChat: () => void;
@@ -48,6 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onClose,
   chats,
   error,
+  onRefresh,
   onRefreshSilent,
   currentChatId,
   onChatSelect,
@@ -163,6 +164,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         console.error('Failed to pin/unpin chat:', err);
         showSnackbar(err instanceof Error ? err.message : t('snackbar.chatPinError'));
       }
+    }
+  };
+
+  const handleRefreshChats = async () => {
+    if (onRefreshSilent) {
+      await onRefreshSilent();
+    } else {
+      await onRefresh();
     }
   };
 
@@ -367,6 +376,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         }}
         onLongPress={handleLongPress}
         onOpenSearch={handleOpenSearch}
+        onRefresh={handleRefreshChats}
       />
 
       <AnimatePresence>
