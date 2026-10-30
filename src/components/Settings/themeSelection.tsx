@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { pageVariants } from '../../motion/transitions';
+import { googleRailPageVariants } from '../../motion/googleRailTransitions';
 import { useLanguage } from '../../hooks/useLanguage';
 import { useTheme, Theme } from '../../hooks/useTheme';
 
@@ -23,7 +23,7 @@ export const ThemeSelection: React.FC<ThemeSelectionProps> = ({ isOpen, onClose 
 
   return (
     <motion.div
-      variants={pageVariants}
+      variants={googleRailPageVariants}
       initial="initial"
       animate="animate"
       exit="exit"

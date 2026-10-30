@@ -1,23 +1,21 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { SearchOverlay } from './SearchOverlay';
 import { RenameDialog } from './RenameDialog';
 import { DeleteConfirmDialog } from './DeleteConfirmDialog';
 import { ShareChatDialog } from '../sharing/ShareChatDialog';
 import { renameChat, togglePinChat, fetchChatMessages } from './chatHeaderFunctions';
-import { ChatList } from './SidebarParts/ChatList';
 import { SidebarMenu } from './SidebarParts/SidebarMenu';
 import { ExportMenu } from './ChatHeaderParts/ExportMenu';
 import { useLanguage } from '../hooks/useLanguage';
 import { Chat } from '../hooks/chatTypes';
 import { useAuth } from '../hooks/useAuth';
 import { ProfileDrawer } from './UserProfile';
-import { SidebarSearch } from './SidebarParts/SidebarSearch';
 import { NewChatButton } from './SidebarParts/NewChatButton';
 import { SidebarProfile } from './SidebarParts/SidebarProfile';
 import { useChatHistory } from '../hooks/useChatHistory';
 import { ChatHistorySelection } from './Settings/chatHistorySelection';
-import { supabase, SUPABASE_ENDPOINT } from '../config';
+import { ChatsPage } from './ChatsPage';
 import '@material/web/icon/icon.js';
 import '@material/web/iconbutton/icon-button.js';
 
@@ -46,11 +44,23 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
-  isOpen, onClose, chats, loading, error, onRefresh, onRefreshSilent, currentChatId,
-  onChatSelect, onNewChat, deleteChatFromDB, setChatTitle, togglePin,
-  setSnackbarMessage, setIsSnackbarOpen, onForkChat
+  isOpen,
+  onClose,
+  chats,
+  error,
+  onRefreshSilent,
+  currentChatId,
+  onChatSelect,
+  onNewChat,
+  deleteChatFromDB,
+  setChatTitle,
+  togglePin,
+  setSnackbarMessage,
+  setIsSnackbarOpen,
+  onForkChat
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isChatsPageOpen, setIsChatsPageOpen] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
@@ -60,103 +70,41 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [isChatHistorySelectionOpen, setIsChatHistorySelectionOpen] = useState(false);
   const [exportMessages, setExportMessages] = useState<any[]>([]);
-  const [layoutMode, setLayoutMode] = useState<'list' | 'grid'>(() => {
-    try {
-      return (localStorage.getItem('chat_history_layout') as 'list' | 'grid') || 'list';
-    } catch {
-      return 'list';
-    }
-  });
+
   const { t } = useLanguage();
   const { user } = useAuth();
   const { isChatHistoryEnabled } = useChatHistory();
-
-  const fetchLayoutSetting = useCallback(async () => {
-    if (!user) return;
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
-      const response = await fetch(`${SUPABASE_ENDPOINT}?type=settings`, {
-        method: 'GET',
-        headers: { 'Authorization': `Bearer ${session.access_token}` }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        const serverLayout = data?.chat_layout || data?.chat_history_layout;
-        if (serverLayout) {
-          const normalized = String(serverLayout).toLowerCase() === 'grid' ? 'grid' : 'list';
-          setLayoutMode(normalized);
-          try {
-            localStorage.setItem('chat_history_layout', normalized);
-          } catch {
-            // ignore
-          }
-        }
-      }
-    } catch (err) {
-      console.error('Failed to fetch chat layout setting:', err);
-    }
-  }, [user]);
-
-  // Fetch setting upon entering app (when user is available)
-  useEffect(() => {
-    fetchLayoutSetting();
-  }, [fetchLayoutSetting]);
 
   const onRefreshSilentRef = useRef(onRefreshSilent);
   useEffect(() => {
     onRefreshSilentRef.current = onRefreshSilent;
   }, [onRefreshSilent]);
 
-  // Fetch setting and background-refresh chats upon every sidebar opening
   useEffect(() => {
-    if (isOpen) {
-      fetchLayoutSetting();
-      if (isChatHistoryEnabled) {
-        onRefreshSilentRef.current?.();
-      }
+    if (isOpen && isChatHistoryEnabled) {
+      onRefreshSilentRef.current?.();
     }
-  }, [isOpen, fetchLayoutSetting, isChatHistoryEnabled]);
+  }, [isOpen, isChatHistoryEnabled]);
 
-  const handleLayoutChange = async (mode: 'list' | 'grid') => {
-    setLayoutMode(mode);
-    try {
-      localStorage.setItem('chat_history_layout', mode);
-    } catch {
-      // ignore
-    }
-
-    if (user) {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.access_token) {
-          await fetch(SUPABASE_ENDPOINT, {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${session.access_token}`
-            },
-            body: JSON.stringify({
-              settings: { chat_layout: mode }
-            })
-          });
-        }
-      } catch (err) {
-        console.error('Failed to sync chat layout setting to server:', err);
-      }
-    }
-  };
-
-  React.useEffect(() => {
+  useEffect(() => {
     if (error) {
       setSnackbarMessage(t('errors.snackbar_failed_connect'));
       setIsSnackbarOpen(true);
     }
-  }, [error]);
+  }, [error, setSnackbarMessage, setIsSnackbarOpen, t]);
 
   const showSnackbar = (message: string) => {
     setSnackbarMessage(message);
     setIsSnackbarOpen(true);
+  };
+
+  const handleOpenSearch = () => {
+    if (!isChatHistoryEnabled) {
+      setSnackbarMessage(t('errors.historyDisabled.search'));
+      setIsSnackbarOpen(true);
+      return;
+    }
+    setIsSearchOpen(true);
   };
 
   const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0];
@@ -184,9 +132,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
           selectedChat.title = title;
         });
         showSnackbar(t('snackbar.chatRenamed'));
-      } catch (error) {
-        console.error("Failed to rename chat:", error);
-        showSnackbar(error instanceof Error ? error.message : t('snackbar.chatRenameError'));
+      } catch (err) {
+        console.error('Failed to rename chat:', err);
+        showSnackbar(err instanceof Error ? err.message : t('snackbar.chatRenameError'));
       }
     }
   };
@@ -198,9 +146,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         if (currentChatId === selectedChat.id) onNewChat();
         setIsDeleteOpen(false);
         showSnackbar(t('snackbar.chatDeleted'));
-      } catch (error) {
-        console.error("Failed to delete chat:", error);
-        showSnackbar(error instanceof Error ? error.message : t('snackbar.chatDeleteError'));
+      } catch (err) {
+        console.error('Failed to delete chat:', err);
+        showSnackbar(err instanceof Error ? err.message : t('snackbar.chatDeleteError'));
       }
     }
   };
@@ -211,12 +159,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
         await togglePinChat(selectedChat.id, !selectedChat.is_pinned, togglePin);
         setIsMenuOpen(false);
         showSnackbar(!selectedChat.is_pinned ? t('snackbar.chatPinned') : t('snackbar.chatUnpinned'));
-      } catch (error) {
-        console.error("Failed to pin/unpin chat:", error);
-        showSnackbar(error instanceof Error ? error.message : t('snackbar.chatPinError'));
+      } catch (err) {
+        console.error('Failed to pin/unpin chat:', err);
+        showSnackbar(err instanceof Error ? err.message : t('snackbar.chatPinError'));
       }
     }
   };
+
+  const pinnedChats = chats.filter((chat) => chat.is_pinned);
 
   return (
     <>
@@ -226,6 +176,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onSelectChat={(id) => {
           onChatSelect(id);
           setIsSearchOpen(false);
+          setIsChatsPageOpen(false);
           onClose();
         }}
       />
@@ -246,101 +197,150 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       <aside
         className="fixed inset-0 h-full w-full bg-[var(--md-sys-color-surface)] flex flex-col z-[150] shadow-2xl overflow-hidden"
-        style={{ 
+        style={{
           transform: isOpen ? 'translateX(0px)' : 'translateX(-100%)',
           transition: 'transform 0.4s cubic-bezier(0.2, 0, 0, 1)'
         }}
       >
-        <div className="flex items-center gap-2 px-3 pt-3 pb-2">
-          <md-icon-button
-            onClick={onClose}
-            aria-label="Back"
-            style={{
-              '--md-icon-button-icon-color': 'var(--md-sys-color-on-surface)',
-              '--md-icon-button-state-layer-color': 'var(--md-sys-color-on-surface)'
-            }}
-          >
-            <md-icon>arrow_back</md-icon>
-          </md-icon-button>
+        <div className="flex items-center justify-between px-4 pt-3 pb-2">
+          <span className="text-[19px] font-semibold text-[var(--md-sys-color-on-surface)] tracking-tight select-none">
+            Gemma
+          </span>
 
-          <SidebarSearch onClick={() => {
-            if (!isChatHistoryEnabled) {
-              setSnackbarMessage(t('errors.historyDisabled.search'));
-              setIsSnackbarOpen(true);
-              return;
-            }
-            setIsSearchOpen(true);
-          }} />
+          <div className="flex items-center gap-1">
+            <md-icon-button
+              onClick={handleOpenSearch}
+              aria-label={t('sidebar.search') || 'Search'}
+              style={{
+                '--md-icon-button-icon-color': 'var(--md-sys-color-on-surface)',
+                '--md-icon-button-state-layer-color': 'var(--md-sys-color-on-surface)'
+              }}
+            >
+              <md-icon>search</md-icon>
+            </md-icon-button>
+
+            <md-icon-button
+              onClick={onClose}
+              aria-label={t('common.close') || 'Close'}
+              style={{
+                '--md-icon-button-icon-color': 'var(--md-sys-color-on-surface)',
+                '--md-icon-button-state-layer-color': 'var(--md-sys-color-on-surface)'
+              }}
+            >
+              <md-icon>close</md-icon>
+            </md-icon-button>
+          </div>
         </div>
 
         <div className="px-4 pt-3 pb-4">
-          <NewChatButton onClick={() => { onNewChat(); onClose(); }} />
+          <NewChatButton
+            onClick={() => {
+              onNewChat();
+              onClose();
+            }}
+          />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-2 mt-2 custom-scrollbar min-h-0">
-          <div className="flex items-center justify-between px-4 py-2">
-            <h2 className="text-[14px] font-medium text-[var(--md-sys-color-on-surface)]">{t('sidebar.chats')}</h2>
-            {isChatHistoryEnabled && (
-              <div className="flex items-center bg-[var(--md-sys-color-surface-container-high)] p-0.5 rounded-full border border-[var(--md-sys-color-outline-variant)]/30 shadow-xs">
-                <button
-                  type="button"
-                  onClick={() => handleLayoutChange('list')}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
-                    layoutMode === 'list'
-                      ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-xs font-medium'
-                      : 'text-[var(--md-sys-color-on-surface-variant)]/70 hover:text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-container-highest)]/40'
-                  }`}
-                  aria-label={t('sidebar.layout_list') || 'List layout'}
-                  title={t('sidebar.layout_list') || 'List layout'}
-                >
-                  <span className="material-symbols-outlined text-[18px]">list</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleLayoutChange('grid')}
-                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all cursor-pointer active:scale-95 ${
-                    layoutMode === 'grid'
-                      ? 'bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-xs font-medium'
-                      : 'text-[var(--md-sys-color-on-surface-variant)]/70 hover:text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-container-highest)]/40'
-                  }`}
-                  aria-label={t('sidebar.layout_grid') || 'Grid layout'}
-                  title={t('sidebar.layout_grid') || 'Grid layout'}
-                >
-                  <span className="material-symbols-outlined text-[18px]">grid_view</span>
-                </button>
-              </div>
-            )}
-          </div>
-          {!isChatHistoryEnabled ? (
-            <div className="flex flex-col items-center justify-center h-[50%] px-4 text-center mt-8">
-              <span className="material-symbols-outlined text-[48px] text-[var(--md-sys-color-on-surface-variant)]/50 mb-4">
+        <div className="flex-1 overflow-y-auto px-3 mt-1 custom-scrollbar min-h-0">
+          <button
+            type="button"
+            onClick={() => {
+              if (!isChatHistoryEnabled) {
+                setSnackbarMessage(t('errors.historyDisabled.chat'));
+                setIsSnackbarOpen(true);
+                return;
+              }
+              setIsChatsPageOpen(true);
+            }}
+            className="w-full flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] transition-all active:scale-[0.99] cursor-pointer"
+          >
+            <div className="flex items-center gap-3.5">
+              <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary)]">
+                forum
+              </span>
+              <span className="text-[15px] font-medium">
+                {t('sidebar.chats') || 'Chats'}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {chats.length > 0 && (
+                <span className="text-xs px-2.5 py-0.5 rounded-full bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] font-medium">
+                  {chats.length}
+                </span>
+              )}
+              <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-on-surface-variant)]/60">
+                chevron_right
+              </span>
+            </div>
+          </button>
+
+          {!isChatHistoryEnabled && (
+            <div className="flex flex-col items-center justify-center py-8 px-4 text-center mt-4">
+              <span className="material-symbols-outlined text-[40px] text-[var(--md-sys-color-on-surface-variant)]/50 mb-3">
                 history_off
               </span>
-              <p className="text-[var(--md-sys-color-on-surface)] font-medium mb-2">
+              <p className="text-sm text-[var(--md-sys-color-on-surface)] font-medium mb-1">
                 {t('sidebar.historyDisabled')}
               </p>
               <button
+                type="button"
                 onClick={() => setIsChatHistorySelectionOpen(true)}
-                className="px-4 py-2 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full text-sm font-medium transition-transform active:scale-95 mt-2"
+                className="px-4 py-2 bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] rounded-full text-xs font-medium transition-transform active:scale-95 mt-2 cursor-pointer"
               >
                 {t('sidebar.enableHistory')}
               </button>
             </div>
-          ) : (
-            <ChatList
-              chats={chats}
-              loading={loading}
-              error={error}
-              onRefresh={onRefresh}
-              currentChatId={currentChatId}
-              onChatSelect={(id) => { onChatSelect(id); onClose(); }}
-              onLongPress={handleLongPress}
-              layoutMode={layoutMode}
-            />
+          )}
+
+          {isChatHistoryEnabled && pinnedChats.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-[var(--md-sys-color-outline-variant)]/20">
+              <div className="px-4 pb-2 text-xs font-medium text-[var(--md-sys-color-on-surface-variant)] uppercase tracking-wider">
+                {t('sidebar.pinned') || 'Pinned'}
+              </div>
+              <div className="flex flex-col gap-1">
+                {pinnedChats.map((chat) => {
+                  const isActive = currentChatId === chat.id;
+
+                  let timer: NodeJS.Timeout;
+                  const handleStart = () => {
+                    timer = setTimeout(() => handleLongPress(chat), 600);
+                  };
+                  const handleEnd = () => clearTimeout(timer);
+
+                  return (
+                    <button
+                      key={chat.id}
+                      type="button"
+                      onClick={() => {
+                        onChatSelect(chat.id);
+                        onClose();
+                      }}
+                      onTouchStart={handleStart}
+                      onTouchEnd={handleEnd}
+                      onTouchMove={handleEnd}
+                      onTouchCancel={handleEnd}
+                      onMouseDown={handleStart}
+                      onMouseUp={handleEnd}
+                      onMouseLeave={handleEnd}
+                      className={`w-full flex items-center justify-between px-4 py-2.5 rounded-full text-sm text-left transition-colors cursor-pointer ${
+                        isActive
+                          ? 'bg-[var(--md-sys-color-primary)] text-[var(--md-sys-color-on-primary)] font-bold'
+                          : 'text-[var(--md-sys-color-on-surface)] hover:bg-[var(--md-sys-color-surface-container-high)]'
+                      }`}
+                    >
+                      <span className="truncate flex-1">{chat.title || t('sidebar.untitled')}</span>
+                      <span className="material-symbols-outlined text-[18px] ml-2 opacity-70">
+                        keep
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           )}
         </div>
 
-        <SidebarProfile 
+        <SidebarProfile
           userAvatar={userAvatar}
           userName={userName}
           onClick={() => {
@@ -349,6 +349,25 @@ export const Sidebar: React.FC<SidebarProps> = ({
           }}
         />
       </aside>
+
+      <ChatsPage
+        isOpen={isChatsPageOpen}
+        onClose={() => setIsChatsPageOpen(false)}
+        chats={chats}
+        currentChatId={currentChatId}
+        onChatSelect={(id) => {
+          onChatSelect(id);
+          setIsChatsPageOpen(false);
+          onClose();
+        }}
+        onNewChat={() => {
+          onNewChat();
+          setIsChatsPageOpen(false);
+          onClose();
+        }}
+        onLongPress={handleLongPress}
+        onOpenSearch={handleOpenSearch}
+      />
 
       <AnimatePresence>
         {isChatHistorySelectionOpen && (
@@ -364,10 +383,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onOpenChange={setIsMenuOpen}
         selectedChat={selectedChat}
         onPin={handleTogglePin}
-        onRename={() => { setIsMenuOpen(false); setTimeout(() => setIsRenameOpen(true), 300); }}
+        onRename={() => {
+          setIsMenuOpen(false);
+          setTimeout(() => setIsRenameOpen(true), 300);
+        }}
         onExport={handleExport}
-        onDelete={() => { setIsMenuOpen(false); setTimeout(() => setIsDeleteOpen(true), 300); }}
-        onShare={() => { setIsMenuOpen(false); setTimeout(() => setIsShareOpen(true), 300); }}
+        onDelete={() => {
+          setIsMenuOpen(false);
+          setTimeout(() => setIsDeleteOpen(true), 300);
+        }}
+        onShare={() => {
+          setIsMenuOpen(false);
+          setTimeout(() => setIsShareOpen(true), 300);
+        }}
         onForkChat={() => {
           setIsMenuOpen(false);
           if (selectedChat) onForkChat?.(selectedChat.id, selectedChat.title);
@@ -401,9 +429,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         showSnackbar={showSnackbar}
       />
 
-      <ProfileDrawer 
-        isOpen={isProfileOpen} 
-        onClose={() => setIsProfileOpen(false)} 
+      <ProfileDrawer
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
       />
     </>
   );

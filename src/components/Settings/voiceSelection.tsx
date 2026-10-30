@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion } from 'motion/react';
-import { pageVariants } from '../../motion/transitions';
+import { googleRailPageVariants } from '../../motion/googleRailTransitions';
 import { useVoicePlayer } from '../../hooks/useVoicePlayer';
 import { SUPABASE_ENDPOINT, supabase } from '../../config';
 import { useAuth } from '../../hooks/useAuth';
@@ -191,7 +191,7 @@ export const VoiceSelection: React.FC<VoiceSelectionProps> = ({ isOpen, onClose 
 
   return (
     <motion.div
-      variants={pageVariants}
+      variants={googleRailPageVariants}
       initial="initial"
       animate="animate"
       exit="exit"

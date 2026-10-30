@@ -1,14 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { supabase, SUPABASE_ENDPOINT } from '../config';
+import { Chat } from './chatTypes';
 
-export interface Chat {
-  id: string;
-  title: string;
-  created_at: string;
-  user_id: string;
-  is_pinned: boolean;
-  parent_chat_title?: string;
-}
+export type { Chat };
 
 const getApiErrorMessage = async (response: Response, fallback: string) => {
   try {
@@ -111,7 +105,9 @@ export const useUserChats = (userId: string | undefined) => {
           if (a.is_pinned !== b.is_pinned) {
             return a.is_pinned ? -1 : 1;
           }
-          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+          const dateA = a.created_at ? new Date(a.created_at).getTime() : 0;
+          const dateB = b.created_at ? new Date(b.created_at).getTime() : 0;
+          return dateB - dateA;
         });
       });
     } catch (err) {

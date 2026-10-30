@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { pageVariants } from '../../motion/transitions';
+import { googleRailPageVariants } from '../../motion/googleRailTransitions';
 import { useLanguage } from '../../hooks/useLanguage';
 
 interface LanguageSelectionProps {
@@ -20,7 +20,7 @@ export const LanguageSelection: React.FC<LanguageSelectionProps> = ({ isOpen, on
 
   return (
     <motion.div
-      variants={pageVariants}
+      variants={googleRailPageVariants}
       initial="initial"
       animate="animate"
       exit="exit"

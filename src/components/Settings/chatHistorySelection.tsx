@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { pageVariants } from '../../motion/transitions';
+import { googleRailPageVariants } from '../../motion/googleRailTransitions';
 import { useChatHistory } from '../../hooks/useChatHistory';
 import { useLanguage } from '../../hooks/useLanguage';
 
@@ -17,7 +17,7 @@ export const ChatHistorySelection: React.FC<ChatHistorySelectionProps> = ({ isOp
 
   return (
     <motion.div
-      variants={pageVariants}
+      variants={googleRailPageVariants}
       initial="initial"
       animate="animate"
       exit="exit"

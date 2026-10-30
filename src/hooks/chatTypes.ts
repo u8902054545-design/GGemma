@@ -4,6 +4,7 @@ export interface Chat {
   created_at?: string;
   user_id?: string;
   is_pinned: boolean;
+  parent_chat_title?: string;
 }
 
 export interface SelectedModel {
