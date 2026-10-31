@@ -197,6 +197,32 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    try {
+      const saved = localStorage.getItem('chat_history_layout');
+      if (saved === 'list' || saved === 'grid') {
+        setViewMode(saved);
+      }
+    } catch {}
+
+    if (onRefresh) {
+      onRefresh();
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    const handleStorage = (e: StorageEvent) => {
+      if (e.key === 'chat_history_layout' && e.newValue) {
+        if (e.newValue === 'list' || e.newValue === 'grid') {
+          setViewMode(e.newValue);
+        }
+      }
+    };
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, []);
+
   const handleViewModeChange = async (mode: 'list' | 'grid') => {
     setViewMode(mode);
     try {
@@ -213,7 +239,10 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
             'Authorization': `Bearer ${session.access_token}`
           },
           body: JSON.stringify({
-            settings: { chat_layout: mode }
+            settings: {
+              chat_layout: mode,
+              chat_history_layout: mode
+            }
           })
         });
       }

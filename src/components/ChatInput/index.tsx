@@ -15,7 +15,10 @@ import { usePremium } from '../../hooks/usePremium';
 import { supabase, SUPABASE_ENDPOINT } from '../../config';
 
 const ChatInputComponent: React.FC<ChatInputProps> = ({
-  input, setInput, handleSend, stopRequest,
+  input,
+  setInput,
+  handleSend,
+  stopRequest,
   selectedModel,
   isTyping,
   isSearchActive = false,
@@ -105,15 +108,8 @@ const ChatInputComponent: React.FC<ChatInputProps> = ({
     }
   }, [isImageDisabled, selectedFile, clearSelection]);
 
-  useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
-  }, [input]);
-
   const onKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+    if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleWrappedSend();
     }

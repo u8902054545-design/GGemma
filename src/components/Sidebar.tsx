@@ -133,6 +133,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
           selectedChat.title = title;
         });
         showSnackbar(t('snackbar.chatRenamed'));
+        handleRefreshChats();
       } catch (err) {
         console.error('Failed to rename chat:', err);
         showSnackbar(err instanceof Error ? err.message : t('snackbar.chatRenameError'));

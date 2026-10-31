@@ -25,9 +25,13 @@ export const useSettingsSync = ({
       if (!user) return;
       try {
         const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) return;
+
         const response = await fetch(`${SUPABASE_ENDPOINT}?type=settings`, {
           method: 'GET',
-          headers: { 'Authorization': `Bearer ${session?.access_token}` }
+          headers: { 
+            'Authorization': `Bearer ${session.access_token}`
+          }
         });
         const data = await response.json();
         
@@ -45,9 +49,15 @@ export const useSettingsSync = ({
           if (serverLayout) {
             const normalized = String(serverLayout).toLowerCase() === 'grid' ? 'grid' : 'list';
             try {
-              localStorage.setItem('chat_history_layout', normalized);
+              const currentSaved = localStorage.getItem('chat_history_layout');
+              if (currentSaved !== normalized) {
+                localStorage.setItem('chat_history_layout', normalized);
+                window.dispatchEvent(new StorageEvent('storage', {
+                  key: 'chat_history_layout',
+                  newValue: normalized
+                }));
+              }
             } catch {
-              // ignore
             }
           }
         }
