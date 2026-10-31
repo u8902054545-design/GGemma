@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import { Chat } from '../hooks/chatTypes';
 import { useLanguage } from '../hooks/useLanguage';
@@ -188,6 +188,34 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
   const { t, language } = useLanguage();
   const isRu = language === 'ru';
 
+  const syncLayoutSetting = useCallback(async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) return;
+
+      const response = await fetch(`${SUPABASE_ENDPOINT}?type=settings`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${session.access_token}`
+        }
+      });
+
+      if (!response.ok) return;
+      const data = await response.json();
+      const serverLayout = data?.chat_layout || data?.chat_history_layout;
+
+      if (serverLayout) {
+        const normalized = String(serverLayout).toLowerCase() === 'grid' ? 'grid' : 'list';
+        setViewMode(normalized);
+        try {
+          localStorage.setItem('chat_history_layout', normalized);
+        } catch {}
+      }
+    } catch (err) {
+      console.error('Failed to sync layout setting from server:', err);
+    }
+  }, []);
+
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -209,7 +237,8 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
     if (onRefresh) {
       onRefresh();
     }
-  }, [isOpen]);
+    syncLayoutSetting();
+  }, [isOpen, syncLayoutSetting]);
 
   useEffect(() => {
     const handleStorage = (e: StorageEvent) => {
@@ -252,9 +281,10 @@ export const ChatsPage: React.FC<ChatsPageProps> = ({
   };
 
   const handleRefresh = async () => {
-    if (onRefresh) {
-      await onRefresh();
-    }
+    await Promise.all([
+      onRefresh ? onRefresh() : Promise.resolve(),
+      syncLayoutSetting()
+    ]);
   };
 
   const createLongPressHandlers = (chat: Chat) => {
