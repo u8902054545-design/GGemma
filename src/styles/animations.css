@@ -99,3 +99,271 @@
 div[class*='motion'] {
   will-change: transform, opacity;
 }
+
+.ai-input-shell {
+  position: relative;
+  width: 100%;
+  background-color: var(--md-sys-color-surface-container-high);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 28px;
+  overflow: clip;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.32);
+  transition:
+    height 0.34s cubic-bezier(0.2, 0, 0, 1),
+    border-radius 0.34s cubic-bezier(0.2, 0, 0, 1),
+    background-color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.34s cubic-bezier(0.2, 0, 0, 1);
+  will-change: height, border-radius;
+  transform: translateZ(0);
+}
+
+.ai-input-shell.is-rectangular {
+  border-radius: 20px;
+  border-color: rgba(168, 199, 250, 0.32);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.48), 0 0 0 1px rgba(168, 199, 250, 0.12);
+}
+
+.textarea-stage {
+  width: 100%;
+  padding: 0 14px;
+  transform: translate3d(42px, 0, 0);
+  transition:
+    transform 0.34s cubic-bezier(0.2, 0, 0, 1),
+    padding 0.34s cubic-bezier(0.2, 0, 0, 1);
+  will-change: transform;
+}
+
+.ai-input-shell.is-rectangular .textarea-stage {
+  padding: 10px 14px 0 14px;
+  transform: translate3d(2px, 0, 0);
+}
+
+.ai-textarea {
+  display: block;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: var(--md-sys-color-on-surface);
+  font-size: 16px;
+  line-height: 24px;
+  padding: 4px 92px 8px 0;
+  margin: 0;
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--md-sys-color-outline-variant) transparent;
+  transition: padding-right 0.34s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.ai-input-shell:not(.is-rectangular) .ai-textarea {
+  height: 54px !important;
+  min-height: 54px !important;
+  padding: 15px 92px 15px 0 !important;
+  overflow: hidden;
+}
+
+.ai-input-shell.is-rectangular .ai-textarea {
+  padding-right: 4px;
+}
+
+.ai-textarea::placeholder {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.textarea-mirror {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  visibility: hidden;
+  pointer-events: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 24px;
+  padding: 4px 4px 8px 0;
+}
+
+.btn-add-bottomleft {
+  position: absolute;
+  bottom: 7px;
+  left: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--md-sys-color-on-surface-variant);
+  background-color: rgba(255, 255, 255, 0.04);
+  border: none;
+  cursor: pointer;
+  z-index: 20;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ai-input-shell.is-rectangular .btn-add-bottomleft {
+  bottom: 8px;
+  background-color: rgba(255, 255, 255, 0.06);
+}
+
+.btn-add-bottomleft:hover {
+  background-color: var(--md-sys-color-surface-container-highest, rgba(255, 255, 255, 0.1));
+  color: var(--md-sys-color-on-surface);
+}
+
+.btn-add-bottomleft:active {
+  transform: scale(0.92);
+}
+
+.btn-add-bottomleft.menu-open {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  transform: rotate(45deg);
+}
+
+.actions-bottomright {
+  position: absolute;
+  bottom: 7px;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 20;
+}
+
+.ai-input-shell.is-rectangular .actions-bottomright {
+  bottom: 8px;
+}
+
+.btn-mic-action {
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--md-sys-color-on-surface-variant);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.btn-mic-action:hover {
+  background-color: var(--md-sys-color-surface-container-highest, rgba(255, 255, 255, 0.1));
+  color: var(--md-sys-color-on-surface);
+}
+
+.btn-mic-action:active {
+  transform: scale(0.9);
+}
+
+.btn-mic-action.is-recording {
+  background-color: rgba(242, 184, 181, 0.16);
+  color: #f2b8b5;
+  animation: micPulse 1.6s infinite ease-in-out;
+}
+
+@keyframes micPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(242, 184, 181, 0.35); }
+  50% { box-shadow: 0 0 0 8px rgba(242, 184, 181, 0); }
+}
+
+.primary-action-slot {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
+
+.btn-slot-item {
+  position: absolute;
+  inset: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 9999px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  will-change: transform, opacity;
+  transition:
+    opacity 0.24s cubic-bezier(0.2, 0, 0, 1),
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.btn-voice-chat {
+  background-color: rgba(255, 255, 255, 0.06);
+  color: var(--md-sys-color-on-surface);
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  pointer-events: auto;
+}
+
+.btn-voice-chat:hover {
+  background-color: var(--md-sys-color-surface-container-highest, rgba(255, 255, 255, 0.12));
+  color: #ffffff;
+}
+
+.ai-input-shell.has-text .btn-voice-chat {
+  opacity: 0;
+  transform: scale(0.55) rotate(-25deg);
+  pointer-events: none;
+}
+
+.btn-send-upward {
+  background-color: var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-primary);
+  opacity: 0;
+  transform: scale(0.55) rotate(25deg);
+  pointer-events: none;
+  box-shadow: 0 2px 10px rgba(168, 199, 250, 0.25);
+}
+
+.btn-send-upward:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 4px 14px rgba(168, 199, 250, 0.4);
+}
+
+.ai-input-shell.has-text .btn-send-upward {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  pointer-events: auto;
+}
+
+.ai-input-shell:not(.has-text) .btn-send-upward:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ai-input-shell.has-text .btn-send-upward:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: none;
+  box-shadow: none;
+}
+
+.btn-stop-action {
+  background-color: var(--md-sys-color-primary-container);
+  color: var(--md-sys-color-on-primary-container);
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  pointer-events: auto;
+}
+
+.btn-stop-action:hover {
+  filter: brightness(1.1);
+}

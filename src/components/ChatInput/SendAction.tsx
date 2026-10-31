@@ -1,6 +1,4 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'motion/react';
-import '@material/web/icon/icon.js';
 
 interface SendActionProps {
   isTyping: boolean;
@@ -9,6 +7,7 @@ interface SendActionProps {
   isSendDisabled: boolean;
   showVoiceChat: boolean;
   onVoiceChatClick: () => void;
+  preventFocusLoss?: (e: React.MouseEvent) => void;
 }
 
 export const SendAction: React.FC<SendActionProps> = ({
@@ -18,69 +17,47 @@ export const SendAction: React.FC<SendActionProps> = ({
   isSendDisabled,
   showVoiceChat,
   onVoiceChatClick,
+  preventFocusLoss = (e) => e.preventDefault(),
 }) => {
   return (
-    <div className="flex-shrink-0">
-      <AnimatePresence mode="wait">
-        {isTyping ? (
-          <motion.button
-            key="stop"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
+    <div className="primary-action-slot">
+      {isTyping ? (
+        <button
+          type="button"
+          onMouseDown={preventFocusLoss}
+          onClick={stopRequest}
+          className="btn-slot-item btn-stop-action"
+          title="Остановить генерацию"
+          aria-label="Stop generation"
+        >
+          <span className="material-symbols-outlined text-[22px]">stop</span>
+        </button>
+      ) : (
+        <>
+          <button
             type="button"
-            onClick={stopRequest}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:brightness-110 active:scale-95 shadow-xl"
-            style={{ backgroundColor: 'var(--md-sys-color-primary-container)' }}
-          >
-            <md-icon style={{ color: 'var(--md-sys-color-on-primary-container)' }}>stop</md-icon>
-          </motion.button>
-        ) : showVoiceChat ? (
-          <motion.button
-            key="voice-chat"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
-            type="button"
+            onMouseDown={preventFocusLoss}
             onClick={onVoiceChatClick}
-            className="w-12 h-12 rounded-full flex items-center justify-center transition-all hover:brightness-110 active:scale-95 shadow-xl cursor-pointer"
-            style={{ 
-              backgroundColor: 'var(--md-sys-color-primary-container)',
-              color: 'var(--md-sys-color-on-primary-container)'
-            }}
+            className="btn-slot-item btn-voice-chat"
+            title="Gemma Live"
+            aria-label="Gemma Live"
           >
-            <span className="material-symbols-outlined text-[26px]">
-              voice_chat
-            </span>
-          </motion.button>
-        ) : (
-          <motion.button
-            key="send"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.8, opacity: 0 }}
+            <span className="material-symbols-outlined text-[22px]">voice_chat</span>
+          </button>
+
+          <button
             type="button"
+            onMouseDown={preventFocusLoss}
             onClick={handleWrappedSend}
             disabled={isSendDisabled}
-            className={`w-12 h-12 rounded-full flex items-center justify-center transition-all shadow-xl ${
-              isSendDisabled 
-                ? "opacity-40 cursor-not-allowed" 
-                : "hover:brightness-110 active:scale-95 cursor-pointer"
-            }`}
-            style={{ 
-              backgroundColor: isSendDisabled ? '#0f0f0f' : 'var(--md-sys-color-primary-container)',
-              color: isSendDisabled ? '#9aa0a6' : 'var(--md-sys-color-on-primary-container)'
-            }}
+            className="btn-slot-item btn-send-upward"
+            title="Отправить сообщение"
+            aria-label="Send message"
           >
-            <span className={`material-symbols-outlined text-[26px] ${
-              !isSendDisabled ? "fill-[1]" : ""
-            }`}>
-              send
-            </span>
-          </motion.button>
-        )}
-      </AnimatePresence>
+            <span className="material-symbols-outlined text-[22px]">arrow_upward</span>
+          </button>
+        </>
+      )}
     </div>
   );
 };
-

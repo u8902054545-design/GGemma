@@ -2,8 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useLanguage } from '../../hooks/useLanguage';
 import { voiceInputVariants, pulseVariants } from '../../motion/voiceTransition';
-import '@material/web/iconbutton/icon-button.js';
-import '@material/web/iconbutton/filled-icon-button.js';
 import { SUPABASE_ENDPOINT, supabase } from '../../config';
 
 interface VoiceInputProps {
@@ -394,14 +392,14 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
       initial="initial"
       animate="animate"
       exit="exit"
-      className="flex-1 flex flex-col justify-between bg-[var(--md-sys-color-surface-container-high)] rounded-[32px] p-4 min-h-[96px] border border-[var(--md-sys-color-primary)]/10 shadow-lg relative overflow-hidden min-w-0 gap-3"
+      className="flex-1 flex flex-col justify-between bg-[var(--md-sys-color-surface-container-high)] rounded-[24px] p-4 min-h-[104px] border border-white/10 shadow-2xl relative overflow-hidden min-w-0 gap-3"
     >
       <AnimatePresence>
         {isListening && !isTranscribing && (
           <motion.div
             variants={pulseVariants}
             animate="animate"
-            className="absolute inset-0 bg-[var(--md-sys-color-primary)]/5 rounded-[32px] pointer-events-none"
+            className="absolute inset-0 bg-[var(--md-sys-color-primary)]/5 rounded-[24px] pointer-events-none"
           />
         )}
       </AnimatePresence>
@@ -430,7 +428,7 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
                     repeatType: "mirror",
                     delay: i * 0.015
                   }}
-                  className="w-[3px] rounded-full bg-[#4285F4]"
+                  className="w-[3px] rounded-full bg-[var(--md-sys-color-primary)]"
                 />
               ))}
             </motion.div>
@@ -440,39 +438,44 @@ export const VoiceInput: React.FC<VoiceInputProps> = ({
 
       <div className="flex justify-between items-center w-full mt-auto">
         <div className="flex items-center min-w-0 pr-4">
-          {isTranscribing && (
-            <span className="text-[var(--md-sys-color-primary)] animate-pulse font-medium text-[15px] flex items-center gap-2 select-none">
+          {isTranscribing ? (
+            <span className="text-[var(--md-sys-color-primary)] animate-pulse font-medium text-[14px] flex items-center gap-2 select-none">
               <div className="w-3.5 h-3.5 border-2 border-[var(--md-sys-color-primary)] border-t-transparent rounded-full animate-spin flex-shrink-0" />
               {language === 'ru' ? 'Расшифровка...' : 'Transcribing...'}
             </span>
+          ) : (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="text-xs text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)] transition-colors px-2 py-1 rounded-lg"
+            >
+              {language === 'ru' ? 'Отмена' : 'Cancel'}
+            </button>
           )}
         </div>
 
         <div className="flex items-center gap-2 z-10 flex-shrink-0">
-          <md-icon-button
+          <button
+            type="button"
             onClick={() => handleStopRecording(false)}
             disabled={isTranscribing}
-            style={{
-              '--md-icon-button-icon-color': 'var(--md-sys-color-on-surface-variant)',
-              '--md-icon-button-hover-state-layer-color': 'var(--md-sys-color-on-surface-variant)',
-              '--md-icon-button-pressed-state-layer-color': 'var(--md-sys-color-primary)',
-            }}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-white/5 hover:bg-white/10 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-[var(--md-sys-color-on-surface-variant)] hover:text-[var(--md-sys-color-on-surface)]"
+            title={language === 'ru' ? 'Вставить текст в поле' : 'Insert into prompt'}
+            aria-label="Stop and insert"
           >
-            <span className="material-symbols-outlined text-[26px]">stop_circle</span>
-          </md-icon-button>
+            <span className="material-symbols-outlined text-[24px]">stop_circle</span>
+          </button>
 
-          <md-filled-icon-button
+          <button
+            type="button"
             onClick={() => handleStopRecording(true)}
             disabled={isTranscribing}
-            style={{
-              '--md-filled-icon-button-container-color': '#1a73e8',
-              '--md-filled-icon-button-icon-color': '#ffffff',
-              '--md-filled-icon-button-disabled-container-color': 'rgba(26, 115, 232, 0.4)',
-              '--md-filled-icon-button-disabled-icon-color': 'rgba(255, 255, 255, 0.6)',
-            }}
+            className="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-[var(--md-sys-color-primary)] hover:brightness-110 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed text-[var(--md-sys-color-on-primary)] shadow-md"
+            title={language === 'ru' ? 'Отправить сразу' : 'Send immediately'}
+            aria-label="Stop and send"
           >
-            <span className="material-symbols-outlined text-[24px]">send</span>
-          </md-filled-icon-button>
+            <span className="material-symbols-outlined text-[22px]">arrow_upward</span>
+          </button>
         </div>
       </div>
     </motion.div>
