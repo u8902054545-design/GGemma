@@ -32,10 +32,15 @@ import { GeoblockDialog } from './components/GeoblockDialog';
 import { BlockedAccountDialog } from './components/BlockedAccountDialog';
 import { TranslationNewChatDialog } from './components/TranslationNewChatDialog';
 import { usePremium } from './hooks/usePremium';
+import { useConnectors } from './hooks/useConnectors';
 import { SUPABASE_ENDPOINT, supabase } from './config';
 
 export default function App() {
   const { user, loading: authLoading, signInWithGoogle, signInWithGitHub, signOut } = useAuth();
+  const { t, language, setLanguage } = useLanguage();
+  const { theme, setTheme } = useTheme();
+  const { exchangeCode } = useConnectors();
+
   const [isBlocked, setIsBlocked] = useState<boolean | null>(null);
   const [showGeoblockDialog, setShowGeoblockDialog] = useState(false);
   const [showBlockedDialog, setShowBlockedDialog] = useState(false);
@@ -153,6 +158,24 @@ export default function App() {
   } = useChat(() => refreshChats(true), isTemporary);
 
   useEffect(() => {
+    const handleOAuthCallback = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+      if (code && user) {
+        window.history.replaceState({}, '', '/');
+        const success = await exchangeCode(code);
+        if (success) {
+          setSnackbarMessage(language === 'ru' ? 'Google Workspace успешно подключен' : 'Google Workspace connected successfully');
+        } else {
+          setSnackbarMessage(language === 'ru' ? 'Ошибка при подключении Google Workspace' : 'Failed to connect Google Workspace');
+        }
+        setIsSnackbarOpen(true);
+      }
+    };
+    handleOAuthCallback();
+  }, [user, exchangeCode, language, setSnackbarMessage, setIsSnackbarOpen]);
+
+  useEffect(() => {
     const hasEverUsedTranslation = messages.some(m => m.isTranslationActive);
 
     if (hasEverUsedTranslation) {
@@ -197,8 +220,6 @@ export default function App() {
   const [isVoiceSelectionOpen, setIsVoiceSelectionOpen] = useState(false);
   const [isCodeImportOpen, setIsCodeImportOpen] = useState(false);
   const [importedCodes, setImportedCodes] = useState<any[]>([]);
-  const { t, language, setLanguage } = useLanguage();
-  const { theme, setTheme } = useTheme();
   const { isPremium, isModelPaid } = usePremium();
 
   const [isRegenModelSelectorOpen, setIsRegenModelSelectorOpen] = useState(false);

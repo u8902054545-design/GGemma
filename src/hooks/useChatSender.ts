@@ -174,7 +174,9 @@ export const useChatSender = (
       let searchTriggeredFlag = false;
       let imageAnalysisTriggeredFlag = false;
       let videoAnalysisTriggeredFlag = false;
+      let workspaceTriggeredFlag = false;
       let youtubeSearchUsed = youtubeSearchUsedFromServer;
+      let workspaceUsed = false;
 
       if (!reader) throw new Error('ReadableStream not supported');
 
@@ -193,8 +195,14 @@ export const useChatSender = (
         if (accumulatedContent.includes("[VIDEO_ANALYSIS_IN_PROGRESS]")) {
           videoAnalysisTriggeredFlag = true;
         }
+        if (accumulatedContent.includes("[WORKSPACE_IN_PROGRESS")) {
+          workspaceTriggeredFlag = true;
+        }
         if (accumulatedContent.includes("[YOUTUBE_SEARCH_USED]")) {
           youtubeSearchUsed = true;
+        }
+        if (accumulatedContent.includes("[WORKSPACE_USED]")) {
+          workspaceUsed = true;
         }
 
         let displayContent = accumulatedContent;
@@ -221,6 +229,15 @@ export const useChatSender = (
             displayContent = displayContent.substring(index + 28);
           }
         }
+        if (workspaceTriggeredFlag) {
+          const index = displayContent.indexOf("[WORKSPACE_IN_PROGRESS");
+          if (index !== -1) {
+            const endIdx = displayContent.indexOf("]", index);
+            if (endIdx !== -1) {
+              displayContent = displayContent.substring(endIdx + 1);
+            }
+          }
+        }
 
         const cleanText = displayContent
           .replace(/\[SEARCH_SOURCES:[^\]]*\]/g, "")
@@ -228,12 +245,15 @@ export const useChatSender = (
           .replace(/\[YOUTUBE_SEARCH_USED\]/g, "")
           .replace(/\[IMAGE_ANALYSIS_IN_PROGRESS\]/g, "")
           .replace(/\[VIDEO_ANALYSIS_IN_PROGRESS\]/g, "")
+          .replace(/\[WORKSPACE_IN_PROGRESS[^\]]*\]/g, "")
+          .replace(/\[WORKSPACE_USED\]/g, "")
           .trim();
 
         if (cleanText.length === 0) {
           if (searchTriggeredFlag) isSearching = true;
           if (imageAnalysisTriggeredFlag) isAnalyzingImage = true;
           if (videoAnalysisTriggeredFlag) isAnalyzingVideo = true;
+          if (workspaceTriggeredFlag) isSearching = true;
         }
 
         if (displayContent.includes("[SEARCH_REQUIRED:")) {
@@ -250,6 +270,18 @@ export const useChatSender = (
 
         if (displayContent.includes("[YOUTUBE_REQUIRED:")) {
           const index = displayContent.indexOf("[YOUTUBE_REQUIRED:");
+          const before = displayContent.substring(0, index);
+          const after = displayContent.substring(index);
+          const closingIdx = after.indexOf("]");
+          if (closingIdx !== -1) {
+            displayContent = before + after.substring(closingIdx + 1);
+          } else {
+            displayContent = before;
+          }
+        }
+
+        if (displayContent.includes("[WORKSPACE_ACTION:")) {
+          const index = displayContent.indexOf("[WORKSPACE_ACTION:");
           const before = displayContent.substring(0, index);
           const after = displayContent.substring(index);
           const closingIdx = after.indexOf("]");
@@ -285,6 +317,11 @@ export const useChatSender = (
           youtubeSearchUsed = true;
         }
 
+        if (displayContent.includes("[WORKSPACE_USED]")) {
+          displayContent = displayContent.replace(/\[WORKSPACE_USED\]/g, "");
+          workspaceUsed = true;
+        }
+
         if (displayContent.endsWith("[SEARCH_USED]")) {
           displayContent = displayContent.slice(0, -13);
           searchUsed = true;
@@ -301,6 +338,7 @@ export const useChatSender = (
               modelName: modelNameFromServer,
               searchUsed: searchUsed,
               youtubeSearchUsed: youtubeSearchUsed,
+              workspaceUsed: workspaceUsed,
               isSearching: isSearching,
               isAnalyzingImage: isAnalyzingImage,
               isAnalyzingVideo: isAnalyzingVideo,
@@ -414,7 +452,9 @@ export const useChatSender = (
       const decoder = new TextDecoder();
       let accumulatedContent = "";
       let searchTriggeredFlag = false;
+      let workspaceTriggeredFlag = false;
       let youtubeSearchUsed = youtubeSearchUsedFromServer;
+      let workspaceUsed = false;
 
       if (!reader) throw new Error('ReadableStream not supported');
 
@@ -427,8 +467,14 @@ export const useChatSender = (
         if (accumulatedContent.includes("[SEARCH_IN_PROGRESS]")) {
           searchTriggeredFlag = true;
         }
+        if (accumulatedContent.includes("[WORKSPACE_IN_PROGRESS")) {
+          workspaceTriggeredFlag = true;
+        }
         if (accumulatedContent.includes("[YOUTUBE_SEARCH_USED]")) {
           youtubeSearchUsed = true;
+        }
+        if (accumulatedContent.includes("[WORKSPACE_USED]")) {
+          workspaceUsed = true;
         }
 
         let displayContent = accumulatedContent;
@@ -452,6 +498,29 @@ export const useChatSender = (
           }
         }
 
+        if (workspaceTriggeredFlag) {
+          const index = displayContent.indexOf("[WORKSPACE_IN_PROGRESS");
+          if (index !== -1) {
+            const endIdx = displayContent.indexOf("]", index);
+            if (endIdx !== -1) {
+              displayContent = displayContent.substring(endIdx + 1);
+            }
+          }
+        }
+
+        const cleanText = displayContent
+          .replace(/\[SEARCH_SOURCES:[^\]]*\]/g, "")
+          .replace(/\[SEARCH_USED\]/g, "")
+          .replace(/\[YOUTUBE_SEARCH_USED\]/g, "")
+          .replace(/\[WORKSPACE_IN_PROGRESS[^\]]*\]/g, "")
+          .replace(/\[WORKSPACE_USED\]/g, "")
+          .trim();
+
+        if (cleanText.length === 0) {
+          if (searchTriggeredFlag) isSearching = true;
+          if (workspaceTriggeredFlag) isSearching = true;
+        }
+
         if (displayContent.includes("[SEARCH_REQUIRED:")) {
           const index = displayContent.indexOf("[SEARCH_REQUIRED:");
           const before = displayContent.substring(0, index);
@@ -466,6 +535,18 @@ export const useChatSender = (
 
         if (displayContent.includes("[YOUTUBE_REQUIRED:")) {
           const index = displayContent.indexOf("[YOUTUBE_REQUIRED:");
+          const before = displayContent.substring(0, index);
+          const after = displayContent.substring(index);
+          const closingIdx = after.indexOf("]");
+          if (closingIdx !== -1) {
+            displayContent = before + after.substring(closingIdx + 1);
+          } else {
+            displayContent = before;
+          }
+        }
+
+        if (displayContent.includes("[WORKSPACE_ACTION:")) {
+          const index = displayContent.indexOf("[WORKSPACE_ACTION:");
           const before = displayContent.substring(0, index);
           const after = displayContent.substring(index);
           const closingIdx = after.indexOf("]");
@@ -501,6 +582,11 @@ export const useChatSender = (
           youtubeSearchUsed = true;
         }
 
+        if (displayContent.includes("[WORKSPACE_USED]")) {
+          displayContent = displayContent.replace(/\[WORKSPACE_USED\]/g, "");
+          workspaceUsed = true;
+        }
+
         if (displayContent.endsWith("[SEARCH_USED]")) {
           displayContent = displayContent.slice(0, -13);
           searchUsed = true;
@@ -517,6 +603,7 @@ export const useChatSender = (
               modelName: modelNameFromServer,
               searchUsed: searchUsed,
               youtubeSearchUsed: youtubeSearchUsed,
+              workspaceUsed: workspaceUsed,
               isSearching: isSearching,
               searchSources: searchSourcesList || existingSources,
               searchEnabledBy: searchUsed || youtubeSearchUsed ? (lastAiMsg.searchEnabledBy || 'model') : undefined

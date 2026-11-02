@@ -16,6 +16,7 @@ import { SidebarProfile } from './SidebarParts/SidebarProfile';
 import { useChatHistory } from '../hooks/useChatHistory';
 import { ChatHistorySelection } from './Settings/chatHistorySelection';
 import { ChatsPage } from './ChatsPage';
+import { ConnectorsPage } from './Connectors/ConnectorsPage';
 import '@material/web/icon/icon.js';
 import '@material/web/iconbutton/icon-button.js';
 
@@ -62,6 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 }) => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isChatsPageOpen, setIsChatsPageOpen] = useState(false);
+  const [isConnectorsOpen, setIsConnectorsOpen] = useState(false);
   const [selectedChat, setSelectedChat] = useState<Chat | null>(null);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isRenameOpen, setIsRenameOpen] = useState(false);
@@ -252,37 +254,57 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </div>
 
         <div className="flex-1 overflow-y-auto px-3 mt-1 custom-scrollbar min-h-0">
-          <button
-            type="button"
-            onClick={() => {
-              if (!isChatHistoryEnabled) {
-                setSnackbarMessage(t('errors.historyDisabled.chat'));
-                setIsSnackbarOpen(true);
-                return;
-              }
-              setIsChatsPageOpen(true);
-            }}
-            className="w-full flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] transition-all active:scale-[0.99] cursor-pointer"
-          >
-            <div className="flex items-center gap-3.5">
-              <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary)]">
-                forum
-              </span>
-              <span className="text-[15px] font-medium">
-                {t('sidebar.chats') || 'Chats'}
-              </span>
-            </div>
-            <div className="flex items-center gap-2">
-              {chats.length > 0 && (
-                <span className="text-xs px-2.5 py-0.5 rounded-full bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] font-medium">
-                  {chats.length}
+          <div className="flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={() => {
+                if (!isChatHistoryEnabled) {
+                  setSnackbarMessage(t('errors.historyDisabled.chat'));
+                  setIsSnackbarOpen(true);
+                  return;
+                }
+                setIsChatsPageOpen(true);
+              }}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] transition-all active:scale-[0.99] cursor-pointer"
+            >
+              <div className="flex items-center gap-3.5">
+                <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary)]">
+                  forum
                 </span>
-              )}
+                <span className="text-[15px] font-medium">
+                  {t('sidebar.chats') || 'Chats'}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                {chats.length > 0 && (
+                  <span className="text-xs px-2.5 py-0.5 rounded-full bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)] font-medium">
+                    {chats.length}
+                  </span>
+                )}
+                <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-on-surface-variant)]/60">
+                  chevron_right
+                </span>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setIsConnectorsOpen(true)}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-2xl hover:bg-[var(--md-sys-color-surface-container-high)] text-[var(--md-sys-color-on-surface)] transition-all active:scale-[0.99] cursor-pointer"
+            >
+              <div className="flex items-center gap-3.5">
+                <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary)]">
+                  hub
+                </span>
+                <span className="text-[15px] font-medium">
+                  {t('sidebar.connectors') || 'Connectors'}
+                </span>
+              </div>
               <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-on-surface-variant)]/60">
                 chevron_right
               </span>
-            </div>
-          </button>
+            </button>
+          </div>
 
           {!isChatHistoryEnabled && (
             <div className="flex flex-col items-center justify-center py-8 px-4 text-center mt-4">
@@ -379,6 +401,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
         onOpenSearch={handleOpenSearch}
         onRefresh={handleRefreshChats}
       />
+
+      <AnimatePresence>
+        {isConnectorsOpen && (
+          <ConnectorsPage
+            isOpen={isConnectorsOpen}
+            onClose={() => setIsConnectorsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {isChatHistorySelectionOpen && (
