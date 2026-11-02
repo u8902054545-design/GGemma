@@ -5,6 +5,7 @@ import { useLanguage } from '../../hooks/useLanguage';
 import { supabase, SUPABASE_ENDPOINT } from '../../config';
 import Snackbar from '../Snackbar';
 import { SettingsBehavior } from './SettingsBehavior';
+import { MemoryBlock } from './MemoryBlock';
 import '@material/web/button/filled-button.js';
 
 interface PersonalizationPageProps {
@@ -184,6 +185,8 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ isOpen
         </p>
 
         <div className="w-full flex flex-col gap-3">
+          <MemoryBlock />
+
           <button
             onClick={() => setIsInstructionsOpen(true)}
             className="ripple-container w-full p-5 flex items-start gap-4 bg-[var(--md-sys-color-surface)] hover:bg-[var(--md-sys-color-on-surface-variant)]/5 border border-[var(--md-sys-color-outline-variant)]/30 rounded-[24px] transition-all text-left active:scale-[0.99] shadow-sm"
