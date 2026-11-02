@@ -117,6 +117,12 @@ export const SettingsHubPage: React.FC<SettingsHubPageProps> = ({ isOpen, onClos
               </div>
             </section>
 
+            <div className="w-full flex justify-start px-3 pt-1">
+              <span className="text-[13px] font-medium tracking-wide text-[var(--md-sys-color-primary,#D0BCFF)]">
+                General settings
+              </span>
+            </div>
+
             <section aria-label="Personalization and Preferences">
               <div className="flex flex-col gap-[3px] rounded-[28px] bg-[var(--md-sys-color-surface-container-low,#141218)] p-1.5 border border-[var(--md-sys-color-outline-variant,#49454F)]/30">
                 <button
@@ -207,6 +213,12 @@ export const SettingsHubPage: React.FC<SettingsHubPageProps> = ({ isOpen, onClos
                 </button>
               </div>
             </section>
+
+            <div className="w-full flex justify-start px-3 pt-1">
+              <span className="text-[13px] font-medium tracking-wide text-[var(--md-sys-color-primary,#D0BCFF)]">
+                Privacy Settings
+              </span>
+            </div>
 
             <section aria-label="Public Links and Chat History">
               <div className="flex flex-col gap-[3px] rounded-[28px] bg-[var(--md-sys-color-surface-container-low,#141218)] p-1.5 border border-[var(--md-sys-color-outline-variant,#49454F)]/30">
@@ -309,3 +321,4 @@ export const SettingsHubPage: React.FC<SettingsHubPageProps> = ({ isOpen, onClos
     </motion.div>
   );
 };
+

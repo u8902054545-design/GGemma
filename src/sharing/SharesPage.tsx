@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { pageVariants } from '../motion/transitions';
+import { googleRailPageVariants } from '../motion/googleRailTransitions';
 import { useLanguage } from '../hooks/useLanguage';
 import { getAllUserShares, deleteShareById, deleteAllUserShares, SharedChat } from './shareUtils';
 import Snackbar from '../components/Snackbar';
@@ -98,7 +98,7 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
 
   return (
     <motion.div
-      variants={pageVariants}
+      variants={googleRailPageVariants}
       initial="initial"
       animate="animate"
       exit="exit"
@@ -217,4 +217,5 @@ export const SharesPage: React.FC<SharesPageProps> = ({ isOpen, onClose }) => {
     </motion.div>
   );
 };
+
 export default SharesPage;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { pageVariants } from '../../motion/transitions';
+import { googleRailPageVariants } from '../../motion/googleRailTransitions';
 import { useLanguage } from '../../hooks/useLanguage';
 import { supabase, SUPABASE_ENDPOINT } from '../../config';
 import Snackbar from '../Snackbar';
@@ -83,7 +83,7 @@ const PersonalInstructions: React.FC<PersonalInstructionsProps> = ({ isOpen, onC
 
   return (
     <motion.div
-      variants={pageVariants}
+      variants={googleRailPageVariants}
       initial="initial"
       animate="animate"
       exit="exit"
@@ -159,7 +159,7 @@ export const PersonalizationPage: React.FC<PersonalizationPageProps> = ({ isOpen
 
   return (
     <motion.div
-      variants={pageVariants}
+      variants={googleRailPageVariants}
       initial="initial"
       animate="animate"
       exit="exit"
