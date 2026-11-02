@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { AnimatePresence } from 'motion/react';
 import { usePremium } from '../../hooks/usePremium';
 import { SettingsHubPage } from '../Settings/SettingsHubPage';
 
@@ -86,10 +87,15 @@ export const SidebarProfile: React.FC<SidebarProfileProps> = ({
         </div>
       </div>
 
-      <SettingsHubPage
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
+      <AnimatePresence>
+        {isSettingsOpen && (
+          <SettingsHubPage
+            key="settings-hub"
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 };
