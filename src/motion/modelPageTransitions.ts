@@ -2,22 +2,20 @@ import { Variants } from 'motion/react';
 
 export const modelPageVariants: Variants = {
   initial: {
-    y: '100vh',
+    opacity: 0,
   },
   animate: {
-    y: 0,
+    opacity: 1,
     transition: {
-      type: 'spring',
-      bounce: 0,
-      duration: 0.5,
+      duration: 0.28,
+      ease: [0.4, 0, 0.2, 1],
     },
   },
   exit: {
-    y: '100vh',
+    opacity: 0,
     transition: {
-      type: 'spring',
-      bounce: 0,
-      duration: 0.3,
+      duration: 0.2,
+      ease: [0.4, 0, 0.2, 1],
     },
   },
 };
@@ -25,10 +23,10 @@ export const modelPageVariants: Variants = {
 export const mainContentBackdropVariants: Variants = {
   idle: {
     opacity: 1,
-    transition: { duration: 0 }
+    transition: { duration: 0 },
   },
   pushed: {
     opacity: 0.8,
-    transition: { duration: 0.3 }
+    transition: { duration: 0.3 },
   },
 };
