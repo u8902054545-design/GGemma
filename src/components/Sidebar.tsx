@@ -294,10 +294,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             >
               <div className="flex items-center gap-3.5">
                 <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary)]">
-                  hub
+                  extension
                 </span>
                 <span className="text-[15px] font-medium">
-                  {t('sidebar.connectors') || 'Connectors'}
+                  Connectors
                 </span>
               </div>
               <span className="material-symbols-outlined text-[18px] text-[var(--md-sys-color-on-surface-variant)]/60">
