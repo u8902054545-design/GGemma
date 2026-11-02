@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'motion/react';
 import { googleRailPageVariants } from '../../motion/googleRailTransitions';
 import { useLanguage } from '../../hooks/useLanguage';
@@ -34,21 +34,45 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
       name.includes('gemini 4 argon') || id.includes('gemini-4-argon');
   };
 
-  const paidQuotas = quotas.filter(isPaidItem);
-  const freeQuotas = quotas.filter(item => !isPaidItem(item));
-  const paidModelsCount = paidQuotas.length;
-  const freeModelsCount = freeQuotas.length;
-  const accessibleModelsCount = isPremium ? quotas.length : freeModelsCount;
+  const {
+    paidQuotas,
+    freeQuotas,
+    paidModelsCount,
+    freeModelsCount,
+    accessibleModelsCount,
+    maxLimit,
+    paidPercent,
+    freePercent,
+    freeStrokeDash,
+    paidStrokeDash,
+  } = useMemo(() => {
+    const paid = quotas.filter(isPaidItem);
+    const free = quotas.filter(item => !isPaidItem(item));
+    const paidCount = paid.length;
+    const freeCount = free.length;
+    const accessibleCount = isPremium ? quotas.length : freeCount;
+    const max = Math.max(...quotas.map(q => Number(q.daily_limit || 50)), 100);
+    const tot = quotas.length || 1;
+    const pPercent = Math.round((paidCount / tot) * 100);
+    const fPercent = 100 - pPercent;
+    const radius = 54;
+    const circumference = 2 * Math.PI * radius;
+    const fStroke = (fPercent / 100) * circumference;
+    const pStroke = (pPercent / 100) * circumference;
 
-  const maxLimit = Math.max(...quotas.map(q => Number(q.daily_limit || 50)), 100);
-
-  const total = quotas.length || 1;
-  const paidPercent = Math.round((paidModelsCount / total) * 100);
-  const freePercent = 100 - paidPercent;
-  const radius = 54;
-  const circumference = 2 * Math.PI * radius;
-  const freeStrokeDash = (freePercent / 100) * circumference;
-  const paidStrokeDash = (paidPercent / 100) * circumference;
+    return {
+      paidQuotas: paid,
+      freeQuotas: free,
+      paidModelsCount: paidCount,
+      freeModelsCount: freeCount,
+      accessibleModelsCount: accessibleCount,
+      maxLimit: max,
+      paidPercent: pPercent,
+      freePercent: fPercent,
+      freeStrokeDash: fStroke,
+      paidStrokeDash: pStroke,
+    };
+  }, [quotas, isPremium]);
 
   const renderQuotaCard = (item: QuotaItem) => {
     const isPaid = isPaidItem(item);
@@ -137,10 +161,14 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
       initial="initial"
       animate="animate"
       exit="exit"
-      style={{ zIndex: 100001 }}
+      style={{
+        zIndex: 100001,
+        willChange: 'transform, opacity',
+        transform: 'translateZ(0)',
+      }}
       className="fixed inset-0 bg-[var(--md-sys-color-background)] flex flex-col font-sans overflow-hidden text-[var(--md-sys-color-on-background)]"
     >
-      <header className="w-full h-16 px-4 border-b border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface)]/95 backdrop-blur-md flex items-center justify-between shrink-0">
+      <header className="w-full h-16 px-4 border-b border-[var(--md-sys-color-outline-variant)]/20 bg-[var(--md-sys-color-surface)] flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3">
           <button
             type="button"
@@ -337,9 +365,10 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
 
                           <div className="w-full h-36 bg-[var(--md-sys-color-surface-container-highest)]/40 rounded-t-xl relative flex items-end overflow-hidden">
                             <motion.div
-                              initial={{ height: 0 }}
-                              animate={{ height: `${heightPercent}%` }}
-                              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                              initial={{ scaleY: 0 }}
+                              animate={{ scaleY: 1 }}
+                              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                              style={{ height: `${heightPercent}%`, transformOrigin: 'bottom' }}
                               className={`w-full rounded-t-xl transition-all duration-200 group-hover:brightness-110 ${
                                 isPaid
                                   ? 'bg-[var(--md-sys-color-primary)]'
@@ -399,7 +428,7 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
                       <circle
                         cx="70"
                         cy="70"
-                        r={radius}
+                        r={54}
                         fill="transparent"
                         stroke="var(--md-sys-color-surface-container-highest)"
                         strokeWidth="16"
@@ -407,11 +436,11 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
                       <circle
                         cx="70"
                         cy="70"
-                        r={radius}
+                        r={54}
                         fill="transparent"
                         stroke="var(--md-sys-color-tertiary)"
                         strokeWidth="16"
-                        strokeDasharray={`${freeStrokeDash} ${circumference}`}
+                        strokeDasharray={`${freeStrokeDash} ${2 * Math.PI * 54}`}
                         strokeDashoffset="0"
                         strokeLinecap="round"
                         className="transition-all duration-700 ease-out"
@@ -419,11 +448,11 @@ export const QuotaAndUsagePage: React.FC<QuotaAndUsagePageProps> = ({ isOpen, on
                       <circle
                         cx="70"
                         cy="70"
-                        r={radius}
+                        r={54}
                         fill="transparent"
                         stroke="var(--md-sys-color-primary)"
                         strokeWidth="16"
-                        strokeDasharray={`${paidStrokeDash} ${circumference}`}
+                        strokeDasharray={`${paidStrokeDash} ${2 * Math.PI * 54}`}
                         strokeDashoffset={`-${freeStrokeDash}`}
                         strokeLinecap="round"
                         className="transition-all duration-700 ease-out"

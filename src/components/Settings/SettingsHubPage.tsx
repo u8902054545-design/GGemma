@@ -52,6 +52,11 @@ export const SettingsHubPage: React.FC<SettingsHubPageProps> = ({ isOpen, onClos
         variants={googleRailHubVariants}
         animate={isSubpageOpen ? 'pushed' : 'active'}
         initial={false}
+        style={{
+          willChange: 'transform, opacity',
+          transform: 'translateZ(0)',
+          pointerEvents: isSubpageOpen ? 'none' : 'auto',
+        }}
         className="flex flex-col flex-1 w-full h-full overflow-hidden"
       >
         <header className="w-full">
@@ -271,48 +276,56 @@ export const SettingsHubPage: React.FC<SettingsHubPageProps> = ({ isOpen, onClos
       <AnimatePresence>
         {isAccountOpen && (
           <ProfileDrawer
+            key="account"
             isOpen={isAccountOpen}
             onClose={() => setIsAccountOpen(false)}
           />
         )}
         {isQuotaUsageOpen && (
           <QuotaAndUsagePage
+            key="quota"
             isOpen={isQuotaUsageOpen}
             onClose={() => setIsQuotaUsageOpen(false)}
           />
         )}
         {isPersonalizationOpen && (
           <PersonalizationPage
+            key="personalization"
             isOpen={isPersonalizationOpen}
             onClose={() => setIsPersonalizationOpen(false)}
           />
         )}
         {isSharesOpen && (
           <SharesPage
+            key="shares"
             isOpen={isSharesOpen}
             onClose={() => setIsSharesOpen(false)}
           />
         )}
         {isThemeOpen && (
           <ThemeSelection
+            key="theme"
             isOpen={isThemeOpen}
             onClose={() => setIsThemeOpen(false)}
           />
         )}
         {isVoiceOpen && (
           <VoiceSelection
+            key="voice"
             isOpen={isVoiceOpen}
             onClose={() => setIsVoiceOpen(false)}
           />
         )}
         {isLanguageOpen && (
           <LanguageSelection
+            key="language"
             isOpen={isLanguageOpen}
             onClose={() => setIsLanguageOpen(false)}
           />
         )}
         {isChatHistoryOpen && (
           <ChatHistorySelection
+            key="chatHistory"
             isOpen={isChatHistoryOpen}
             onClose={() => setIsChatHistoryOpen(false)}
           />
@@ -321,4 +334,3 @@ export const SettingsHubPage: React.FC<SettingsHubPageProps> = ({ isOpen, onClos
     </motion.div>
   );
 };
-
