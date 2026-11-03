@@ -262,7 +262,7 @@ export const useChatSender = (
           .replace(/\[VIDEO_ANALYSIS_IN_PROGRESS\]/g, "")
           .replace(/\[WORKSPACE_IN_PROGRESS[^\]]*\]/g, "")
           .replace(/\[WORKSPACE_USED[^\]]*\]/g, "")
-          .replace(/\[WORKSPACE_ACTION:\s*\{.*?\}\s*\]/gs, "")
+          .replace(/\[WORKSPACE_ACTION:\s*\{[\s\S]*?\}\s*\]/g, "")
           .trim();
 
         if (cleanText.length === 0) {
@@ -296,16 +296,10 @@ export const useChatSender = (
           }
         }
 
+        displayContent = displayContent.replace(/\[WORKSPACE_ACTION:\s*\{[\s\S]*?\}\s*\]/g, "");
         if (displayContent.includes("[WORKSPACE_ACTION:")) {
           const index = displayContent.indexOf("[WORKSPACE_ACTION:");
-          const before = displayContent.substring(0, index);
-          const after = displayContent.substring(index);
-          const closingIdx = after.indexOf("]");
-          if (closingIdx !== -1) {
-            displayContent = before + after.substring(closingIdx + 1);
-          } else {
-            displayContent = before;
-          }
+          displayContent = displayContent.substring(0, index);
         }
 
         let searchSourcesList = undefined;
@@ -545,7 +539,7 @@ export const useChatSender = (
           .replace(/\[YOUTUBE_SEARCH_USED\]/g, "")
           .replace(/\[WORKSPACE_IN_PROGRESS[^\]]*\]/g, "")
           .replace(/\[WORKSPACE_USED[^\]]*\]/g, "")
-          .replace(/\[WORKSPACE_ACTION:\s*\{.*?\}\s*\]/gs, "")
+          .replace(/\[WORKSPACE_ACTION:\s*\{[\s\S]*?\}\s*\]/g, "")
           .trim();
 
         if (cleanText.length === 0) {
@@ -577,16 +571,10 @@ export const useChatSender = (
           }
         }
 
+        displayContent = displayContent.replace(/\[WORKSPACE_ACTION:\s*\{[\s\S]*?\}\s*\]/g, "");
         if (displayContent.includes("[WORKSPACE_ACTION:")) {
           const index = displayContent.indexOf("[WORKSPACE_ACTION:");
-          const before = displayContent.substring(0, index);
-          const after = displayContent.substring(index);
-          const closingIdx = after.indexOf("]");
-          if (closingIdx !== -1) {
-            displayContent = before + after.substring(closingIdx + 1);
-          } else {
-            displayContent = before;
-          }
+          displayContent = displayContent.substring(0, index);
         }
 
         let searchSourcesList = undefined;

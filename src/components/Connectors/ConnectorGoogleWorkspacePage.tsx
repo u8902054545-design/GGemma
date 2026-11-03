@@ -6,6 +6,12 @@ import { GoogleWorkspaceIcon } from '../IconsApp/GoogleWorkspaceIcon';
 import { GoogleCalendarIcon } from '../IconsApp/GoogleCalendarIcon';
 import { GoogleDriveIcon } from '../IconsApp/GoogleDriveIcon';
 import { GoogleDocsIcon } from '../IconsApp/GoogleDocsIcon';
+import { GoogleSheetsIcon } from '../IconsApp/GoogleSheetsIcon';
+import { GoogleTasksIcon } from '../IconsApp/GoogleTasksIcon';
+import { GmailIcon } from '../IconsApp/GmailIcon';
+import { GoogleSlidesIcon } from '../IconsApp/GoogleSlidesIcon';
+import { GoogleFormsIcon } from '../IconsApp/GoogleFormsIcon';
+import { GoogleAppsScriptIcon } from '../IconsApp/GoogleAppsScriptIcon';
 
 interface ConnectorGoogleWorkspacePageProps {
   isOpen: boolean;
@@ -78,7 +84,7 @@ export const ConnectorGoogleWorkspacePage: React.FC<ConnectorGoogleWorkspacePage
             </div>
 
             <p className="text-[14px] text-[var(--md-sys-color-on-surface-variant,#938F99)] leading-relaxed max-w-md">
-              Connect your Google account to grant Gemma access to your personal files, calendar schedule, and documents upon request.
+              Connect your Google account to grant Gemma access to view and manage your calendar, files, documents, spreadsheets, tasks, emails, and automation scripts upon request.
             </p>
 
             <div className="mt-6 w-full max-w-xs">
@@ -121,7 +127,7 @@ export const ConnectorGoogleWorkspacePage: React.FC<ConnectorGoogleWorkspacePage
                     Google Calendar
                   </span>
                   <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
-                    Read upcoming events, check availability, and manage schedule queries.
+                    View upcoming schedule, create events, and manage calendar entries.
                   </span>
                 </div>
               </div>
@@ -135,7 +141,7 @@ export const ConnectorGoogleWorkspacePage: React.FC<ConnectorGoogleWorkspacePage
                     Google Drive
                   </span>
                   <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
-                    Search and discover stored files, spreadsheets, and documents.
+                    Search and discover stored files, spreadsheets, and create new folders.
                   </span>
                 </div>
               </div>
@@ -149,7 +155,91 @@ export const ConnectorGoogleWorkspacePage: React.FC<ConnectorGoogleWorkspacePage
                     Google Docs
                   </span>
                   <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
-                    Inspect, parse, and analyze document contents directly in chat.
+                    Inspect document contents, generate new documents, and append text.
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 flex items-start gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2">
+                  <GoogleSheetsIcon className="w-6 h-6" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
+                    Google Sheets
+                  </span>
+                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
+                    Create new spreadsheets, read table cells, and append data rows automatically.
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 flex items-start gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2">
+                  <GoogleTasksIcon className="w-6 h-6" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
+                    Google Tasks
+                  </span>
+                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
+                    Track to-do lists, add tasks with due dates, and mark items as completed.
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 flex items-start gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2">
+                  <GmailIcon className="w-6 h-6" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
+                    Gmail
+                  </span>
+                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
+                    Search messages, compose email drafts for review, and send emails.
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 flex items-start gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2">
+                  <GoogleSlidesIcon className="w-6 h-6" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
+                    Google Slides
+                  </span>
+                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
+                    Create presentations and initialize slide decks directly through Gemma.
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 flex items-start gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2">
+                  <GoogleFormsIcon className="w-6 h-6" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
+                    Google Forms
+                  </span>
+                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
+                    Generate surveys and question forms for fast feedback and polling.
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 flex items-start gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2">
+                  <GoogleAppsScriptIcon className="w-6 h-6" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
+                    Google Apps Script
+                  </span>
+                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
+                    Create automation projects and write custom scripts for Workspace workflows.
                   </span>
                 </div>
               </div>
