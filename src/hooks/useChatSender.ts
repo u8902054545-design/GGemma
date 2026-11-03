@@ -175,6 +175,8 @@ export const useChatSender = (
       let imageAnalysisTriggeredFlag = false;
       let videoAnalysisTriggeredFlag = false;
       let workspaceTriggeredFlag = false;
+      let activeConnectorName = "";
+      let finalConnectorName = "";
       let youtubeSearchUsed = youtubeSearchUsedFromServer;
       let workspaceUsed = false;
 
@@ -197,12 +199,24 @@ export const useChatSender = (
         }
         if (accumulatedContent.includes("[WORKSPACE_IN_PROGRESS")) {
           workspaceTriggeredFlag = true;
+          const match = accumulatedContent.match(/\[WORKSPACE_IN_PROGRESS:\s*([^\]]+)\]/);
+          if (match) {
+            activeConnectorName = match[1].trim();
+          } else {
+            activeConnectorName = "Google Workspace";
+          }
         }
         if (accumulatedContent.includes("[YOUTUBE_SEARCH_USED]")) {
           youtubeSearchUsed = true;
         }
-        if (accumulatedContent.includes("[WORKSPACE_USED]")) {
+        if (accumulatedContent.includes("[WORKSPACE_USED")) {
           workspaceUsed = true;
+          const match = accumulatedContent.match(/\[WORKSPACE_USED:\s*([^\]]+)\]/);
+          if (match) {
+            finalConnectorName = match[1].trim();
+          } else {
+            finalConnectorName = finalConnectorName || "Google Workspace";
+          }
         }
 
         let displayContent = accumulatedContent;
@@ -210,6 +224,7 @@ export const useChatSender = (
         let isSearching = false;
         let isAnalyzingImage = false;
         let isAnalyzingVideo = false;
+        let isUsingConnector = false;
 
         if (searchTriggeredFlag) {
           const index = displayContent.indexOf("[SEARCH_IN_PROGRESS]");
@@ -246,14 +261,15 @@ export const useChatSender = (
           .replace(/\[IMAGE_ANALYSIS_IN_PROGRESS\]/g, "")
           .replace(/\[VIDEO_ANALYSIS_IN_PROGRESS\]/g, "")
           .replace(/\[WORKSPACE_IN_PROGRESS[^\]]*\]/g, "")
-          .replace(/\[WORKSPACE_USED\]/g, "")
+          .replace(/\[WORKSPACE_USED[^\]]*\]/g, "")
+          .replace(/\[WORKSPACE_ACTION:\s*\{.*?\}\s*\]/gs, "")
           .trim();
 
         if (cleanText.length === 0) {
           if (searchTriggeredFlag) isSearching = true;
           if (imageAnalysisTriggeredFlag) isAnalyzingImage = true;
           if (videoAnalysisTriggeredFlag) isAnalyzingVideo = true;
-          if (workspaceTriggeredFlag) isSearching = true;
+          if (workspaceTriggeredFlag) isUsingConnector = true;
         }
 
         if (displayContent.includes("[SEARCH_REQUIRED:")) {
@@ -317,9 +333,16 @@ export const useChatSender = (
           youtubeSearchUsed = true;
         }
 
-        if (displayContent.includes("[WORKSPACE_USED]")) {
-          displayContent = displayContent.replace(/\[WORKSPACE_USED\]/g, "");
+        if (displayContent.includes("[WORKSPACE_USED")) {
+          const match = displayContent.match(/\[WORKSPACE_USED:\s*([^\]]+)\]/);
+          if (match) {
+            finalConnectorName = match[1].trim();
+          }
+          displayContent = displayContent.replace(/\[WORKSPACE_USED[^\]]*\]/g, "");
           workspaceUsed = true;
+          if (!finalConnectorName) {
+            finalConnectorName = "Google Workspace";
+          }
         }
 
         if (displayContent.endsWith("[SEARCH_USED]")) {
@@ -339,9 +362,12 @@ export const useChatSender = (
               searchUsed: searchUsed,
               youtubeSearchUsed: youtubeSearchUsed,
               workspaceUsed: workspaceUsed,
+              connectorName: workspaceUsed ? (finalConnectorName || 'Google Workspace') : undefined,
+              activeConnectorName: isUsingConnector ? (activeConnectorName || 'Google Workspace') : undefined,
               isSearching: isSearching,
               isAnalyzingImage: isAnalyzingImage,
               isAnalyzingVideo: isAnalyzingVideo,
+              isUsingConnector: isUsingConnector,
               searchSources: searchSourcesList || existingSources,
               searchEnabledBy: searchUsed || youtubeSearchUsed ? ((isSearchActive || isYouTubeSearchActive) ? 'user' : 'model') : undefined
             };
@@ -434,7 +460,7 @@ export const useChatSender = (
           voice: currentVoice,
           isRegenerate: true,
           regenerateMode: mode || 'repeat',
-          isTranslationFound: userMsg.isTranslationActive,
+          isTranslationActive: userMsg.isTranslationActive,
           translationInputLang: userMsg.translationInputLang,
           translationOutputLang: userMsg.translationOutputLang
         }),
@@ -453,6 +479,8 @@ export const useChatSender = (
       let accumulatedContent = "";
       let searchTriggeredFlag = false;
       let workspaceTriggeredFlag = false;
+      let activeConnectorName = "";
+      let finalConnectorName = "";
       let youtubeSearchUsed = youtubeSearchUsedFromServer;
       let workspaceUsed = false;
 
@@ -469,32 +497,35 @@ export const useChatSender = (
         }
         if (accumulatedContent.includes("[WORKSPACE_IN_PROGRESS")) {
           workspaceTriggeredFlag = true;
+          const match = accumulatedContent.match(/\[WORKSPACE_IN_PROGRESS:\s*([^\]]+)\]/);
+          if (match) {
+            activeConnectorName = match[1].trim();
+          } else {
+            activeConnectorName = "Google Workspace";
+          }
         }
         if (accumulatedContent.includes("[YOUTUBE_SEARCH_USED]")) {
           youtubeSearchUsed = true;
         }
-        if (accumulatedContent.includes("[WORKSPACE_USED]")) {
+        if (accumulatedContent.includes("[WORKSPACE_USED")) {
           workspaceUsed = true;
+          const match = accumulatedContent.match(/\[WORKSPACE_USED:\s*([^\]]+)\]/);
+          if (match) {
+            finalConnectorName = match[1].trim();
+          } else {
+            finalConnectorName = finalConnectorName || "Google Workspace";
+          }
         }
 
         let displayContent = accumulatedContent;
         let searchUsed = searchUsedFromServer;
         let isSearching = false;
+        let isUsingConnector = false;
 
         if (searchTriggeredFlag) {
           const index = displayContent.indexOf("[SEARCH_IN_PROGRESS]");
           if (index !== -1) {
             displayContent = displayContent.substring(index + 20);
-          }
-
-          const cleanText = displayContent
-            .replace(/\[SEARCH_SOURCES:[^\]]*\]/g, "")
-            .replace(/\[SEARCH_USED\]/g, "")
-            .replace(/\[YOUTUBE_SEARCH_USED\]/g, "")
-            .trim();
-
-          if (cleanText.length === 0) {
-            isSearching = true;
           }
         }
 
@@ -513,12 +544,13 @@ export const useChatSender = (
           .replace(/\[SEARCH_USED\]/g, "")
           .replace(/\[YOUTUBE_SEARCH_USED\]/g, "")
           .replace(/\[WORKSPACE_IN_PROGRESS[^\]]*\]/g, "")
-          .replace(/\[WORKSPACE_USED\]/g, "")
+          .replace(/\[WORKSPACE_USED[^\]]*\]/g, "")
+          .replace(/\[WORKSPACE_ACTION:\s*\{.*?\}\s*\]/gs, "")
           .trim();
 
         if (cleanText.length === 0) {
           if (searchTriggeredFlag) isSearching = true;
-          if (workspaceTriggeredFlag) isSearching = true;
+          if (workspaceTriggeredFlag) isUsingConnector = true;
         }
 
         if (displayContent.includes("[SEARCH_REQUIRED:")) {
@@ -582,9 +614,16 @@ export const useChatSender = (
           youtubeSearchUsed = true;
         }
 
-        if (displayContent.includes("[WORKSPACE_USED]")) {
-          displayContent = displayContent.replace(/\[WORKSPACE_USED\]/g, "");
+        if (displayContent.includes("[WORKSPACE_USED")) {
+          const match = displayContent.match(/\[WORKSPACE_USED:\s*([^\]]+)\]/);
+          if (match) {
+            finalConnectorName = match[1].trim();
+          }
+          displayContent = displayContent.replace(/\[WORKSPACE_USED[^\]]*\]/g, "");
           workspaceUsed = true;
+          if (!finalConnectorName) {
+            finalConnectorName = "Google Workspace";
+          }
         }
 
         if (displayContent.endsWith("[SEARCH_USED]")) {
@@ -604,7 +643,10 @@ export const useChatSender = (
               searchUsed: searchUsed,
               youtubeSearchUsed: youtubeSearchUsed,
               workspaceUsed: workspaceUsed,
+              connectorName: workspaceUsed ? (finalConnectorName || 'Google Workspace') : undefined,
+              activeConnectorName: isUsingConnector ? (activeConnectorName || 'Google Workspace') : undefined,
               isSearching: isSearching,
+              isUsingConnector: isUsingConnector,
               searchSources: searchSourcesList || existingSources,
               searchEnabledBy: searchUsed || youtubeSearchUsed ? (lastAiMsg.searchEnabledBy || 'model') : undefined
             };

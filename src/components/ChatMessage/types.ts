@@ -8,9 +8,13 @@ export type ChatMessageProps = {
   onFeedback?: (id: string, type: 'like' | 'dislike' | null) => void;
   searchUsed?: boolean;
   youtubeSearchUsed?: boolean;
+  workspaceUsed?: boolean;
+  connectorName?: string;
+  activeConnectorName?: string;
   isSearching?: boolean;
   isAnalyzingImage?: boolean;
   isAnalyzingVideo?: boolean;
+  isUsingConnector?: boolean;
   searchSources?: { title: string; url: string }[];
   hideActions?: boolean;
   isTranslationActive?: boolean;

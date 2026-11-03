@@ -41,6 +41,8 @@ export const useChatLoader = (
         codes: m.codes,
         searchUsed: m.search_used,
         youtubeSearchUsed: m.youtube_search_used,
+        workspaceUsed: m.workspace_used,
+        connectorName: m.connector_name,
         searchSources: m.search_sources,
         searchEnabledBy: m.search_enabled_by,
         isTranslationActive: m.is_translation_active,

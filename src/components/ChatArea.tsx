@@ -108,9 +108,13 @@ export const ChatArea: React.FC<ChatAreaProps> = ({
                   isTemporary={isTemporary}
                   searchUsed={msg.searchUsed}
                   youtubeSearchUsed={msg.youtubeSearchUsed}
+                  workspaceUsed={msg.workspaceUsed}
+                  connectorName={msg.connectorName}
+                  activeConnectorName={msg.activeConnectorName}
                   isSearching={msg.isSearching}
                   isAnalyzingImage={msg.isAnalyzingImage}
                   isAnalyzingVideo={msg.isAnalyzingVideo}
+                  isUsingConnector={msg.isUsingConnector}
                   searchSources={msg.searchSources}
                   onRegenerate={handleRegenerate}
                   isLastUserMessage={msg.id === lastUserMsgId}

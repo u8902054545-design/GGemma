@@ -32,9 +32,13 @@ export type Message = {
   voice?: string;
   searchUsed?: boolean;
   youtubeSearchUsed?: boolean;
+  workspaceUsed?: boolean;
+  connectorName?: string;
+  activeConnectorName?: string;
   isSearching?: boolean;
   isAnalyzingImage?: boolean;
   isAnalyzingVideo?: boolean;
+  isUsingConnector?: boolean;
   searchSources?: { title: string; url: string }[];
   searchEnabledBy?: 'user' | 'model';
   isTranslationActive?: boolean;

@@ -57,9 +57,13 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
   isTemporary = false,
   searchUsed,
   youtubeSearchUsed,
+  workspaceUsed,
+  connectorName,
+  activeConnectorName,
   isSearching,
   isAnalyzingImage,
   isAnalyzingVideo,
+  isUsingConnector,
   searchSources,
   hideActions = false,
   onRegenerate,
@@ -222,6 +226,12 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
         {isAI && isAnalyzingVideo && (
           <SearchProgress statusText={t('message.video_analysis_progress')} key="video-progress" />
         )}
+        {isAI && isUsingConnector && (
+          <SearchProgress
+            statusText={`Is used the connector «${activeConnectorName || connectorName || 'Google Workspace'}»`}
+            key="connector-progress"
+          />
+        )}
       </AnimatePresence>
 
       <div className={`relative w-full flex flex-col ${isAI ? 'items-start' : 'items-end'}`}>
@@ -352,6 +362,8 @@ const ChatMessageComponent: React.FC<ExtendedChatMessageProps> = ({
               modelName={modelName}
               searchUsed={searchUsed}
               youtubeSearchUsed={youtubeSearchUsed}
+              workspaceUsed={workspaceUsed}
+              connectorName={connectorName}
               imageUsed={userHasImage}
               videoUsed={userHasVideo}
             />
