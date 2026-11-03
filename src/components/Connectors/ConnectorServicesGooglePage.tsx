@@ -2,14 +2,15 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { pageVariants } from '../../motion/transitions';
 import { useConnectors } from '../../hooks/useConnectors';
+import { GoogleIcon } from '../IconsApp/GoogleIcon';
 import { GoogleContactsIcon } from '../IconsApp/GoogleContactsIcon';
 
-interface ConnectorGoogleContactsPageProps {
+interface ConnectorServicesGooglePageProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const ConnectorGoogleContactsPage: React.FC<ConnectorGoogleContactsPageProps> = ({ isOpen, onClose }) => {
+export const ConnectorServicesGooglePage: React.FC<ConnectorServicesGooglePageProps> = ({ isOpen, onClose }) => {
   const { status, loading, actionLoading, error, connectGoogle, disconnectGoogle } = useConnectors('google_contacts');
 
   if (!isOpen) return null;
@@ -37,7 +38,7 @@ export const ConnectorGoogleContactsPage: React.FC<ConnectorGoogleContactsPagePr
           </div>
 
           <h1 className="text-[22px] font-normal leading-7 tracking-normal text-[var(--md-sys-color-on-surface,#E6E0E9)] text-center truncate">
-            Google Contacts
+            Services Google
           </h1>
 
           <div className="w-12" aria-hidden="true" />
@@ -55,11 +56,11 @@ export const ConnectorGoogleContactsPage: React.FC<ConnectorGoogleContactsPagePr
 
           <div className="flex flex-col items-center text-center pt-4 pb-2">
             <div className="flex items-center justify-center px-6 py-3.5 rounded-2xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] mb-4">
-              <GoogleContactsIcon className="w-12 h-12" />
+              <GoogleIcon className="w-10 h-10" />
             </div>
 
             <h2 className="text-[24px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)] mb-1">
-              Google Contacts
+              Services Google
             </h2>
 
             <div className="inline-flex items-center gap-2 mb-3">
@@ -75,7 +76,7 @@ export const ConnectorGoogleContactsPage: React.FC<ConnectorGoogleContactsPagePr
             </div>
 
             <p className="text-[14px] text-[var(--md-sys-color-on-surface-variant,#938F99)] leading-relaxed max-w-md">
-              Connect your Google Contacts to grant Gemma access to find phone numbers, email addresses, and manage your personal address book upon request.
+              Connect your Google account to grant Gemma access to Google services, including Contacts, to search and manage your address book upon request.
             </p>
 
             <div className="mt-6 w-full max-w-xs">
@@ -105,62 +106,20 @@ export const ConnectorGoogleContactsPage: React.FC<ConnectorGoogleContactsPagePr
 
           <section className="flex flex-col gap-3">
             <h3 className="text-[14px] font-medium text-[var(--md-sys-color-on-surface-variant,#938F99)] uppercase tracking-wider px-1">
-              Included Capabilities
+              Included Services
             </h3>
 
             <div className="rounded-[24px] bg-[var(--md-sys-color-surface-container-low,#141218)] border border-[var(--md-sys-color-outline-variant,#49454F)]/30 divide-y divide-[var(--md-sys-color-outline-variant,#49454F)]/20 overflow-hidden">
               <div className="p-4 flex items-start gap-3.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)]">
-                  <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary,#D0BCFF)]">search</span>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2">
+                  <GoogleContactsIcon className="w-6 h-6" />
                 </div>
                 <div className="flex flex-col">
                   <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
-                    Search Contacts
+                    Google Contacts
                   </span>
                   <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
-                    Look up phone numbers, emails, job titles, and notes by person name.
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 flex items-start gap-3.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)]">
-                  <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary,#D0BCFF)]">list_alt</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
-                    View Address Book
-                  </span>
-                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
-                    List and organize contacts stored in your personal Google account.
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 flex items-start gap-3.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)]">
-                  <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary,#D0BCFF)]">person_add</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
-                    Create New Contacts
-                  </span>
-                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
-                    Save new contact cards with phone, email, company, and notes directly from chat.
-                  </span>
-                </div>
-              </div>
-
-              <div className="p-4 flex items-start gap-3.5">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)]">
-                  <span className="material-symbols-outlined text-[22px] text-[var(--md-sys-color-primary,#D0BCFF)]">person_remove</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
-                    Delete Contacts
-                  </span>
-                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
-                    Remove outdated or duplicate contacts upon explicit request.
+                    Search contacts, view address book, create and manage personal contact cards directly from chat.
                   </span>
                 </div>
               </div>

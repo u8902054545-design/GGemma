@@ -173,13 +173,13 @@ export default function App() {
 
         if (success) {
           if (isContacts) {
-            setSnackbarMessage(language === 'ru' ? 'Google Contacts успешно подключен' : 'Google Contacts connected successfully');
+            setSnackbarMessage(language === 'ru' ? 'Services Google успешно подключен' : 'Services Google connected successfully');
           } else {
             setSnackbarMessage(language === 'ru' ? 'Google Workspace успешно подключен' : 'Google Workspace connected successfully');
           }
         } else {
           if (isContacts) {
-            setSnackbarMessage(language === 'ru' ? 'Ошибка при подключении Google Contacts' : 'Failed to connect Google Contacts');
+            setSnackbarMessage(language === 'ru' ? 'Ошибка при подключении Services Google' : 'Failed to connect Services Google');
           } else {
             setSnackbarMessage(language === 'ru' ? 'Ошибка при подключении Google Workspace' : 'Failed to connect Google Workspace');
           }

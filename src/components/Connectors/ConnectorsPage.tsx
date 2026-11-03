@@ -3,8 +3,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { pageVariants } from '../../motion/transitions';
 import { useConnectors } from '../../hooks/useConnectors';
 import { ConnectorGoogleWorkspacePage } from './ConnectorGoogleWorkspacePage';
-import { ConnectorGoogleContactsPage } from './ConnectorGoogleContactsPage';
+import { ConnectorServicesGooglePage } from './ConnectorServicesGooglePage';
 import { GoogleWorkspaceIcon } from '../IconsApp/GoogleWorkspaceIcon';
+import { GoogleIcon } from '../IconsApp/GoogleIcon';
 
 interface ConnectorsPageProps {
   isOpen: boolean;
@@ -16,7 +17,7 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
   const { status: contactsStatus, loading: contactsLoading, error: contactsError } = useConnectors('google_contacts');
 
   const [isGoogleWorkspaceOpen, setIsGoogleWorkspaceOpen] = useState(false);
-  const [isGoogleContactsOpen, setIsGoogleContactsOpen] = useState(false);
+  const [isServicesGoogleOpen, setIsServicesGoogleOpen] = useState(false);
 
   const error = workspaceError || contactsError;
 
@@ -68,11 +69,7 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
               </div>
             )}
 
-            <section aria-label="Google Workspace" className="flex flex-col gap-2.5">
-              <h2 className="text-[12px] font-semibold text-[var(--md-sys-color-on-surface-variant,#938F99)] uppercase tracking-wider px-2">
-                Google Workspace
-              </h2>
-
+            <div className="flex flex-col gap-3">
               <button
                 type="button"
                 onClick={() => setIsGoogleWorkspaceOpen(true)}
@@ -107,26 +104,20 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
                   chevron_right
                 </span>
               </button>
-            </section>
-
-            <section aria-label="Services Google" className="flex flex-col gap-2.5">
-              <h2 className="text-[12px] font-semibold text-[var(--md-sys-color-on-surface-variant,#938F99)] uppercase tracking-wider px-2">
-                Services Google
-              </h2>
 
               <button
                 type="button"
-                onClick={() => setIsGoogleContactsOpen(true)}
+                onClick={() => setIsServicesGoogleOpen(true)}
                 className="w-full text-left rounded-[24px] bg-[var(--md-sys-color-surface-container-low,#141218)] p-4 border border-[var(--md-sys-color-outline-variant,#49454F)]/30 hover:border-[var(--md-sys-color-outline-variant,#49454F)]/60 transition-all cursor-pointer active:scale-[0.99] flex items-center justify-between gap-3"
               >
                 <div className="flex items-center gap-3.5 min-w-0">
                   <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] px-2.5">
-                    <span className="material-symbols-outlined text-[28px] text-[var(--md-sys-color-primary,#D0BCFF)]">contacts</span>
+                    <GoogleIcon className="w-6 h-6" />
                   </div>
                   <div className="flex flex-col min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-[16px] font-medium leading-6 tracking-[0.15px] text-[var(--md-sys-color-on-surface,#E6E0E9)] truncate">
-                        Google Contacts
+                        Service Google
                       </span>
                       <span
                         className={`px-2 py-0.5 rounded-full text-[11px] font-medium ${
@@ -139,16 +130,16 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
                       </span>
                     </div>
                     <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] truncate">
-                      Search and manage address book
+                      Contacts
                     </span>
                   </div>
                 </div>
 
                 <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant,#938F99)] shrink-0">
-                  chevron_right
-                </span>
+                      chevron_right
+                    </span>
               </button>
-            </section>
+            </div>
           </div>
         </main>
       </motion.div>
@@ -160,10 +151,10 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
             onClose={() => setIsGoogleWorkspaceOpen(false)}
           />
         )}
-        {isGoogleContactsOpen && (
-          <ConnectorGoogleContactsPage
-            isOpen={isGoogleContactsOpen}
-            onClose={() => setIsGoogleContactsOpen(false)}
+        {isServicesGoogleOpen && (
+          <ConnectorServicesGooglePage
+            isOpen={isServicesGoogleOpen}
+            onClose={() => setIsServicesGoogleOpen(false)}
           />
         )}
       </AnimatePresence>
