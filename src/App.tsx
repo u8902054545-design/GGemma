@@ -161,13 +161,28 @@ export default function App() {
     const handleOAuthCallback = async () => {
       const params = new URLSearchParams(window.location.search);
       const code = params.get('code');
+      const state = params.get('state');
+
       if (code && user) {
         window.history.replaceState({}, '', '/');
-        const success = await exchangeCode(code);
+        const stateParts = (state || '').split(':');
+        const targetProvider = stateParts[1] || 'google';
+
+        const success = await exchangeCode(code, targetProvider);
+        const isContacts = targetProvider === 'google_contacts';
+
         if (success) {
-          setSnackbarMessage(language === 'ru' ? 'Google Workspace успешно подключен' : 'Google Workspace connected successfully');
+          if (isContacts) {
+            setSnackbarMessage(language === 'ru' ? 'Google Contacts успешно подключен' : 'Google Contacts connected successfully');
+          } else {
+            setSnackbarMessage(language === 'ru' ? 'Google Workspace успешно подключен' : 'Google Workspace connected successfully');
+          }
         } else {
-          setSnackbarMessage(language === 'ru' ? 'Ошибка при подключении Google Workspace' : 'Failed to connect Google Workspace');
+          if (isContacts) {
+            setSnackbarMessage(language === 'ru' ? 'Ошибка при подключении Google Contacts' : 'Failed to connect Google Contacts');
+          } else {
+            setSnackbarMessage(language === 'ru' ? 'Ошибка при подключении Google Workspace' : 'Failed to connect Google Workspace');
+          }
         }
         setIsSnackbarOpen(true);
       }
