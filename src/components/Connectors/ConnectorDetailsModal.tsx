@@ -14,6 +14,7 @@ import { GoogleFormsIcon } from '../IconsApp/GoogleFormsIcon';
 import { GoogleAppsScriptIcon } from '../IconsApp/GoogleAppsScriptIcon';
 import { GoogleChatIcon } from '../IconsApp/GoogleChatIcon';
 import { GoogleContactsIcon } from '../IconsApp/GoogleContactsIcon';
+import { GoogleHomeIcon } from '../IconsApp/GoogleHomeIcon';
 
 interface ConnectorDetailsModalProps {
   connectorId: ConnectorId | null;
@@ -65,6 +66,8 @@ export const ConnectorDetailsModal: React.FC<ConnectorDetailsModalProps> = ({
         return <GoogleChatIcon className="w-7 h-7" />;
       case 'google_contacts':
         return <GoogleContactsIcon className="w-7 h-7" />;
+      case 'google_home':
+        return <GoogleHomeIcon className="w-7 h-7" />;
       default:
         return <GoogleIcon className="w-7 h-7" />;
     }

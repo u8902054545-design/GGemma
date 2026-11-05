@@ -11,7 +11,8 @@ export type ConnectorId =
   | 'google_forms'
   | 'google_apps_script'
   | 'google_chat'
-  | 'google_contacts';
+  | 'google_contacts'
+  | 'google_home';
 
 export interface ConnectorDescription {
   id: ConnectorId;
@@ -54,24 +55,24 @@ export const CONNECTOR_DESCRIPTIONS: Record<ConnectorId, ConnectorDescription> =
     title: 'Services Google',
     subtitle: 'Personal Google account services',
     description:
-      'Integrates Gemma with core personal Google services such as Google Contacts, enabling fast lookup, organization, and management of your personal and professional address book directly through natural language requests.',
+      'Integrates Gemma with personal Google services such as Google Contacts and Google Home, enabling address book management and smart home device automation directly through natural language requests.',
     canDo: [
       'Search your address book by name, email address, phone number, or organization',
       'Retrieve detailed contact information to use in emails, invites, or messages',
       'Create new contact cards with phone numbers, emails, job titles, and notes',
-      'Update existing contact details or remove outdated entries when instructed'
+      'Inspect and control connected smart home devices, lights, thermostats, and switches'
     ],
     cannotDo: [
       'Modify or delete contacts without your explicit instruction',
       'Access local device contacts that are not synced with your Google Account',
-      'Share your private address book externally without your confirmation',
-      'Recover contacts that were permanently deleted more than 30 days ago'
+      'Unlock security doors or disarm alarm systems without authorization',
+      'Share your private personal data externally without your confirmation'
     ],
     examplePrompts: [
       'Find the email address and phone number for Alex in my Google Contacts.',
       'Add a new contact named Sarah Jenkins with email sarah@example.com.',
-      'List all contacts in my address book who work at Acme Corp.',
-      'Update the phone number for Michael in my Google Contacts.'
+      'Turn off all smart lights in the apartment.',
+      'What is the current temperature on the home thermostat?'
     ]
   },
   google_calendar: {
@@ -336,6 +337,31 @@ export const CONNECTOR_DESCRIPTIONS: Record<ConnectorId, ConnectorDescription> =
       'Create a new contact for John Doe with phone +1-555-0199 and email john@doe.com.',
       'What is the email address for Elena in my Contacts?',
       'Update Alex’s company name to "TechLabs" in my Google Contacts.'
+    ]
+  },
+  google_home: {
+    id: 'google_home',
+    title: 'Google Home',
+    subtitle: 'Smart home & device control',
+    description:
+      'Connects Gemma to your Google Home and Nest ecosystem, allowing you to check device statuses, control smart lights, thermostats, plugs, and manage home automation routines directly through natural conversation.',
+    canDo: [
+      'View the list of connected smart home devices and their current states',
+      'Turn smart lights, plugs, and switches on or off',
+      'Adjust thermostat target temperatures and HVAC modes',
+      'Check sensor readings such as ambient temperature and humidity'
+    ],
+    cannotDo: [
+      'Unlock security doors or disarm security systems without PIN authorization',
+      'Access live camera video streams directly within chat messages',
+      'Add or pair new physical hardware devices without the official Google Home app',
+      'Modify home member permissions or account access levels'
+    ],
+    examplePrompts: [
+      'Turn off all lights in the living room.',
+      'What is the current temperature on the hallway thermostat?',
+      'Set the thermostat to 22 degrees Celsius.',
+      'Show me all active smart devices in my home.'
     ]
   }
 };

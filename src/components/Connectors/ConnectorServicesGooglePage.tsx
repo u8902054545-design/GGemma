@@ -4,6 +4,7 @@ import { pageVariants } from '../../motion/transitions';
 import { useConnectors } from '../../hooks/useConnectors';
 import { GoogleIcon } from '../IconsApp/GoogleIcon';
 import { GoogleContactsIcon } from '../IconsApp/GoogleContactsIcon';
+import { GoogleHomeIcon } from '../IconsApp/GoogleHomeIcon';
 import { ConnectorDetailsModal } from './ConnectorDetailsModal';
 import { ConnectorId } from './connectorDescriptions';
 
@@ -72,6 +73,7 @@ export const ConnectorServicesGooglePage: React.FC<ConnectorServicesGooglePagePr
 
   const isServicesGroupActive = status.connected && isGroupEnabled('services_google');
   const isContactsToolActive = isToolEnabled('google_contacts');
+  const isHomeToolActive = isToolEnabled('google_home');
 
   if (!isOpen) return null;
 
@@ -137,7 +139,7 @@ export const ConnectorServicesGooglePage: React.FC<ConnectorServicesGooglePagePr
               </div>
 
               <p className="text-[14px] text-[var(--md-sys-color-on-surface-variant,#938F99)] leading-relaxed max-w-md">
-                Connect your Google account to grant Gemma access to Google services, including Contacts, to search and manage your address book upon request.
+                Connect your Google account to grant Gemma access to Google services, including Contacts and Google Home, to manage your address book and smart home devices upon request.
               </p>
 
               <div className="mt-6 w-full max-w-xs">
@@ -217,6 +219,35 @@ export const ConnectorServicesGooglePage: React.FC<ConnectorServicesGooglePagePr
                     />
                   </div>
                 </div>
+
+                <div className="w-full p-4 flex items-center justify-between gap-3.5 hover:bg-[var(--md-sys-color-surface-container-highest,#2B2930)]/40 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedConnectorId('google_home')}
+                    className="flex items-start gap-3.5 flex-1 min-w-0 text-left cursor-pointer group"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2 group-hover:scale-105 transition-transform">
+                      <GoogleHomeIcon className="w-6 h-6" />
+                    </div>
+                    <div className="flex flex-col min-w-0 pr-2">
+                      <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)] truncate">
+                        Google Home
+                      </span>
+                      <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5 line-clamp-2">
+                        Control smart home devices, lights, thermostats, and inspect device statuses directly from chat.
+                      </span>
+                    </div>
+                  </button>
+
+                  <div className="shrink-0 flex items-center pl-2">
+                    <GoogleSwitch
+                      checked={isServicesGroupActive && isHomeToolActive}
+                      disabled={!status.connected || !isServicesGroupActive}
+                      onChange={() => toggleTool('google_home')}
+                      ariaLabel="Toggle Google Home"
+                    />
+                  </div>
+                </div>
               </div>
             </section>
           </div>
@@ -230,3 +261,4 @@ export const ConnectorServicesGooglePage: React.FC<ConnectorServicesGooglePagePr
     </>
   );
 };
+
