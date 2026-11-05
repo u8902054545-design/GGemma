@@ -28,6 +28,7 @@ export const DEFAULT_CONNECTOR_SETTINGS: ConnectorSettings = {
     google_forms: true,
     google_apps_script: true,
     google_chat: true,
+    google_meet: true,
     google_contacts: true,
     google_home: true,
   },

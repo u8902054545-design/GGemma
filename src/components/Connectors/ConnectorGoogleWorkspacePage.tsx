@@ -13,6 +13,7 @@ import { GoogleSlidesIcon } from '../IconsApp/GoogleSlidesIcon';
 import { GoogleFormsIcon } from '../IconsApp/GoogleFormsIcon';
 import { GoogleAppsScriptIcon } from '../IconsApp/GoogleAppsScriptIcon';
 import { GoogleChatIcon } from '../IconsApp/GoogleChatIcon';
+import { GoogleMeetIcon } from '../IconsApp/GoogleMeetIcon';
 import { ConnectorDetailsModal } from './ConnectorDetailsModal';
 import { ConnectorId } from './connectorDescriptions';
 
@@ -88,6 +89,12 @@ const WORKSPACE_SERVICES: WorkspaceServiceItem[] = [
     name: 'Google Chat',
     description: 'View spaces and direct messages, read conversations, and send messages.',
     icon: GoogleChatIcon,
+  },
+  {
+    id: 'google_meet',
+    name: 'Google Meet',
+    description: 'Create video meeting spaces, generate instant links, and view conference details.',
+    icon: GoogleMeetIcon,
   },
 ];
 
@@ -215,7 +222,7 @@ export const ConnectorGoogleWorkspacePage: React.FC<ConnectorGoogleWorkspacePage
               </div>
 
               <p className="text-[14px] text-[var(--md-sys-color-on-surface-variant,#938F99)] leading-relaxed max-w-md">
-                Connect your Google account to grant Gemma access to view and manage your calendar, files, documents, spreadsheets, tasks, emails, chat messages, and automation scripts upon request.
+                Connect your Google account to grant Gemma access to view and manage your calendar, files, documents, spreadsheets, tasks, emails, chat messages, video meetings, and automation scripts upon request.
               </p>
 
               <div className="mt-6 w-full max-w-xs">

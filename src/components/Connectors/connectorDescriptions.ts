@@ -11,6 +11,7 @@ export type ConnectorId =
   | 'google_forms'
   | 'google_apps_script'
   | 'google_chat'
+  | 'google_meet'
   | 'google_contacts'
   | 'google_home';
 
@@ -30,11 +31,12 @@ export const CONNECTOR_DESCRIPTIONS: Record<ConnectorId, ConnectorDescription> =
     title: 'Google Workspace',
     subtitle: 'Productivity & collaboration suite',
     description:
-      'Connects Gemma to your Google Workspace ecosystem, allowing you to seamlessly search, summarize, create, and manage your emails, documents, spreadsheets, presentations, calendar events, tasks, chat messages, and automation scripts directly from the conversation.',
+      'Connects Gemma to your Google Workspace ecosystem, allowing you to seamlessly search, summarize, create, and manage your emails, documents, spreadsheets, presentations, calendar events, tasks, chat messages, video meetings, and automation scripts directly from the conversation.',
     canDo: [
       'Search and summarize emails, documents, files, and chat conversations across your account',
       'Create and update calendar events, to-do tasks, Google Docs, Sheets, Slides, and Forms',
       'Draft and send emails in Gmail or post messages in Google Chat spaces upon your request',
+      'Generate instant Google Meet video conferences and share meeting links',
       'Generate and manage custom Google Apps Script automation projects'
     ],
     cannotDo: [
@@ -313,6 +315,31 @@ export const CONNECTOR_DESCRIPTIONS: Record<ConnectorId, ConnectorDescription> =
       'Summarize the latest messages in the "Engineering" Google Chat space.',
       'Post a message to the "Announcements" space saying the deployment is complete.',
       'Find any links shared in my Google Chat spaces today.'
+    ]
+  },
+  google_meet: {
+    id: 'google_meet',
+    title: 'Google Meet',
+    subtitle: 'Video meetings & conferencing',
+    description:
+      'Connects Gemma to Google Meet, allowing you to quickly create new video meeting spaces, generate call links, and view conference details right in the conversation.',
+    canDo: [
+      'Create instant Google Meet spaces and generate shareable meeting links',
+      'Retrieve meeting room codes and conference details upon request',
+      'Generate ready-to-join video call links to include in messages or notes',
+      'Check existing meeting space configurations and access parameters'
+    ],
+    cannotDo: [
+      'Join or participate in live video and audio streams as an active participant',
+      'Record meetings without host permissions or bypass meeting recording policies',
+      'Mute participants, kick attendees, or alter in-call moderation settings remotely',
+      'Access meeting recordings or artifacts not shared with your Google account'
+    ],
+    examplePrompts: [
+      'Create a new Google Meet space for a quick team sync.',
+      'Generate a Google Meet link so I can invite someone to a call.',
+      'Start a new video meeting and give me the joining link.',
+      'Create a Google Meet conference room and share the room code.'
     ]
   },
   google_contacts: {

@@ -13,6 +13,7 @@ import { GoogleSlidesIcon } from '../IconsApp/GoogleSlidesIcon';
 import { GoogleFormsIcon } from '../IconsApp/GoogleFormsIcon';
 import { GoogleAppsScriptIcon } from '../IconsApp/GoogleAppsScriptIcon';
 import { GoogleChatIcon } from '../IconsApp/GoogleChatIcon';
+import { GoogleMeetIcon } from '../IconsApp/GoogleMeetIcon';
 import { GoogleContactsIcon } from '../IconsApp/GoogleContactsIcon';
 import { GoogleHomeIcon } from '../IconsApp/GoogleHomeIcon';
 
@@ -64,6 +65,8 @@ export const ConnectorDetailsModal: React.FC<ConnectorDetailsModalProps> = ({
         return <GoogleAppsScriptIcon className="w-7 h-7" />;
       case 'google_chat':
         return <GoogleChatIcon className="w-7 h-7" />;
+      case 'google_meet':
+        return <GoogleMeetIcon className="w-7 h-7" />;
       case 'google_contacts':
         return <GoogleContactsIcon className="w-7 h-7" />;
       case 'google_home':
