@@ -6,6 +6,7 @@ import { ConnectorGoogleWorkspacePage } from './ConnectorGoogleWorkspacePage';
 import { ConnectorServicesGooglePage } from './ConnectorServicesGooglePage';
 import { GoogleWorkspaceIcon } from '../IconsApp/GoogleWorkspaceIcon';
 import { GoogleIcon } from '../IconsApp/GoogleIcon';
+import { GooglePlayIcon } from '../IconsApp/GooglePlayIcon';
 
 interface ConnectorsPageProps {
   isOpen: boolean;
@@ -140,6 +141,34 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
                     </div>
                     <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] leading-snug line-clamp-2">
                       Search address book, view and manage personal contacts directly.
+                    </span>
+                  </div>
+                </div>
+
+                <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant,#938F99)] shrink-0">
+                  chevron_right
+                </span>
+              </button>
+
+              <button
+                type="button"
+                className="w-full text-left rounded-[24px] bg-[var(--md-sys-color-surface-container-low,#141218)] p-4 border border-[var(--md-sys-color-outline-variant,#49454F)]/30 hover:border-[var(--md-sys-color-outline-variant,#49454F)]/60 transition-all cursor-pointer active:scale-[0.99] flex items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
+                  <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] px-2.5">
+                    <GooglePlayIcon className="w-6 h-6" />
+                  </div>
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span className="text-[16px] font-medium leading-6 tracking-[0.15px] text-[var(--md-sys-color-on-surface,#E6E0E9)] truncate">
+                        Google Play services
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-[var(--md-sys-color-surface-container-highest,#2B2930)] text-[var(--md-sys-color-on-surface-variant,#938F99)]">
+                        Not connected
+                      </span>
+                    </div>
+                    <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] leading-snug line-clamp-2">
+                      Search apps, inspect ratings, reviews, and manage Google Play content.
                     </span>
                   </div>
                 </div>
