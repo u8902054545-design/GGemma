@@ -12,6 +12,7 @@ import { GmailIcon } from '../IconsApp/GmailIcon';
 import { GoogleSlidesIcon } from '../IconsApp/GoogleSlidesIcon';
 import { GoogleFormsIcon } from '../IconsApp/GoogleFormsIcon';
 import { GoogleAppsScriptIcon } from '../IconsApp/GoogleAppsScriptIcon';
+import { GoogleChatIcon } from '../IconsApp/GoogleChatIcon';
 
 interface ConnectorGoogleWorkspacePageProps {
   isOpen: boolean;
@@ -84,7 +85,7 @@ export const ConnectorGoogleWorkspacePage: React.FC<ConnectorGoogleWorkspacePage
             </div>
 
             <p className="text-[14px] text-[var(--md-sys-color-on-surface-variant,#938F99)] leading-relaxed max-w-md">
-              Connect your Google account to grant Gemma access to view and manage your calendar, files, documents, spreadsheets, tasks, emails, and automation scripts upon request.
+              Connect your Google account to grant Gemma access to view and manage your calendar, files, documents, spreadsheets, tasks, emails, chat messages, and automation scripts upon request.
             </p>
 
             <div className="mt-6 w-full max-w-xs">
@@ -240,6 +241,20 @@ export const ConnectorGoogleWorkspacePage: React.FC<ConnectorGoogleWorkspacePage
                   </span>
                   <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
                     Create automation projects and write custom scripts for Workspace workflows.
+                  </span>
+                </div>
+              </div>
+
+              <div className="p-4 flex items-start gap-3.5">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2">
+                  <GoogleChatIcon className="w-6 h-6" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
+                    Google Chat
+                  </span>
+                  <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
+                    View spaces and direct messages, read conversations, and send messages.
                   </span>
                 </div>
               </div>
