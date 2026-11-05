@@ -13,8 +13,17 @@ interface ConnectorsPageProps {
 }
 
 export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose }) => {
-  const { status: workspaceStatus, loading: workspaceLoading, error: workspaceError } = useConnectors('google');
-  const { status: contactsStatus, loading: contactsLoading, error: contactsError } = useConnectors('google_contacts');
+  const {
+    status: workspaceStatus,
+    loading: workspaceLoading,
+    error: workspaceError,
+  } = useConnectors('google');
+
+  const {
+    status: contactsStatus,
+    loading: contactsLoading,
+    error: contactsError,
+  } = useConnectors('google_contacts');
 
   const [isGoogleWorkspaceOpen, setIsGoogleWorkspaceOpen] = useState(false);
   const [isServicesGoogleOpen, setIsServicesGoogleOpen] = useState(false);
@@ -75,12 +84,12 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
                 onClick={() => setIsGoogleWorkspaceOpen(true)}
                 className="w-full text-left rounded-[24px] bg-[var(--md-sys-color-surface-container-low,#141218)] p-4 border border-[var(--md-sys-color-outline-variant,#49454F)]/30 hover:border-[var(--md-sys-color-outline-variant,#49454F)]/60 transition-all cursor-pointer active:scale-[0.99] flex items-center justify-between gap-3"
               >
-                <div className="flex items-center gap-3.5 min-w-0">
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
                   <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] px-2.5">
                     <GoogleWorkspaceIcon className="w-full h-auto" />
                   </div>
-                  <div className="flex flex-col min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
                       <span className="text-[16px] font-medium leading-6 tracking-[0.15px] text-[var(--md-sys-color-on-surface,#E6E0E9)] truncate">
                         Google Workspace
                       </span>
@@ -94,8 +103,8 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
                         {workspaceLoading ? 'Checking...' : workspaceStatus.connected ? 'Connected' : 'Not connected'}
                       </span>
                     </div>
-                    <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] truncate">
-                      Calendar, Drive, Docs
+                    <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] leading-snug line-clamp-2">
+                      Manage calendar events, cloud files, documents, spreadsheets, and emails.
                     </span>
                   </div>
                 </div>
@@ -110,12 +119,12 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
                 onClick={() => setIsServicesGoogleOpen(true)}
                 className="w-full text-left rounded-[24px] bg-[var(--md-sys-color-surface-container-low,#141218)] p-4 border border-[var(--md-sys-color-outline-variant,#49454F)]/30 hover:border-[var(--md-sys-color-outline-variant,#49454F)]/60 transition-all cursor-pointer active:scale-[0.99] flex items-center justify-between gap-3"
               >
-                <div className="flex items-center gap-3.5 min-w-0">
+                <div className="flex items-center gap-3.5 min-w-0 flex-1">
                   <div className="flex h-12 w-16 shrink-0 items-center justify-center rounded-2xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] px-2.5">
                     <GoogleIcon className="w-6 h-6" />
                   </div>
-                  <div className="flex flex-col min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex flex-col min-w-0 pr-2">
+                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
                       <span className="text-[16px] font-medium leading-6 tracking-[0.15px] text-[var(--md-sys-color-on-surface,#E6E0E9)] truncate">
                         Service Google
                       </span>
@@ -129,15 +138,15 @@ export const ConnectorsPage: React.FC<ConnectorsPageProps> = ({ isOpen, onClose 
                         {contactsLoading ? 'Checking...' : contactsStatus.connected ? 'Connected' : 'Not connected'}
                       </span>
                     </div>
-                    <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] truncate">
-                      Contacts
+                    <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] leading-snug line-clamp-2">
+                      Search address book, view and manage personal contacts directly.
                     </span>
                   </div>
                 </div>
 
                 <span className="material-symbols-outlined text-[20px] text-[var(--md-sys-color-on-surface-variant,#938F99)] shrink-0">
-                      chevron_right
-                    </span>
+                  chevron_right
+                </span>
               </button>
             </div>
           </div>

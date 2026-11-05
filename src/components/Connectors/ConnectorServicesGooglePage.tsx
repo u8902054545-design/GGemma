@@ -12,9 +12,66 @@ interface ConnectorServicesGooglePageProps {
   onClose: () => void;
 }
 
+const GoogleSwitch: React.FC<{
+  checked: boolean;
+  disabled?: boolean;
+  onChange: () => void;
+  ariaLabel?: string;
+}> = ({ checked, disabled = false, onChange, ariaLabel }) => {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={checked}
+      aria-label={ariaLabel}
+      disabled={disabled}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (!disabled) onChange();
+      }}
+      className={`relative inline-flex h-8 w-[52px] shrink-0 cursor-pointer items-center rounded-full border-2 transition-colors duration-200 ease-in-out focus:outline-none ${
+        disabled
+          ? 'opacity-40 cursor-not-allowed border-[var(--md-sys-color-outline-variant,#49454F)] bg-[var(--md-sys-color-surface-container-highest,#2B2930)]'
+          : checked
+          ? 'border-[var(--md-sys-color-primary,#D0BCFF)] bg-[var(--md-sys-color-primary,#D0BCFF)]'
+          : 'border-[var(--md-sys-color-outline,#79747E)] bg-[var(--md-sys-color-surface-container-highest,#2B2930)] hover:border-[var(--md-sys-color-outline-variant,#49454F)]'
+      }`}
+    >
+      <span
+        className={`pointer-events-none flex items-center justify-center rounded-full transition-all duration-200 ease-in-out ${
+          checked
+            ? 'translate-x-[22px] h-6 w-6 bg-[var(--md-sys-color-on-primary,#381E72)] text-[var(--md-sys-color-primary,#D0BCFF)] shadow-sm'
+            : 'translate-x-[6px] h-4 w-4 bg-[var(--md-sys-color-outline,#79747E)]'
+        }`}
+      >
+        {checked && (
+          <span className="material-symbols-outlined text-[15px] font-bold leading-none select-none">
+            check
+          </span>
+        )}
+      </span>
+    </button>
+  );
+};
+
 export const ConnectorServicesGooglePage: React.FC<ConnectorServicesGooglePageProps> = ({ isOpen, onClose }) => {
-  const { status, loading, actionLoading, error, connectGoogle, disconnectGoogle } = useConnectors('google_contacts');
+  const {
+    status,
+    loading,
+    actionLoading,
+    error,
+    connectGoogle,
+    disconnectGoogle,
+    toggleGroup,
+    toggleTool,
+    isGroupEnabled,
+    isToolEnabled,
+  } = useConnectors('google_contacts');
+
   const [selectedConnectorId, setSelectedConnectorId] = useState<ConnectorId | null>(null);
+
+  const isServicesGroupActive = status.connected && isGroupEnabled('services_google');
+  const isContactsToolActive = isToolEnabled('google_contacts');
 
   if (!isOpen) return null;
 
@@ -106,6 +163,24 @@ export const ConnectorServicesGooglePage: React.FC<ConnectorServicesGooglePagePr
                   </button>
                 )}
               </div>
+
+              {status.connected && (
+                <div className="mt-6 w-full max-w-md p-4 rounded-2xl bg-[var(--md-sys-color-surface-container-low,#141218)] border border-[var(--md-sys-color-outline-variant,#49454F)]/30 flex items-center justify-between gap-4 text-left">
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
+                      Enable for Gemma
+                    </span>
+                    <span className="text-[12px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
+                      Allow AI model to use Google Services during chat conversations
+                    </span>
+                  </div>
+                  <GoogleSwitch
+                    checked={isGroupEnabled('services_google')}
+                    onChange={() => toggleGroup('services_google')}
+                    ariaLabel="Toggle all Google Services connectors"
+                  />
+                </div>
+              )}
             </div>
 
             <section className="flex flex-col gap-3">
@@ -114,23 +189,34 @@ export const ConnectorServicesGooglePage: React.FC<ConnectorServicesGooglePagePr
               </h3>
 
               <div className="rounded-[24px] bg-[var(--md-sys-color-surface-container-low,#141218)] border border-[var(--md-sys-color-outline-variant,#49454F)]/30 divide-y divide-[var(--md-sys-color-outline-variant,#49454F)]/20 overflow-hidden">
-                <button
-                  type="button"
-                  onClick={() => setSelectedConnectorId('google_contacts')}
-                  className="w-full text-left p-4 flex items-start gap-3.5 hover:bg-[var(--md-sys-color-surface-container-highest,#2B2930)]/40 active:bg-[var(--md-sys-color-surface-container-highest,#2B2930)]/70 transition-colors cursor-pointer"
-                >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2">
-                    <GoogleContactsIcon className="w-6 h-6" />
+                <div className="w-full p-4 flex items-center justify-between gap-3.5 hover:bg-[var(--md-sys-color-surface-container-highest,#2B2930)]/40 transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedConnectorId('google_contacts')}
+                    className="flex items-start gap-3.5 flex-1 min-w-0 text-left cursor-pointer group"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[var(--md-sys-color-surface-container-highest,#2B2930)] p-2 group-hover:scale-105 transition-transform">
+                      <GoogleContactsIcon className="w-6 h-6" />
+                    </div>
+                    <div className="flex flex-col min-w-0 pr-2">
+                      <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)] truncate">
+                        Google Contacts
+                      </span>
+                      <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5 line-clamp-2">
+                        Search contacts, view address book, create and manage personal contact cards directly from chat.
+                      </span>
+                    </div>
+                  </button>
+
+                  <div className="shrink-0 flex items-center pl-2">
+                    <GoogleSwitch
+                      checked={isServicesGroupActive && isContactsToolActive}
+                      disabled={!status.connected || !isServicesGroupActive}
+                      onChange={() => toggleTool('google_contacts')}
+                      ariaLabel="Toggle Google Contacts"
+                    />
                   </div>
-                  <div className="flex flex-col min-w-0">
-                    <span className="text-[15px] font-medium text-[var(--md-sys-color-on-surface,#E6E0E9)]">
-                      Google Contacts
-                    </span>
-                    <span className="text-[13px] text-[var(--md-sys-color-on-surface-variant,#938F99)] mt-0.5">
-                      Search contacts, view address book, create and manage personal contact cards directly from chat.
-                    </span>
-                  </div>
-                </button>
+                </div>
               </div>
             </section>
           </div>

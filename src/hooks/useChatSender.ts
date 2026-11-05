@@ -4,6 +4,7 @@ import { Message, ImportedCode } from './chatTypes';
 import { saveTempMessages } from '../TemporaryChat/temporaryStorage';
 import { processImage, updateChatTitle } from './useChatSenderUtils';
 import { useChatHistory } from './useChatHistory';
+import { getLocalConnectorSettings } from './useConnectors';
 
 interface SelectedModel {
   id: string;
@@ -156,7 +157,8 @@ export const useChatSender = (
           editMessageId: editMessageId || null,
           isTranslationActive,
           translationInputLang,
-          translationOutputLang
+          translationOutputLang,
+          connectorSettings: getLocalConnectorSettings(),
         }),
       });
 
@@ -456,7 +458,8 @@ export const useChatSender = (
           regenerateMode: mode || 'repeat',
           isTranslationActive: userMsg.isTranslationActive,
           translationInputLang: userMsg.translationInputLang,
-          translationOutputLang: userMsg.translationOutputLang
+          translationOutputLang: userMsg.translationOutputLang,
+          connectorSettings: getLocalConnectorSettings(),
         }),
       });
 
