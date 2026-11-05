@@ -90,28 +90,28 @@ export const ConnectorDetailsModal: React.FC<ConnectorDetailsModalProps> = ({
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-[380px] max-h-[82vh] rounded-[28px] bg-[var(--md-sys-color-surface-container-high,#1E1F20)] text-[var(--md-sys-color-on-surface,#E3E3E3)] shadow-2xl flex flex-col overflow-hidden"
           >
-            <div className="px-6 pt-6 pb-6 overflow-y-auto flex-1">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-3.5 min-w-0">
-                  <div className="shrink-0 flex items-center justify-center">
-                    {renderIcon(connectorId)}
-                  </div>
-                  <h2 className="text-[22px] font-normal leading-7 text-[var(--md-sys-color-on-surface,#E3E3E3)] truncate">
-                    {details.title}
-                  </h2>
+            <div className="px-6 pt-6 pb-2 shrink-0 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3.5 min-w-0">
+                <div className="shrink-0 flex items-center justify-center">
+                  {renderIcon(connectorId)}
                 </div>
-
-                <button
-                  type="button"
-                  onClick={onClose}
-                  aria-label="Close"
-                  className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-[var(--md-sys-color-on-surface-variant,#C4C7C5)] hover:bg-white/10 active:scale-90 transition-all -mr-1.5"
-                >
-                  <span className="material-symbols-outlined text-[24px]">close</span>
-                </button>
+                <h2 className="text-[22px] font-normal leading-7 text-[var(--md-sys-color-on-surface,#E3E3E3)] truncate">
+                  {details.title}
+                </h2>
               </div>
 
-              <p className="mt-4 text-[14px] leading-[20px] text-[var(--md-sys-color-on-surface-variant,#C4C7C5)]">
+              <button
+                type="button"
+                onClick={onClose}
+                aria-label="Close"
+                className="flex h-9 w-9 shrink-0 cursor-pointer items-center justify-center rounded-full text-[var(--md-sys-color-on-surface-variant,#C4C7C5)] hover:bg-white/10 active:scale-90 transition-all -mr-1.5"
+              >
+                <span className="material-symbols-outlined text-[24px]">close</span>
+              </button>
+            </div>
+
+            <div className="px-6 pt-2 pb-6 overflow-y-auto flex-1">
+              <p className="text-[14px] leading-[20px] text-[var(--md-sys-color-on-surface-variant,#C4C7C5)]">
                 {details.description}
               </p>
 
